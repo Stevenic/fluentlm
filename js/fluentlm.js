@@ -112,21 +112,30 @@ var FluentLM = (function () {
   }
 
   /**
-   * Set theme ('light' or 'dark').
+   * Register a custom theme.
+   * @param {string} name      - Theme identifier (e.g. 'highcontrast')
+   * @param {string} className - CSS class applied to <html> (e.g. 'fluent-highcontrast')
+   */
+  function registerTheme(name, className) {
+    FluentTheme.register(name, className);
+  }
+
+  /**
+   * Set theme by name (e.g. 'light', 'dark', or any registered theme).
    */
   function setTheme(theme) {
     FluentTheme.setTheme(theme);
   }
 
   /**
-   * Toggle between light and dark. Returns new theme name.
+   * Toggle to the next theme. Returns new theme name.
    */
   function toggleTheme() {
     return FluentTheme.toggle();
   }
 
   /**
-   * Get current theme ('light' or 'dark').
+   * Get current theme name.
    */
   function getTheme() {
     return FluentTheme.current();
@@ -144,6 +153,7 @@ var FluentLM = (function () {
   return {
     init: init,
     refresh: refresh,
+    registerTheme: registerTheme,
     setTheme: setTheme,
     toggleTheme: toggleTheme,
     getTheme: getTheme,

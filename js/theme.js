@@ -1,26 +1,70 @@
 /**
  * FluentLM — Theme Manager
  *
- * Handles light/dark theme switching via class on <html>.
+ * Handles theme switching via class on <html>.
  * Respects prefers-color-scheme on first load.
+ *
+ * Built-in themes: light, dark.
+ * Register custom themes with FluentTheme.register(name, className).
  */
 var FluentTheme = (function () {
   'use strict';
 
-  var LIGHT = 'fluentlm';
-  var DARK = 'fluent-dark';
   var TRANSITION = 'fluent-theme-transition';
   var STORAGE_KEY = 'fluentlm-theme';
 
+  // Theme registry: name → CSS class
+  var themes = {
+    light: 'fluentlm',
+    dark: 'fluent-dark'
+  };
+
+  // Ordered list of theme names for cycling
+  var themeOrder = ['light', 'dark'];
+
+  /**
+   * Register a custom theme.
+   * @param {string} name  - Theme identifier (used with setTheme/getTheme)
+   * @param {string} className - CSS class applied to <html>
+   */
+  function register(name, className) {
+    if (!name || !className) { return; }
+    themes[name] = className;
+    if (themeOrder.indexOf(name) === -1) {
+      themeOrder.push(name);
+    }
+  }
+
+  function allClasses() {
+    var classes = [];
+    for (var key in themes) {
+      if (themes.hasOwnProperty(key)) { classes.push(themes[key]); }
+    }
+    return classes;
+  }
+
   function current() {
-    return document.documentElement.classList.contains(DARK) ? 'dark' : 'light';
+    var html = document.documentElement;
+    for (var i = themeOrder.length - 1; i >= 0; i--) {
+      if (html.classList.contains(themes[themeOrder[i]])) {
+        return themeOrder[i];
+      }
+    }
+    return 'light';
   }
 
   function setTheme(theme) {
+    var className = themes[theme];
+    if (!className) { return; }
+
     var html = document.documentElement;
     html.classList.add(TRANSITION);
-    html.classList.remove(LIGHT, DARK);
-    html.classList.add(theme === 'dark' ? DARK : LIGHT);
+
+    var classes = allClasses();
+    for (var i = 0; i < classes.length; i++) {
+      html.classList.remove(classes[i]);
+    }
+    html.classList.add(className);
 
     try { localStorage.setItem(STORAGE_KEY, theme); } catch (e) { /* noop */ }
 
@@ -30,7 +74,9 @@ var FluentTheme = (function () {
   }
 
   function toggle() {
-    setTheme(current() === 'light' ? 'dark' : 'light');
+    var idx = themeOrder.indexOf(current());
+    var next = themeOrder[(idx + 1) % themeOrder.length];
+    setTheme(next);
     return current();
   }
 
@@ -41,16 +87,24 @@ var FluentTheme = (function () {
     var stored;
     try { stored = localStorage.getItem(STORAGE_KEY); } catch (e) { /* noop */ }
 
-    if (stored === 'dark' || stored === 'light') {
-      html.classList.remove(LIGHT, DARK);
-      html.classList.add(stored === 'dark' ? DARK : LIGHT);
+    if (stored && themes[stored]) {
+      var classes = allClasses();
+      for (var i = 0; i < classes.length; i++) {
+        html.classList.remove(classes[i]);
+      }
+      html.classList.add(themes[stored]);
       return;
     }
 
-    // 2. Check OS preference (only if no class is already set)
-    if (!html.classList.contains(LIGHT) && !html.classList.contains(DARK)) {
+    // 2. Check OS preference (only if no theme class is already set)
+    var classes = allClasses();
+    var hasTheme = false;
+    for (var i = 0; i < classes.length; i++) {
+      if (html.classList.contains(classes[i])) { hasTheme = true; break; }
+    }
+    if (!hasTheme) {
       var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      html.classList.add(prefersDark ? DARK : LIGHT);
+      html.classList.add(prefersDark ? themes.dark : themes.light);
     }
   }
 
@@ -58,6 +112,7 @@ var FluentTheme = (function () {
     init: init,
     current: current,
     setTheme: setTheme,
-    toggle: toggle
+    toggle: toggle,
+    register: register
   };
 })();
