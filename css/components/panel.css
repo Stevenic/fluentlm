@@ -1,0 +1,105 @@
+/* Panel — slide-out surface from the right */
+
+.flm-panel-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--overlayBackground);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration3) var(--easeStandard);
+}
+
+.flm-panel-overlay--open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.flm-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 340px;
+  max-width: 100vw;
+  background-color: var(--bodyBackground);
+  box-shadow: var(--elevation64);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform var(--duration3) var(--easeDecelerate);
+}
+
+.flm-panel--open {
+  transform: translateX(0);
+}
+
+/* Size variants */
+.flm-panel--small       { width: 272px; }
+.flm-panel--medium      { width: 592px; }
+.flm-panel--large       { width: 940px; }
+.flm-panel--extraLarge  { width: 100%; max-width: 1200px; }
+.flm-panel--fluid       { width: 100%; }
+
+/* Left side variant */
+.flm-panel--left {
+  right: auto;
+  left: 0;
+  transform: translateX(-100%);
+}
+
+.flm-panel--left.flm-panel--open {
+  transform: translateX(0);
+}
+
+.flm-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacingM) var(--spacingL1);
+  flex-shrink: 0;
+}
+
+.flm-panel-title {
+  font-size: var(--fontSizeXLarge);
+  font-weight: var(--fontWeightSemibold);
+  line-height: var(--lineHeightXLarge);
+  color: var(--bodyText);
+  margin: 0;
+}
+
+.flm-panel-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--roundedCorner2);
+  background: transparent;
+  color: var(--bodySubtext);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.flm-panel-close:hover {
+  background-color: var(--buttonBackgroundHovered);
+  color: var(--bodyText);
+}
+
+.flm-panel-body {
+  padding: 0 var(--spacingL1);
+  overflow-y: auto;
+  flex: 1;
+}
+
+.flm-panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacingS1);
+  padding: var(--spacingM) var(--spacingL1);
+  border-top: 1px solid var(--bodyDivider);
+  flex-shrink: 0;
+}

@@ -1,0 +1,116 @@
+/* TeachingBubble — Guided callout with inverted colors */
+
+.flm-teachingbubble {
+  position: absolute;
+  z-index: 1000;
+  background-color: var(--themePrimary);
+  color: var(--white);
+  border-radius: var(--roundedCorner2);
+  box-shadow: var(--elevation16);
+  max-width: 364px;
+  min-width: 240px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity var(--duration1) var(--easeStandard),
+              transform var(--duration1) var(--easeDecelerate);
+  font-family: var(--fontFamily);
+}
+
+.flm-teachingbubble--visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Header */
+.flm-teachingbubble-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--spacingM) var(--spacingM) 0;
+}
+
+.flm-teachingbubble-headline {
+  font-size: var(--fontSizeMediumPlus);
+  font-weight: var(--fontWeightSemibold);
+  line-height: var(--lineHeightMediumPlus);
+  color: var(--white);
+  margin: 0;
+}
+
+/* Close button */
+.flm-teachingbubble-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  padding: 0;
+  border-radius: var(--roundedCorner2);
+  opacity: 0.8;
+  flex-shrink: 0;
+}
+
+.flm-teachingbubble-close:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Body text */
+.flm-teachingbubble-body {
+  padding: var(--spacingS1) var(--spacingM);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Footer with action buttons */
+.flm-teachingbubble-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacingS1);
+  padding: var(--spacingS1) var(--spacingM) var(--spacingM);
+}
+
+/* Button overrides inside teaching bubble */
+.flm-teachingbubble .flm-button {
+  border-color: var(--white);
+  color: var(--white);
+  background-color: transparent;
+}
+
+.flm-teachingbubble .flm-button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.flm-teachingbubble .flm-button--primary {
+  background-color: var(--white);
+  color: var(--themePrimary);
+  border-color: var(--white);
+}
+
+.flm-teachingbubble .flm-button--primary:hover {
+  background-color: rgba(255, 255, 255, 0.85);
+}
+
+/* Beak */
+.flm-teachingbubble-beak {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: var(--themePrimary);
+  transform: rotate(45deg);
+  top: -8px;
+  left: 24px; /* default; overridden by JS to point at target */
+}
+
+.flm-teachingbubble--above .flm-teachingbubble-beak {
+  top: auto;
+  bottom: -8px;
+}

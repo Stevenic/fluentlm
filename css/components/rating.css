@@ -1,0 +1,108 @@
+/* Rating — Star rating control */
+
+.flm-rating {
+  display: inline-flex;
+  flex-direction: row-reverse;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--fontFamily);
+}
+
+/* Hide native radio */
+.flm-rating-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* Star label */
+.flm-rating-star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  color: var(--neutralTertiary);
+  transition: color var(--duration1) var(--easeStandard);
+}
+
+/* Star shape via clip-path */
+.flm-rating-star::before {
+  content: '';
+  display: block;
+  width: 18px;
+  height: 18px;
+  background-color: currentColor;
+  clip-path: polygon(
+    50% 0%,
+    63% 35%,
+    100% 35%,
+    69% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    31% 57%,
+    0% 35%,
+    37% 35%
+  );
+}
+
+/* Hover: current star and all lower via sibling combinator */
+.flm-rating-star:hover,
+.flm-rating-star:hover ~ .flm-rating-star {
+  color: var(--themePrimary);
+}
+
+/* Checked: fill current and all lower stars (row-reverse makes ~ go to lower values) */
+.flm-rating-input:checked + .flm-rating-star,
+.flm-rating-input:checked + .flm-rating-star ~ .flm-rating-star {
+  color: var(--themePrimary);
+}
+
+/* Focus */
+.flm-rating-input:focus-visible + .flm-rating-star {
+  outline: var(--focusOutlineWidth) solid var(--focusBorder);
+  outline-offset: var(--focusOutlineOffset);
+  border-radius: var(--roundedCorner2);
+}
+
+/* Readonly variant */
+.flm-rating--readonly .flm-rating-star {
+  cursor: default;
+  pointer-events: none;
+}
+
+.flm-rating--readonly .flm-rating-star--empty {
+  color: var(--neutralTertiary);
+}
+
+.flm-rating--readonly .flm-rating-star--filled {
+  color: var(--themePrimary);
+}
+
+/* Disabled */
+.flm-rating--disabled .flm-rating-star {
+  cursor: default;
+  pointer-events: none;
+  color: var(--disabledText);
+}
+
+.flm-rating--disabled .flm-rating-input:checked + .flm-rating-star,
+.flm-rating--disabled .flm-rating-input:checked + .flm-rating-star ~ .flm-rating-star {
+  color: var(--disabledText);
+}
+
+/* Large variant */
+.flm-rating--large .flm-rating-star {
+  width: 32px;
+  height: 32px;
+}
+
+.flm-rating--large .flm-rating-star::before {
+  width: 24px;
+  height: 24px;
+}

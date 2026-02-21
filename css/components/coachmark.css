@@ -1,0 +1,60 @@
+/* Coachmark — Pulsing beacon that reveals a TeachingBubble */
+
+@keyframes flm-coachmark-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.flm-coachmark {
+  position: absolute;
+  z-index: 999;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Central dot */
+.flm-coachmark-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--themePrimary);
+  position: relative;
+  z-index: 1;
+}
+
+/* Pulsing ring */
+.flm-coachmark-ring {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--themePrimary);
+  animation: flm-coachmark-pulse 1.5s ease-out infinite;
+  top: 50%;
+  left: 50%;
+  margin-top: -6px;
+  margin-left: -6px;
+  box-sizing: border-box;
+}
+
+/* Hidden state (after teaching bubble dismissed) */
+.flm-coachmark--hidden {
+  display: none;
+}
+
+/* Color variants */
+.flm-coachmark--dark .flm-coachmark-dot {
+  background-color: var(--themeDark);
+}
+
+.flm-coachmark--dark .flm-coachmark-ring {
+  border-color: var(--themeDark);
+}

@@ -1,0 +1,108 @@
+/* List — Simple scrollable list */
+
+.flm-list {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  color: var(--bodyText);
+}
+
+/* Bordered variant */
+.flm-list--bordered {
+  border: 1px solid var(--variantBorder);
+  border-radius: var(--roundedCorner2);
+}
+
+/* Scrollable variant */
+.flm-list--scrollable {
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+/* Compact variant */
+.flm-list--compact .flm-list-item {
+  min-height: 28px;
+  padding: 2px var(--spacingS1);
+  font-size: var(--fontSizeSmall);
+}
+
+/* List items */
+.flm-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingS1);
+  min-height: 36px;
+  padding: 4px var(--spacingS1);
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+  border-bottom: 1px solid transparent;
+}
+
+.flm-list--bordered .flm-list-item {
+  border-bottom-color: var(--variantBorder);
+}
+
+.flm-list--bordered .flm-list-item:last-child {
+  border-bottom-color: transparent;
+}
+
+/* Hover */
+.flm-list-item:hover {
+  background-color: var(--listItemBackgroundHovered);
+}
+
+/* Selected */
+.flm-list-item--selected {
+  background-color: var(--listItemBackgroundChecked);
+}
+
+.flm-list-item--selected:hover {
+  background-color: var(--listItemBackgroundCheckedHovered);
+}
+
+/* Disabled */
+.flm-list-item--disabled {
+  color: var(--disabledText);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Icon slot */
+.flm-list-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--bodySubtext);
+}
+
+/* Text content */
+.flm-list-item-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.flm-list-item-primary {
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  color: var(--bodyText);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.flm-list-item-secondary {
+  font-size: var(--fontSizeSmall);
+  line-height: var(--lineHeightSmall);
+  color: var(--bodySubtext);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

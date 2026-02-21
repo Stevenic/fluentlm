@@ -1,0 +1,16 @@
+/* Overlay — semi-transparent backdrop for modals/panels/dialogs */
+
+.flm-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--overlayBackground);
+  z-index: 1000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration2) var(--easeStandard);
+}
+
+.flm-overlay--visible {
+  opacity: 1;
+  pointer-events: auto;
+}

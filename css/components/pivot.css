@@ -1,0 +1,83 @@
+/* Pivot — tab navigation */
+
+.flm-pivot {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--fontFamily);
+}
+
+.flm-pivot-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--bodyDivider);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE/Edge */
+  flex-shrink: 0;
+}
+
+.flm-pivot-tabs::-webkit-scrollbar { display: none; }
+
+.flm-pivot-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacingS2);
+  padding: var(--spacingS1) var(--spacingS1);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--bodyText);
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  font-weight: var(--fontWeightRegular);
+  line-height: var(--lineHeightMedium);
+  cursor: pointer;
+  white-space: nowrap;
+  margin-bottom: -1px;
+  transition: color var(--duration1) var(--easeStandard),
+              border-color var(--duration1) var(--easeStandard);
+}
+
+.flm-pivot-tab:hover {
+  color: var(--bodyText);
+  background-color: var(--buttonBackgroundHovered);
+}
+
+.flm-pivot-tab--active {
+  color: var(--themePrimary);
+  font-weight: var(--fontWeightSemibold);
+  border-bottom-color: var(--themePrimary);
+}
+
+.flm-pivot-tab--disabled {
+  color: var(--disabledText);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Pivot content panels */
+.flm-pivot-panel {
+  display: none;
+  padding: var(--spacingM) 0;
+}
+
+.flm-pivot-panel--active {
+  display: block;
+}
+
+/* Link-style variant (underline) */
+.flm-pivot--links .flm-pivot-tab {
+  padding: var(--spacingS1) var(--spacingM);
+}
+
+/* Tab-style variant (filled tabs) */
+.flm-pivot--tabs .flm-pivot-tab {
+  border-bottom: none;
+  border-radius: var(--roundedCorner2) var(--roundedCorner2) 0 0;
+}
+
+.flm-pivot--tabs .flm-pivot-tab--active {
+  background-color: var(--bodyBackground);
+  border: 1px solid var(--bodyDivider);
+  border-bottom-color: var(--bodyBackground);
+}

@@ -1,0 +1,80 @@
+/* CommandBar — horizontal toolbar */
+
+.flm-commandbar {
+  display: flex;
+  align-items: stretch;
+  height: 44px;
+  background-color: var(--bodyBackground);
+  border-bottom: 1px solid var(--bodyDivider);
+  padding: 0 var(--spacingS2);
+  font-family: var(--fontFamily);
+}
+
+.flm-commandbar-items {
+  display: flex;
+  align-items: stretch;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.flm-commandbar-far {
+  display: flex;
+  align-items: stretch;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.flm-commandbar-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacingS2);
+  padding: 0 var(--spacingS1);
+  border: none;
+  background: transparent;
+  color: var(--bodyText);
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  cursor: pointer;
+  white-space: nowrap;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.flm-commandbar-item:hover {
+  background-color: var(--buttonBackgroundHovered);
+  color: var(--buttonTextHovered);
+}
+
+.flm-commandbar-item:active {
+  background-color: var(--buttonBackgroundPressed);
+}
+
+.flm-commandbar-item[disabled] {
+  color: var(--disabledText);
+  cursor: default;
+  pointer-events: none;
+}
+
+.flm-commandbar-divider {
+  width: 1px;
+  align-self: stretch;
+  margin: 8px 4px;
+  background-color: var(--bodyDivider);
+}
+
+/* Overflow button */
+.flm-commandbar-overflow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  border: none;
+  background: transparent;
+  color: var(--bodyText);
+  cursor: pointer;
+}
+
+.flm-commandbar-overflow:hover {
+  background-color: var(--buttonBackgroundHovered);
+}

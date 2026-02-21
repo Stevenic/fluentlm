@@ -1,0 +1,52 @@
+/* Callout — positioned popup anchored to a target element */
+
+.flm-callout {
+  position: absolute;
+  z-index: 1000;
+  background-color: var(--bodyBackground);
+  border-radius: var(--roundedCorner2);
+  box-shadow: var(--elevation16);
+  border: 1px solid var(--variantBorder);
+  max-width: 364px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity var(--duration1) var(--easeStandard),
+              transform var(--duration1) var(--easeDecelerate);
+}
+
+.flm-callout--visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.flm-callout-body {
+  padding: var(--spacingM);
+}
+
+/* Beak / arrow */
+.flm-callout-beak {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background-color: var(--bodyBackground);
+  border: 1px solid var(--variantBorder);
+  transform: rotate(45deg);
+  border-right: none;
+  border-bottom: none;
+  top: -9px;
+  left: 24px;
+}
+
+.flm-callout--below .flm-callout-beak {
+  top: -9px;
+}
+
+.flm-callout--above .flm-callout-beak {
+  top: auto;
+  bottom: -9px;
+  border: 1px solid var(--variantBorder);
+  border-left: none;
+  border-top: none;
+}

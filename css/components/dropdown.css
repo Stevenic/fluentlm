@@ -1,0 +1,151 @@
+/* Dropdown — custom dropdown (non-native) */
+
+.flm-dropdown {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  font-family: var(--fontFamily);
+}
+
+/* Trigger button — styled to match ComboBox wrapper */
+.flm-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 32px;
+  border: 1px solid var(--inputBorder);
+  border-radius: var(--roundedCorner2);
+  background-color: var(--inputBackground);
+  box-sizing: border-box;
+  cursor: pointer;
+  padding: 0;
+  overflow: hidden;
+  text-align: left;
+  font-family: var(--fontFamily);
+}
+
+.flm-dropdown-trigger:hover {
+  border-color: var(--inputBorderHovered);
+}
+
+.flm-dropdown-trigger:focus {
+  border-color: var(--inputFocusBorderAlt);
+  border-bottom-width: 2px;
+  outline: none;
+}
+
+.flm-dropdown-title {
+  flex: 1;
+  padding: 0 8px;
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  color: var(--inputText);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flm-dropdown-title--placeholder {
+  color: var(--inputPlaceholderText);
+}
+
+.flm-dropdown-caret {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 100%;
+  color: var(--bodySubtext);
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+/* Options listbox */
+.flm-dropdown-listbox {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin-top: 2px;
+  z-index: 1000;
+  background-color: var(--bodyBackground);
+  border: 1px solid var(--variantBorder);
+  border-radius: var(--roundedCorner2);
+  box-shadow: var(--elevation8);
+  max-height: 220px;
+  overflow-y: auto;
+  display: none;
+}
+
+.flm-dropdown-listbox--open {
+  display: block;
+}
+
+.flm-dropdown-listbox--above {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+
+.flm-dropdown-option {
+  display: flex;
+  align-items: center;
+  padding: 6px var(--spacingS1);
+  min-height: 32px;
+  cursor: pointer;
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  color: var(--bodyText);
+  box-sizing: border-box;
+}
+
+.flm-dropdown-option:hover,
+.flm-dropdown-option--highlighted {
+  background-color: var(--listItemBackgroundHovered);
+}
+
+.flm-dropdown-option--selected {
+  background-color: var(--listItemBackgroundChecked);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.flm-dropdown-option--disabled {
+  color: var(--disabledText);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Hidden input for form value */
+.flm-dropdown-value {
+  display: none;
+}
+
+/* Disabled */
+.flm-dropdown--disabled .flm-dropdown-trigger {
+  border-color: var(--disabledBorder);
+  background-color: var(--disabledBackground);
+  cursor: default;
+}
+
+.flm-dropdown--disabled .flm-dropdown-title {
+  color: var(--disabledText);
+}
+
+.flm-dropdown--disabled .flm-dropdown-caret {
+  color: var(--disabledText);
+}
+
+/* Error */
+.flm-dropdown--error .flm-dropdown-trigger {
+  border-color: var(--errorText);
+}
+
+.flm-dropdown-error {
+  display: block;
+  font-size: var(--fontSizeSmall);
+  line-height: var(--lineHeightSmall);
+  color: var(--errorText);
+  padding-top: 5px;
+}

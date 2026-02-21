@@ -1,0 +1,153 @@
+/* TimePicker — Time input with scrollable dropdown of time slots */
+
+.flm-timepicker {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  font-family: var(--fontFamily);
+}
+
+.flm-timepicker-wrapper {
+  display: flex;
+  align-items: stretch;
+  height: 32px;
+  border: 1px solid var(--inputBorder);
+  border-radius: var(--roundedCorner2);
+  background-color: var(--inputBackground);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.flm-timepicker-wrapper:hover {
+  border-color: var(--inputBorderHovered);
+}
+
+.flm-timepicker-wrapper:focus-within {
+  border-color: var(--inputFocusBorderAlt);
+  border-bottom-width: 2px;
+}
+
+.flm-timepicker-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--inputText);
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  padding: 0 8px;
+  outline: none;
+  min-width: 0;
+}
+
+.flm-timepicker-input::placeholder {
+  color: var(--inputPlaceholderText);
+}
+
+/* Clock icon button */
+.flm-timepicker-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  border: none;
+  background: transparent;
+  color: var(--bodySubtext);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.flm-timepicker-icon:hover {
+  background-color: var(--listItemBackgroundHovered);
+  color: var(--bodyText);
+}
+
+/* Dropdown listbox */
+.flm-timepicker-listbox {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 2px;
+  z-index: 1000;
+  background-color: var(--bodyBackground);
+  border: 1px solid var(--variantBorder);
+  border-radius: var(--roundedCorner2);
+  box-shadow: var(--elevation8);
+  display: none;
+  width: 100%;
+  max-height: 220px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.flm-timepicker-listbox--open {
+  display: block;
+}
+
+.flm-timepicker-listbox--above {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+
+/* Option rows */
+.flm-timepicker-option {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 8px;
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  color: var(--bodyText);
+  cursor: pointer;
+  user-select: none;
+}
+
+.flm-timepicker-option:hover {
+  background-color: var(--listItemBackgroundHovered);
+}
+
+.flm-timepicker-option--highlighted {
+  background-color: var(--listItemBackgroundHovered);
+}
+
+.flm-timepicker-option--selected {
+  background-color: var(--listItemBackgroundChecked);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.flm-timepicker-option--hidden {
+  display: none;
+}
+
+/* Disabled state */
+.flm-timepicker--disabled .flm-timepicker-wrapper {
+  border-color: var(--disabledBorder);
+  background-color: var(--disabledBackground);
+}
+
+.flm-timepicker--disabled .flm-timepicker-input {
+  color: var(--disabledText);
+}
+
+.flm-timepicker--disabled .flm-timepicker-icon {
+  color: var(--disabledText);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Error state */
+.flm-timepicker--error .flm-timepicker-wrapper {
+  border-color: var(--errorText);
+}
+
+.flm-timepicker-error {
+  display: block;
+  font-size: var(--fontSizeSmall);
+  line-height: var(--lineHeightSmall);
+  color: var(--errorText);
+  padding-top: 5px;
+}

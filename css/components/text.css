@@ -1,0 +1,61 @@
+/* Text — Typography component */
+
+.flm-text {
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  font-weight: var(--fontWeightRegular);
+  color: var(--bodyText);
+}
+
+/* Size variants */
+.flm-text--tiny       { font-size: var(--fontSizeTiny);       line-height: var(--lineHeightTiny); }
+.flm-text--xSmall     { font-size: var(--fontSizeXSmall);     line-height: var(--lineHeightXSmall); }
+.flm-text--small      { font-size: var(--fontSizeSmall);      line-height: var(--lineHeightSmall); }
+.flm-text--smallPlus  { font-size: var(--fontSizeSmallPlus);  line-height: var(--lineHeightSmallPlus); }
+.flm-text--medium     { font-size: var(--fontSizeMedium);     line-height: var(--lineHeightMedium); }
+.flm-text--mediumPlus { font-size: var(--fontSizeMediumPlus); line-height: var(--lineHeightMediumPlus); }
+.flm-text--large      { font-size: var(--fontSizeLarge);      line-height: var(--lineHeightLarge); }
+
+.flm-text--xLarge {
+  font-size: var(--fontSizeXLarge);
+  line-height: var(--lineHeightXLarge);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.flm-text--xxLarge {
+  font-size: var(--fontSizeXXLarge);
+  line-height: var(--lineHeightXXLarge);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.flm-text--superLarge {
+  font-size: var(--fontSizeSuperLarge);
+  line-height: var(--lineHeightSuperLarge);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.flm-text--mega {
+  font-size: var(--fontSizeMega);
+  line-height: var(--lineHeightMega);
+  font-weight: var(--fontWeightSemibold);
+}
+
+/* Color variants */
+.flm-text--secondary { color: var(--bodySubtext); }
+.flm-text--disabled  { color: var(--disabledText); }
+.flm-text--error     { color: var(--errorText); }
+.flm-text--success   { color: var(--successText); }
+
+/* Weight variants */
+.flm-text--semibold { font-weight: var(--fontWeightSemibold); }
+.flm-text--bold     { font-weight: var(--fontWeightBold); }
+
+/* Display variants */
+.flm-text--block { display: block; }
+
+.flm-text--nowrap {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

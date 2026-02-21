@@ -1,0 +1,88 @@
+/* GroupedList — Collapsible grouped items */
+
+.flm-groupedlist {
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  width: 100%;
+}
+
+.flm-groupedlist-group {
+  margin-bottom: var(--spacingS2);
+}
+
+.flm-groupedlist-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingS2);
+  padding: var(--spacingS2) var(--spacingS1);
+  font-size: var(--fontSizeMedium);
+  font-weight: var(--fontWeightSemibold);
+  color: var(--bodyText);
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+
+.flm-groupedlist-header:hover {
+  background-color: var(--listItemBackgroundHovered);
+}
+
+/* Chevron */
+.flm-groupedlist-chevron {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  transition: transform var(--duration1) var(--easeStandard);
+  flex-shrink: 0;
+}
+
+.flm-groupedlist-chevron--expanded {
+  transform: rotate(90deg);
+}
+
+/* Items container */
+.flm-groupedlist-items {
+  overflow: hidden;
+}
+
+.flm-groupedlist-items--collapsed {
+  display: none;
+}
+
+/* Individual items */
+.flm-groupedlist-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingS1);
+  padding: 6px var(--spacingS1) 6px var(--spacingL2);
+  min-height: 36px;
+  color: var(--bodyText);
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.flm-groupedlist-item:hover {
+  background-color: var(--listItemBackgroundHovered);
+}
+
+.flm-groupedlist-item--selected {
+  background-color: var(--listItemBackgroundChecked);
+}
+
+.flm-groupedlist-item--disabled {
+  color: var(--disabledText);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Group count badge */
+.flm-groupedlist-count {
+  font-size: var(--fontSizeSmall);
+  color: var(--bodySubtext);
+  font-weight: var(--fontWeightRegular);
+  margin-left: var(--spacingS2);
+}

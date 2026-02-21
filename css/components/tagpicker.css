@@ -1,0 +1,243 @@
+/* TagPicker / PeoplePicker — multi-select input with chip/tag UI */
+
+.flm-tagpicker {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  font-family: var(--fontFamily);
+}
+
+/* Well — flex-wrap input area holding chips + input */
+.flm-tagpicker-well {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 2px 4px;
+  border: 1px solid var(--inputBorder);
+  border-radius: var(--roundedCorner2);
+  background-color: var(--inputBackground);
+  box-sizing: border-box;
+  cursor: text;
+}
+
+.flm-tagpicker-well:hover {
+  border-color: var(--inputBorderHovered);
+}
+
+.flm-tagpicker-well:focus-within {
+  border-color: var(--inputFocusBorderAlt);
+  border-bottom-width: 2px;
+}
+
+/* Chip / Tag pill */
+.flm-tagpicker-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  padding: 0 4px 0 8px;
+  background-color: var(--neutralLight);
+  border-radius: var(--roundedCorner4);
+  font-size: var(--fontSizeSmall);
+  line-height: var(--lineHeightSmall);
+  color: var(--bodyText);
+  max-width: 200px;
+  box-sizing: border-box;
+}
+
+.flm-tagpicker-chip-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flm-tagpicker-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
+  border: none;
+  background: transparent;
+  color: var(--bodySubtext);
+  cursor: pointer;
+  padding: 0;
+  border-radius: var(--roundedCorner2);
+  flex-shrink: 0;
+}
+
+.flm-tagpicker-chip-remove:hover {
+  background-color: var(--neutralQuaternary);
+  color: var(--bodyText);
+}
+
+.flm-tagpicker-chip-remove svg {
+  width: 8px;
+  height: 8px;
+  fill: currentColor;
+}
+
+/* Input inside the well */
+.flm-tagpicker-input {
+  flex: 1;
+  min-width: 80px;
+  border: none;
+  background: transparent;
+  color: var(--inputText);
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  padding: 2px 4px;
+  outline: none;
+}
+
+.flm-tagpicker-input::placeholder {
+  color: var(--inputPlaceholderText);
+}
+
+/* Listbox (option dropdown) */
+.flm-tagpicker-listbox {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin-top: 2px;
+  z-index: 1000;
+  background-color: var(--bodyBackground);
+  border: 1px solid var(--variantBorder);
+  border-radius: var(--roundedCorner2);
+  box-shadow: var(--elevation8);
+  max-height: 220px;
+  overflow-y: auto;
+  display: none;
+}
+
+.flm-tagpicker-listbox--open {
+  display: block;
+}
+
+.flm-tagpicker-listbox--above {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+
+/* Option */
+.flm-tagpicker-option {
+  display: flex;
+  align-items: center;
+  padding: 6px var(--spacingS1);
+  min-height: 32px;
+  cursor: pointer;
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  color: var(--bodyText);
+  box-sizing: border-box;
+}
+
+.flm-tagpicker-option:hover,
+.flm-tagpicker-option--highlighted {
+  background-color: var(--listItemBackgroundHovered);
+}
+
+.flm-tagpicker-option--selected {
+  color: var(--disabledText);
+  cursor: default;
+}
+
+.flm-tagpicker-option--hidden {
+  display: none;
+}
+
+/* PeoplePicker variant — option with persona coin */
+.flm-tagpicker--people .flm-tagpicker-option {
+  gap: var(--spacingS2);
+}
+
+.flm-tagpicker-option-coin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--themePrimary);
+  color: var(--white);
+  font-size: 10px;
+  font-weight: var(--fontWeightSemibold);
+  flex-shrink: 0;
+}
+
+.flm-tagpicker-option-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.flm-tagpicker-option-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.flm-tagpicker-option-secondary {
+  font-size: var(--fontSizeSmall);
+  line-height: var(--lineHeightSmall);
+  color: var(--bodySubtext);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* PeoplePicker chip with small coin */
+.flm-tagpicker-chip-coin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: var(--themePrimary);
+  color: var(--white);
+  font-size: 8px;
+  font-weight: var(--fontWeightSemibold);
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+/* Disabled state */
+.flm-tagpicker--disabled .flm-tagpicker-well {
+  border-color: var(--disabledBorder);
+  background-color: var(--disabledBackground);
+  cursor: default;
+}
+
+.flm-tagpicker--disabled .flm-tagpicker-input {
+  color: var(--disabledText);
+}
+
+.flm-tagpicker--disabled .flm-tagpicker-chip {
+  background-color: var(--neutralLighter);
+  color: var(--disabledText);
+}
+
+.flm-tagpicker--disabled .flm-tagpicker-chip-remove {
+  display: none;
+}
+
+/* Error state */
+.flm-tagpicker--error .flm-tagpicker-well {
+  border-color: var(--errorText);
+}
+
+.flm-tagpicker-error {
+  display: block;
+  font-size: var(--fontSizeSmall);
+  line-height: var(--lineHeightSmall);
+  color: var(--errorText);
+  padding-top: 5px;
+}

@@ -1,0 +1,99 @@
+/* SpinButton — Numeric input with increment/decrement */
+
+.flm-spinbutton {
+  display: inline-flex;
+  align-items: stretch;
+  height: 32px;
+  border: 1px solid var(--inputBorder);
+  border-radius: var(--roundedCorner2);
+  background-color: var(--inputBackground);
+  font-family: var(--fontFamily);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.flm-spinbutton:hover {
+  border-color: var(--inputBorderHovered);
+}
+
+.flm-spinbutton:focus-within {
+  border-color: var(--inputFocusBorderAlt);
+  border-bottom-width: 2px;
+}
+
+/* Label above the spinbutton */
+.flm-spinbutton-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Hide native spinners */
+.flm-spinbutton-input {
+  border: none;
+  background: transparent;
+  color: var(--inputText);
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  padding: 0 8px;
+  width: 80px;
+  height: 100%;
+  outline: none;
+  box-sizing: border-box;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+.flm-spinbutton-input::-webkit-outer-spin-button,
+.flm-spinbutton-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Buttons */
+.flm-spinbutton-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  border: none;
+  background: transparent;
+  color: var(--bodySubtext);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.flm-spinbutton-btn:hover {
+  background-color: var(--listItemBackgroundHovered);
+  color: var(--bodyText);
+}
+
+.flm-spinbutton-btn:active {
+  background-color: var(--listItemBackgroundChecked);
+}
+
+.flm-spinbutton-btn--decrement {
+  border-right: 1px solid var(--variantBorder);
+}
+
+.flm-spinbutton-btn--increment {
+  border-left: 1px solid var(--variantBorder);
+}
+
+/* Disabled */
+.flm-spinbutton--disabled {
+  border-color: var(--disabledBorder);
+  background-color: var(--disabledBackground);
+}
+
+.flm-spinbutton--disabled .flm-spinbutton-input {
+  color: var(--disabledText);
+}
+
+.flm-spinbutton--disabled .flm-spinbutton-btn {
+  color: var(--disabledText);
+  cursor: default;
+  pointer-events: none;
+}

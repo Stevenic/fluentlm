@@ -1,0 +1,92 @@
+/* Nav — hierarchical navigation */
+
+.flm-nav {
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  width: 100%;
+}
+
+.flm-nav-group {
+  margin-bottom: var(--spacingS2);
+}
+
+.flm-nav-group-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingS2);
+  padding: var(--spacingS2) var(--spacingS1);
+  font-size: var(--fontSizeSmall);
+  font-weight: var(--fontWeightSemibold);
+  color: var(--bodySubtext);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+}
+
+.flm-nav-group-header:hover {
+  color: var(--bodyText);
+}
+
+.flm-nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingS1);
+  padding: 6px var(--spacingS1) 6px var(--spacingM);
+  color: var(--bodyText);
+  text-decoration: none;
+  border-radius: var(--roundedCorner2);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+}
+
+.flm-nav-link:hover {
+  background-color: var(--listItemBackgroundHovered);
+  text-decoration: none;
+}
+
+.flm-nav-link--active {
+  border-left-color: var(--themePrimary);
+  background-color: var(--listItemBackgroundChecked);
+  font-weight: var(--fontWeightSemibold);
+  color: var(--themePrimary);
+}
+
+.flm-nav-link--disabled {
+  color: var(--disabledText);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Nested links (indented) */
+.flm-nav-link--nested {
+  padding-left: var(--spacingL2);
+}
+
+/* Chevron for expandable groups */
+.flm-nav-chevron {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  transition: transform var(--duration1) var(--easeStandard);
+  flex-shrink: 0;
+}
+
+.flm-nav-chevron--expanded {
+  transform: rotate(90deg);
+}
+
+/* Collapsible group content */
+.flm-nav-group-items {
+  overflow: hidden;
+}
+
+.flm-nav-group-items--collapsed {
+  display: none;
+}

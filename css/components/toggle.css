@@ -1,0 +1,128 @@
+/* Toggle */
+
+.flm-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacingS1);
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  color: var(--bodyText);
+  position: relative;
+}
+
+/* Hide native checkbox */
+.flm-toggle-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.flm-toggle-label {
+  font-weight: var(--fontWeightSemibold);
+}
+
+/* Track (pill shape) */
+.flm-toggle-track {
+  display: inline-flex;
+  align-items: center;
+  width: 40px;
+  height: 20px;
+  padding: 0 3px;
+  border: 1px solid var(--smallInputBorder);
+  border-radius: 10px;
+  background-color: var(--inputBackground);
+  transition: background-color var(--duration2) var(--easeStandard),
+              border-color var(--duration2) var(--easeStandard);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+/* Thumb (circle) */
+.flm-toggle-thumb {
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--smallInputBorder);
+  transition: transform var(--duration2) var(--easeStandard),
+              background-color var(--duration2) var(--easeStandard);
+}
+
+/* Hover */
+.flm-toggle:hover .flm-toggle-track {
+  border-color: var(--inputBorderHovered);
+}
+
+.flm-toggle:hover .flm-toggle-thumb {
+  background-color: var(--inputBorderHovered);
+}
+
+/* Checked */
+.flm-toggle-input:checked ~ .flm-toggle-track {
+  background-color: var(--inputBackgroundChecked);
+  border-color: var(--inputBackgroundChecked);
+}
+
+.flm-toggle-input:checked ~ .flm-toggle-track .flm-toggle-thumb {
+  background-color: var(--inputForegroundChecked);
+  transform: translateX(20px);
+}
+
+/* Checked + hover */
+.flm-toggle:hover .flm-toggle-input:checked ~ .flm-toggle-track {
+  background-color: var(--inputBackgroundCheckedHovered);
+  border-color: var(--inputBackgroundCheckedHovered);
+}
+
+/* Focus */
+.flm-toggle-input:focus-visible ~ .flm-toggle-track {
+  outline: var(--focusOutlineWidth) solid var(--focusBorder);
+  outline-offset: var(--focusOutlineOffset);
+}
+
+/* State text */
+.flm-toggle-state {
+  font-size: var(--fontSizeMedium);
+  color: var(--bodySubtext);
+}
+
+/* Show data-off by default, data-on when checked */
+.flm-toggle-state::after {
+  content: attr(data-off);
+}
+
+.flm-toggle-input:checked ~ .flm-toggle-state::after {
+  content: attr(data-on);
+}
+
+/* Disabled */
+.flm-toggle--disabled,
+.flm-toggle:has(.flm-toggle-input:disabled) {
+  cursor: default;
+  color: var(--disabledText);
+}
+
+.flm-toggle-input:disabled ~ .flm-toggle-track {
+  background-color: var(--disabledBackground);
+  border-color: var(--disabledBorder);
+}
+
+.flm-toggle-input:disabled ~ .flm-toggle-track .flm-toggle-thumb {
+  background-color: var(--disabledText);
+}
+
+.flm-toggle-input:disabled:checked ~ .flm-toggle-track {
+  background-color: var(--disabledBackground);
+  border-color: var(--disabledBorder);
+}
+
+/* Inline variant */
+.flm-toggle--inline {
+  flex-direction: row;
+}

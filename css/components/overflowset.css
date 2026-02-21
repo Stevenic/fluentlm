@@ -1,0 +1,61 @@
+/* OverflowSet — responsive container that hides items into overflow menu */
+
+.flm-overflowset {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  font-family: var(--fontFamily);
+}
+
+.flm-overflowset-items {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingS2);
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
+
+.flm-overflowset-item {
+  flex-shrink: 0;
+}
+
+.flm-overflowset-item--hidden {
+  display: none;
+}
+
+/* Overflow "..." button */
+.flm-overflowset-overflow {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--bodySubtext);
+  cursor: pointer;
+  padding: 0;
+  border-radius: var(--roundedCorner2);
+  flex-shrink: 0;
+  font-size: var(--fontSizeMedium);
+}
+
+.flm-overflowset-overflow:hover {
+  background-color: var(--listItemBackgroundHovered);
+  color: var(--bodyText);
+}
+
+.flm-overflowset--has-overflow .flm-overflowset-overflow {
+  display: flex;
+}
+
+/* Far-side items — never overflow */
+.flm-overflowset-far {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingS2);
+  margin-left: auto;
+  flex-shrink: 0;
+}

@@ -1,0 +1,16 @@
+/* Separator */
+
+.flm-separator {
+  border: none;
+  border-top: 1px solid var(--bodyDivider);
+  margin: 0;
+  padding: 0;
+}
+
+.flm-separator--vertical {
+  border-top: none;
+  border-left: 1px solid var(--bodyDivider);
+  align-self: stretch;
+  width: 0;
+  min-height: 1em;
+}

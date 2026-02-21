@@ -1,0 +1,229 @@
+/* DatePicker — Date input with calendar dropdown */
+
+.flm-datepicker {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  font-family: var(--fontFamily);
+}
+
+.flm-datepicker-wrapper {
+  display: flex;
+  align-items: stretch;
+  height: 32px;
+  border: 1px solid var(--inputBorder);
+  border-radius: var(--roundedCorner2);
+  background-color: var(--inputBackground);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.flm-datepicker-wrapper:hover {
+  border-color: var(--inputBorderHovered);
+}
+
+.flm-datepicker-wrapper:focus-within {
+  border-color: var(--inputFocusBorderAlt);
+  border-bottom-width: 2px;
+}
+
+.flm-datepicker-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--inputText);
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  padding: 0 8px;
+  outline: none;
+  min-width: 0;
+}
+
+.flm-datepicker-input::placeholder {
+  color: var(--inputPlaceholderText);
+}
+
+/* Calendar icon button */
+.flm-datepicker-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  border: none;
+  background: transparent;
+  color: var(--bodySubtext);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.flm-datepicker-icon:hover {
+  background-color: var(--listItemBackgroundHovered);
+  color: var(--bodyText);
+}
+
+/* Calendar callout */
+.flm-datepicker-callout {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  margin-top: 2px;
+  z-index: 1000;
+  background-color: var(--bodyBackground);
+  border: 1px solid var(--variantBorder);
+  border-radius: var(--roundedCorner2);
+  box-shadow: var(--elevation8);
+  padding: var(--spacingS1);
+  display: none;
+  width: 252px;
+}
+
+.flm-datepicker-callout--open {
+  display: block;
+}
+
+.flm-datepicker-callout--above {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+
+/* Month navigation header */
+.flm-datepicker-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacingS2) 0;
+  margin-bottom: var(--spacingS2);
+}
+
+.flm-datepicker-month {
+  font-size: var(--fontSizeMedium);
+  font-weight: var(--fontWeightSemibold);
+  color: var(--bodyText);
+  user-select: none;
+}
+
+.flm-datepicker-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: var(--bodySubtext);
+  cursor: pointer;
+  border-radius: var(--roundedCorner2);
+  padding: 0;
+}
+
+.flm-datepicker-nav-btn:hover {
+  background-color: var(--listItemBackgroundHovered);
+  color: var(--bodyText);
+}
+
+/* Day-of-week header row */
+.flm-datepicker-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.flm-datepicker-weekday {
+  font-size: var(--fontSizeSmall);
+  line-height: 32px;
+  color: var(--bodySubtext);
+  font-weight: var(--fontWeightSemibold);
+  user-select: none;
+}
+
+/* Calendar grid (7×6 = 42 cells) */
+.flm-datepicker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+}
+
+.flm-datepicker-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: 1px auto;
+  border: none;
+  background: transparent;
+  color: var(--bodyText);
+  font-size: var(--fontSizeSmall);
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 0;
+}
+
+.flm-datepicker-day:hover {
+  background-color: var(--listItemBackgroundHovered);
+}
+
+/* Today */
+.flm-datepicker-day--today {
+  font-weight: var(--fontWeightSemibold);
+  color: var(--themePrimary);
+  background-color: var(--themeLighterAlt);
+  border-radius: 50%;
+}
+
+/* Selected */
+.flm-datepicker-day--selected {
+  background-color: var(--themePrimary);
+  color: var(--white);
+}
+
+.flm-datepicker-day--selected:hover {
+  background-color: var(--themeDarkAlt);
+}
+
+/* Outside current month */
+.flm-datepicker-day--outside {
+  color: var(--neutralTertiary);
+}
+
+/* Disabled dates */
+.flm-datepicker-day--disabled {
+  color: var(--disabledText);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Disabled datepicker */
+.flm-datepicker--disabled .flm-datepicker-wrapper {
+  border-color: var(--disabledBorder);
+  background-color: var(--disabledBackground);
+}
+
+.flm-datepicker--disabled .flm-datepicker-input {
+  color: var(--disabledText);
+}
+
+.flm-datepicker--disabled .flm-datepicker-icon {
+  color: var(--disabledText);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Error */
+.flm-datepicker--error .flm-datepicker-wrapper {
+  border-color: var(--errorText);
+}
+
+.flm-datepicker-error {
+  display: block;
+  font-size: var(--fontSizeSmall);
+  line-height: var(--lineHeightSmall);
+  color: var(--errorText);
+  padding-top: 5px;
+}

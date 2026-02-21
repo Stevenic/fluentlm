@@ -1,0 +1,114 @@
+/* MessageBar */
+
+.flm-messagebar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingS1);
+  padding: var(--spacingS1) var(--spacingM);
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  color: var(--messageText);
+  border-radius: var(--roundedCorner2);
+  min-height: 32px;
+  box-sizing: border-box;
+}
+
+/* Icon slot */
+.flm-messagebar-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.flm-messagebar-icon > svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+/* Text fills remaining space */
+.flm-messagebar-text {
+  flex: 1;
+}
+
+/* Actions area */
+.flm-messagebar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingS2);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Dismiss button */
+.flm-messagebar-dismiss {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: var(--roundedCorner2);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.flm-messagebar-dismiss:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Type variants */
+.flm-messagebar--info {
+  background-color: var(--infoBackground);
+}
+
+.flm-messagebar--info .flm-messagebar-icon {
+  color: var(--infoIcon);
+}
+
+.flm-messagebar--success {
+  background-color: var(--successBackground);
+}
+
+.flm-messagebar--success .flm-messagebar-icon {
+  color: var(--successIcon);
+}
+
+.flm-messagebar--warning {
+  background-color: var(--warningBackground);
+}
+
+.flm-messagebar--warning .flm-messagebar-icon {
+  color: var(--warningIcon);
+}
+
+.flm-messagebar--severeWarning {
+  background-color: var(--severeWarningBackground);
+}
+
+.flm-messagebar--severeWarning .flm-messagebar-icon {
+  color: var(--severeWarningIcon);
+}
+
+.flm-messagebar--error {
+  background-color: var(--errorBackground);
+}
+
+.flm-messagebar--error .flm-messagebar-icon {
+  color: var(--errorIcon);
+}
+
+.flm-messagebar--blocked {
+  background-color: var(--blockingBackground);
+}
+
+.flm-messagebar--blocked .flm-messagebar-icon {
+  color: var(--blockingIcon);
+}

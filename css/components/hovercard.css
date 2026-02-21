@@ -1,0 +1,62 @@
+/* HoverCard — Two-phase hover detail card */
+
+.flm-hovercard {
+  position: absolute;
+  z-index: 1000;
+  background-color: var(--bodyBackground);
+  border: 1px solid var(--variantBorder);
+  border-radius: var(--roundedCorner2);
+  box-shadow: var(--elevation16);
+  min-width: 260px;
+  max-width: 364px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity var(--duration1) var(--easeStandard),
+              transform var(--duration1) var(--easeDecelerate);
+  font-family: var(--fontFamily);
+}
+
+.flm-hovercard--visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Compact section (shows first on hover) */
+.flm-hovercard-compact {
+  padding: var(--spacingM);
+}
+
+/* Expanded section (shows after delay) */
+.flm-hovercard-expanded {
+  display: none;
+  padding: 0 var(--spacingM) var(--spacingM);
+  border-top: 1px solid var(--variantBorder);
+}
+
+.flm-hovercard-expanded--visible {
+  display: block;
+}
+
+/* Content sections */
+.flm-hovercard-title {
+  font-size: var(--fontSizeMediumPlus);
+  font-weight: var(--fontWeightSemibold);
+  line-height: var(--lineHeightMediumPlus);
+  color: var(--bodyText);
+  margin-bottom: var(--spacingS2);
+}
+
+.flm-hovercard-subtitle {
+  font-size: var(--fontSizeSmall);
+  line-height: var(--lineHeightSmall);
+  color: var(--bodySubtext);
+}
+
+.flm-hovercard-body {
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  color: var(--bodyText);
+  padding-top: var(--spacingS1);
+}

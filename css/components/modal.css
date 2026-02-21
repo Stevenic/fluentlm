@@ -1,0 +1,33 @@
+/* Modal — generic modal container (uses overlay) */
+
+.flm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--overlayBackground);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration2) var(--easeStandard);
+}
+
+.flm-modal-overlay--open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.flm-modal {
+  background-color: var(--bodyBackground);
+  border-radius: var(--roundedCorner4);
+  box-shadow: var(--elevation64);
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: translateY(16px);
+  transition: transform var(--duration2) var(--easeDecelerate);
+}
+
+.flm-modal-overlay--open .flm-modal {
+  transform: translateY(0);
+}

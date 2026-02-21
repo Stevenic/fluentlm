@@ -1,0 +1,26 @@
+/* Link */
+
+.flm-link {
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  color: var(--link);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.flm-link:hover {
+  color: var(--linkHovered);
+  text-decoration: underline;
+}
+
+.flm-link:active {
+  color: var(--linkHovered);
+}
+
+.flm-link--disabled,
+.flm-link--disabled:hover {
+  color: var(--disabledText);
+  text-decoration: none;
+  cursor: default;
+  pointer-events: none;
+}

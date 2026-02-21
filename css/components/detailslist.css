@@ -1,0 +1,124 @@
+/* DetailsList — data table */
+
+.flm-detailslist {
+  width: 100%;
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  border-collapse: collapse;
+}
+
+/* Header */
+.flm-detailslist-header {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--bodyDivider);
+  background-color: var(--bodyBackground);
+  min-height: 42px;
+  user-select: none;
+}
+
+.flm-detailslist-header-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingS2);
+  padding: 0 var(--spacingS1);
+  font-size: var(--fontSizeSmall);
+  font-weight: var(--fontWeightSemibold);
+  color: var(--bodyText);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.flm-detailslist-header-cell:hover {
+  background-color: var(--listHeaderBackgroundHovered);
+}
+
+.flm-detailslist-header-cell:active {
+  background-color: var(--listHeaderBackgroundPressed);
+}
+
+/* Sort indicator */
+.flm-detailslist-sort {
+  display: inline-flex;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+/* Rows */
+.flm-detailslist-row {
+  display: flex;
+  align-items: center;
+  min-height: 42px;
+  border-bottom: 1px solid var(--bodyDivider);
+  background-color: var(--listBackground);
+  cursor: default;
+}
+
+.flm-detailslist-row:hover {
+  background-color: var(--listItemBackgroundHovered);
+}
+
+.flm-detailslist-row--selected {
+  background-color: var(--listItemBackgroundChecked);
+}
+
+.flm-detailslist-row--selected:hover {
+  background-color: var(--listItemBackgroundCheckedHovered);
+}
+
+.flm-detailslist-cell {
+  padding: 0 var(--spacingS1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--fontSizeMedium);
+  color: var(--bodyText);
+  flex-shrink: 0;
+}
+
+/* Row checkbox */
+.flm-detailslist-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  flex-shrink: 0;
+}
+
+/* Compact mode */
+.flm-detailslist--compact .flm-detailslist-row,
+.flm-detailslist--compact .flm-detailslist-header {
+  min-height: 32px;
+}
+
+/* Empty state */
+.flm-detailslist-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacingL2);
+  color: var(--bodySubtext);
+  font-size: var(--fontSizeMedium);
+}
+
+/* Column resize handle */
+.flm-detailslist-resize {
+  width: 4px;
+  align-self: stretch;
+  cursor: col-resize;
+  margin-left: auto;
+  opacity: 0;
+  background-color: var(--themePrimary);
+  transition: opacity var(--duration1) var(--easeStandard);
+}
+
+.flm-detailslist-header-cell:hover .flm-detailslist-resize {
+  opacity: 1;
+}

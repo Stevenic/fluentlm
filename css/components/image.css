@@ -1,0 +1,46 @@
+/* Image */
+
+.flm-image {
+  display: block;
+  max-width: 100%;
+  border: 0;
+}
+
+/* Fit variants */
+.flm-image--cover {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.flm-image--contain {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+}
+
+.flm-image--center {
+  object-fit: none;
+  object-position: center;
+}
+
+.flm-image--none {
+  object-fit: none;
+}
+
+/* Border */
+.flm-image--border {
+  border: 1px solid var(--variantBorder);
+  border-radius: var(--roundedCorner2);
+}
+
+/* Round (for avatars / thumbnails) */
+.flm-image--round {
+  border-radius: 50%;
+}
+
+/* Maximize frame — stretch to fill parent */
+.flm-image--maximize {
+  width: 100%;
+  height: 100%;
+}

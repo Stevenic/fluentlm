@@ -1,0 +1,165 @@
+/* ==========================================================================
+   FluentLM — Design Tokens
+   All raw palette values, typography, spacing, effects, and motion tokens.
+   These are theme-independent constants. Semantic (theme-aware) colors live
+   in theme-light.css / theme-dark.css.
+   ========================================================================== */
+
+:root {
+  /* -----------------------------------------------------------------------
+     PALETTE — Brand / Theme Colors
+     ----------------------------------------------------------------------- */
+  --themeDarker:      #004578;
+  --themeDark:        #005a9e;
+  --themeDarkAlt:     #106ebe;
+  --themePrimary:     #0078d4;
+  --themeSecondary:   #2b88d8;
+  --themeTertiary:    #71afe5;
+  --themeLight:       #c7e0f4;
+  --themeLighter:     #deecf9;
+  --themeLighterAlt:  #eff6fc;
+
+  /* -----------------------------------------------------------------------
+     PALETTE — Neutrals
+     ----------------------------------------------------------------------- */
+  --black:                #000000;
+  --blackTranslucent40:   rgba(0, 0, 0, 0.4);
+  --neutralDark:          #201f1e;
+  --neutralPrimary:       #323130;
+  --neutralPrimaryAlt:    #3b3a39;
+  --neutralSecondary:     #605e5c;
+  --neutralSecondaryAlt:  #8a8886;
+  --neutralTertiary:      #a19f9d;
+  --neutralTertiaryAlt:   #c8c6c4;
+  --neutralQuaternary:    #d2d0ce;
+  --neutralQuaternaryAlt: #e1dfdd;
+  --neutralLight:         #edebe9;
+  --neutralLighter:       #f3f2f1;
+  --neutralLighterAlt:    #faf9f8;
+  --white:                #ffffff;
+  --whiteTranslucent40:   rgba(255, 255, 255, 0.4);
+
+  /* -----------------------------------------------------------------------
+     PALETTE — Status / Accent Colors
+     ----------------------------------------------------------------------- */
+  --yellow:         #ffb900;
+  --yellowDark:     #d29200;
+  --yellowLight:    #fff100;
+  --orange:         #d83b01;
+  --orangeLight:    #ea4300;
+  --orangeLighter:  #ff8c00;
+  --redDark:        #a4262c;
+  --red:            #e81123;
+  --magentaDark:    #5c005c;
+  --magenta:        #b4009e;
+  --magentaLight:   #e3008c;
+  --purpleDark:     #32145a;
+  --purple:         #5c2d91;
+  --purpleLight:    #b4a0ff;
+  --blueDark:       #002050;
+  --blueMid:        #00188f;
+  --blue:           #0078d4;
+  --blueLight:      #00bcf2;
+  --tealDark:       #004b50;
+  --teal:           #008272;
+  --tealLight:      #00b294;
+  --greenDark:      #004b1c;
+  --green:          #107c10;
+  --greenLight:     #bad80a;
+
+  /* -----------------------------------------------------------------------
+     TYPOGRAPHY — Font Family
+     ----------------------------------------------------------------------- */
+  --fontFamily: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system,
+    BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', sans-serif;
+  --fontFamilyMonospace: 'Cascadia Code', 'Consolas', 'Courier New', monospace;
+
+  /* -----------------------------------------------------------------------
+     TYPOGRAPHY — Font Sizes
+     ----------------------------------------------------------------------- */
+  --fontSizeTiny:       10px;
+  --fontSizeXSmall:     10px;
+  --fontSizeSmall:      12px;
+  --fontSizeSmallPlus:  12px;
+  --fontSizeMedium:     14px;
+  --fontSizeMediumPlus: 16px;
+  --fontSizeLarge:      18px;
+  --fontSizeXLarge:     20px;
+  --fontSizeXXLarge:    28px;
+  --fontSizeSuperLarge: 42px;
+  --fontSizeMega:       68px;
+
+  /* -----------------------------------------------------------------------
+     TYPOGRAPHY — Font Weights
+     ----------------------------------------------------------------------- */
+  --fontWeightLight:     100;
+  --fontWeightSemilight: 300;
+  --fontWeightRegular:   400;
+  --fontWeightSemibold:  600;
+  --fontWeightBold:      700;
+
+  /* -----------------------------------------------------------------------
+     TYPOGRAPHY — Line Heights (matched to size ramp)
+     ----------------------------------------------------------------------- */
+  --lineHeightTiny:       14px;
+  --lineHeightXSmall:     14px;
+  --lineHeightSmall:      16px;
+  --lineHeightSmallPlus:  16px;
+  --lineHeightMedium:     20px;
+  --lineHeightMediumPlus: 22px;
+  --lineHeightLarge:      24px;
+  --lineHeightXLarge:     28px;
+  --lineHeightXXLarge:    36px;
+  --lineHeightSuperLarge: 52px;
+  --lineHeightMega:       80px;
+
+  /* -----------------------------------------------------------------------
+     SPACING
+     ----------------------------------------------------------------------- */
+  --spacingS2: 4px;
+  --spacingS1: 8px;
+  --spacingM:  16px;
+  --spacingL1: 20px;
+  --spacingL2: 32px;
+
+  /* -----------------------------------------------------------------------
+     EFFECTS — Elevation / Shadows
+     ----------------------------------------------------------------------- */
+  --elevation4:  0 1.6px 3.6px 0 rgba(0, 0, 0, 0.132),
+                 0 0.3px 0.9px 0 rgba(0, 0, 0, 0.108);
+  --elevation8:  0 3.2px 7.2px 0 rgba(0, 0, 0, 0.132),
+                 0 0.6px 1.8px 0 rgba(0, 0, 0, 0.108);
+  --elevation16: 0 6.4px 14.4px 0 rgba(0, 0, 0, 0.132),
+                 0 1.2px 3.6px 0 rgba(0, 0, 0, 0.108);
+  --elevation64: 0 25.6px 57.6px 0 rgba(0, 0, 0, 0.22),
+                 0 4.8px 14.4px 0 rgba(0, 0, 0, 0.18);
+
+  /* -----------------------------------------------------------------------
+     EFFECTS — Border Radius
+     ----------------------------------------------------------------------- */
+  --roundedCorner2: 2px;
+  --roundedCorner4: 4px;
+  --roundedCorner6: 6px;
+
+  /* -----------------------------------------------------------------------
+     MOTION — Durations
+     ----------------------------------------------------------------------- */
+  --duration1: 100ms;
+  --duration2: 200ms;
+  --duration3: 300ms;
+  --duration4: 400ms;
+
+  /* -----------------------------------------------------------------------
+     MOTION — Easing Curves
+     ----------------------------------------------------------------------- */
+  --easeAccelerate: cubic-bezier(0.9, 0.1, 1, 0.2);
+  --easeDecelerate: cubic-bezier(0.1, 0.9, 0.2, 1);
+  --easeLinear:     cubic-bezier(0, 0, 1, 1);
+  --easeStandard:   cubic-bezier(0.8, 0, 0.2, 1);
+
+  /* -----------------------------------------------------------------------
+     FOCUS — Outline style used by all interactive components
+     ----------------------------------------------------------------------- */
+  --focusOutlineWidth: 2px;
+  --focusOutlineOffset: -1px;
+}

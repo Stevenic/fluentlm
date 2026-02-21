@@ -1,0 +1,83 @@
+/* Facepile — Overlapping persona coin row */
+
+.flm-facepile {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--fontFamily);
+}
+
+/* Coins overlap via negative margin */
+.flm-facepile-member {
+  margin-left: -8px;
+  border: 2px solid var(--bodyBackground);
+  border-radius: 50%;
+  box-sizing: content-box;
+}
+
+.flm-facepile-member:first-child {
+  margin-left: 0;
+}
+
+/* Reuse persona coin sizing */
+.flm-facepile .flm-persona-coin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--themePrimary);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: var(--fontWeightSemibold);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.flm-facepile .flm-persona-coin img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* Overflow chip (+N) */
+.flm-facepile-overflow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--neutralLight);
+  color: var(--bodyText);
+  font-size: var(--fontSizeSmall);
+  font-weight: var(--fontWeightSemibold);
+  margin-left: -8px;
+  border: 2px solid var(--bodyBackground);
+  box-sizing: content-box;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* Add button */
+.flm-facepile-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px dashed var(--neutralTertiary);
+  background: transparent;
+  color: var(--themePrimary);
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: var(--spacingS2);
+  flex-shrink: 0;
+}
+
+.flm-facepile-add:hover {
+  border-color: var(--themePrimary);
+  background-color: var(--themeLighterAlt);
+}

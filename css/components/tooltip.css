@@ -1,0 +1,31 @@
+/* Tooltip */
+
+.flm-tooltip {
+  position: absolute;
+  z-index: 1100;
+  background-color: var(--bodyBackground);
+  border: 1px solid var(--variantBorder);
+  border-radius: var(--roundedCorner4);
+  box-shadow: var(--elevation8);
+  padding: 6px var(--spacingS1);
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeSmall);
+  line-height: var(--lineHeightSmall);
+  color: var(--bodyText);
+  max-width: 276px;
+  white-space: normal;
+  word-wrap: break-word;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration1) var(--easeStandard);
+}
+
+.flm-tooltip--visible {
+  opacity: 1;
+}
+
+/* Tooltip host — wrapper around the trigger element */
+.flm-tooltip-host {
+  display: inline-block;
+  position: relative;
+}

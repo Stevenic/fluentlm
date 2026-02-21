@@ -1,0 +1,112 @@
+/* ContextualMenu */
+
+.flm-contextmenu {
+  position: absolute;
+  z-index: 1000;
+  background-color: var(--menuBackground);
+  border-radius: var(--roundedCorner2);
+  box-shadow: var(--elevation8);
+  border: 1px solid var(--variantBorder);
+  min-width: 180px;
+  max-width: 300px;
+  padding: var(--spacingS2) 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: scaleY(0.95);
+  transform-origin: top left;
+  transition: opacity var(--duration1) var(--easeStandard),
+              transform var(--duration1) var(--easeDecelerate);
+  font-family: var(--fontFamily);
+}
+
+.flm-contextmenu--visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: scaleY(1);
+}
+
+.flm-contextmenu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingS2);
+  padding: 6px var(--spacingS1);
+  border: none;
+  background: transparent;
+  color: var(--menuItemText);
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.flm-contextmenu-item:hover {
+  background-color: var(--menuItemBackgroundHovered);
+  color: var(--menuItemTextHovered);
+}
+
+.flm-contextmenu-item:active {
+  background-color: var(--menuItemBackgroundPressed);
+}
+
+.flm-contextmenu-item[disabled] {
+  color: var(--disabledText);
+  cursor: default;
+  pointer-events: none;
+}
+
+.flm-contextmenu-item-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  color: var(--menuIcon);
+  flex-shrink: 0;
+}
+
+.flm-contextmenu-item-icon > svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+.flm-contextmenu-item-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Submenu indicator */
+.flm-contextmenu-item-submenu {
+  display: inline-flex;
+  width: 12px;
+  height: 12px;
+  margin-left: auto;
+  color: var(--bodySubtext);
+  flex-shrink: 0;
+}
+
+.flm-contextmenu-divider {
+  height: 1px;
+  background-color: var(--menuDivider);
+  margin: var(--spacingS2) 0;
+}
+
+.flm-contextmenu-header {
+  padding: 6px var(--spacingS1);
+  font-size: var(--fontSizeSmall);
+  font-weight: var(--fontWeightSemibold);
+  color: var(--menuHeader);
+}
+
+/* Checkbox / radio items */
+.flm-contextmenu-item--checked::before {
+  content: '';
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='%230078d4' d='M13.86 3.66a.5.5 0 0 1-.02.7l-7.93 7.48a.5.5 0 0 1-.7-.02L2.16 8.59a.5.5 0 0 1 .72-.7l2.7 2.88 7.58-7.13a.5.5 0 0 1 .7.02z'/%3E%3C/svg%3E");
+  background-size: contain;
+  flex-shrink: 0;
+}

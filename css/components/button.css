@@ -1,0 +1,196 @@
+/* Button */
+
+.flm-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacingS2);
+  min-width: 80px;
+  height: 32px;
+  padding: 0 20px;
+  border: 1px solid var(--buttonBorder);
+  border-radius: var(--roundedCorner2);
+  background-color: var(--buttonBackground);
+  color: var(--buttonText);
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  font-weight: var(--fontWeightSemibold);
+  line-height: var(--lineHeightMedium);
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  outline: none;
+  position: relative;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+.flm-button:hover {
+  background-color: var(--buttonBackgroundHovered);
+  color: var(--buttonTextHovered);
+}
+
+.flm-button:active {
+  background-color: var(--buttonBackgroundPressed);
+  color: var(--buttonTextPressed);
+}
+
+.flm-button:focus-visible {
+  outline: var(--focusOutlineWidth) solid var(--focusBorder);
+  outline-offset: var(--focusOutlineOffset);
+}
+
+/* Disabled */
+.flm-button:disabled,
+.flm-button[disabled] {
+  background-color: var(--buttonBackgroundDisabled);
+  border-color: var(--buttonBorderDisabled);
+  color: var(--buttonTextDisabled);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Primary */
+.flm-button--primary {
+  background-color: var(--primaryButtonBackground);
+  border-color: var(--primaryButtonBorder);
+  color: var(--primaryButtonText);
+}
+
+.flm-button--primary:hover {
+  background-color: var(--primaryButtonBackgroundHovered);
+  color: var(--primaryButtonTextHovered);
+}
+
+.flm-button--primary:active {
+  background-color: var(--primaryButtonBackgroundPressed);
+  color: var(--primaryButtonTextPressed);
+}
+
+.flm-button--primary:disabled,
+.flm-button--primary[disabled] {
+  background-color: var(--primaryButtonBackgroundDisabled);
+  color: var(--primaryButtonTextDisabled);
+  border-color: var(--primaryButtonBackgroundDisabled);
+}
+
+/* Subtle */
+.flm-button--subtle {
+  background-color: transparent;
+  border-color: transparent;
+  min-width: auto;
+}
+
+.flm-button--subtle:hover {
+  background-color: var(--buttonBackgroundHovered);
+  border-color: transparent;
+}
+
+.flm-button--subtle:active {
+  background-color: var(--buttonBackgroundPressed);
+}
+
+/* Icon-only */
+.flm-button--icon {
+  min-width: 32px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--bodyText);
+}
+
+.flm-button--icon:hover {
+  background-color: var(--buttonBackgroundHovered);
+  color: var(--buttonTextHovered);
+}
+
+.flm-button--icon:active {
+  background-color: var(--buttonBackgroundPressed);
+}
+
+/* Compound */
+.flm-button--compound {
+  height: auto;
+  min-height: 40px;
+  padding: 8px 20px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.flm-button-label {
+  font-size: var(--fontSizeMedium);
+  font-weight: var(--fontWeightSemibold);
+  line-height: var(--lineHeightMedium);
+}
+
+.flm-button-description {
+  font-size: var(--fontSizeSmall);
+  font-weight: var(--fontWeightRegular);
+  line-height: var(--lineHeightSmall);
+  color: var(--bodySubtext);
+}
+
+.flm-button--compound:hover .flm-button-description {
+  color: var(--bodyText);
+}
+
+.flm-button--primary.flm-button--compound .flm-button-description {
+  color: var(--whiteTranslucent40);
+}
+
+.flm-button--primary.flm-button--compound:hover .flm-button-description {
+  color: var(--white);
+}
+
+/* Split button */
+.flm-button-split {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.flm-button-split > .flm-button {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.flm-button-split-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  border: 1px solid var(--buttonBorder);
+  border-left: none;
+  border-radius: 0 var(--roundedCorner2) var(--roundedCorner2) 0;
+  background-color: var(--buttonBackground);
+  color: var(--buttonText);
+  cursor: pointer;
+}
+
+.flm-button-split-caret:hover {
+  background-color: var(--buttonBackgroundHovered);
+  color: var(--buttonTextHovered);
+}
+
+.flm-button-split--primary > .flm-button {
+  border-right-color: var(--themeDark);
+}
+
+.flm-button-split--primary .flm-button-split-caret {
+  background-color: var(--primaryButtonBackground);
+  border-color: var(--primaryButtonBorder);
+  border-left-color: var(--themeDark);
+  color: var(--primaryButtonText);
+}
+
+.flm-button-split--primary .flm-button-split-caret:hover {
+  background-color: var(--primaryButtonBackgroundHovered);
+}
+
+/* Icon inside button */
+.flm-button > .flm-icon {
+  flex-shrink: 0;
+}

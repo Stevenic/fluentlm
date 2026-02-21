@@ -1,0 +1,106 @@
+/* Checkbox */
+
+.flm-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacingS2);
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  color: var(--bodyText);
+  position: relative;
+  padding: 2px 0;
+}
+
+/* Hide native checkbox */
+.flm-checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* Visual checkbox box */
+.flm-checkbox-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border: 1px solid var(--smallInputBorder);
+  border-radius: var(--roundedCorner2);
+  background-color: var(--inputBackground);
+  transition: background-color var(--duration1) var(--easeStandard),
+              border-color var(--duration1) var(--easeStandard);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+/* Checkmark icon (CSS-drawn) */
+.flm-checkbox-mark::after {
+  content: '';
+  display: none;
+  width: 6px;
+  height: 10px;
+  border: solid var(--inputForegroundChecked);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-top: -2px;
+}
+
+/* Hover */
+.flm-checkbox:hover .flm-checkbox-mark {
+  border-color: var(--inputBorderHovered);
+}
+
+/* Checked */
+.flm-checkbox-input:checked + .flm-checkbox-mark {
+  background-color: var(--inputBackgroundChecked);
+  border-color: var(--inputBackgroundChecked);
+}
+
+.flm-checkbox-input:checked + .flm-checkbox-mark::after {
+  display: block;
+}
+
+/* Checked hover */
+.flm-checkbox:hover .flm-checkbox-input:checked + .flm-checkbox-mark {
+  background-color: var(--inputBackgroundCheckedHovered);
+  border-color: var(--inputBackgroundCheckedHovered);
+}
+
+/* Focus */
+.flm-checkbox-input:focus-visible + .flm-checkbox-mark {
+  outline: var(--focusOutlineWidth) solid var(--focusBorder);
+  outline-offset: var(--focusOutlineOffset);
+}
+
+/* Disabled */
+.flm-checkbox--disabled,
+.flm-checkbox:has(.flm-checkbox-input:disabled) {
+  cursor: default;
+  color: var(--disabledText);
+}
+
+.flm-checkbox-input:disabled + .flm-checkbox-mark {
+  background-color: var(--disabledBackground);
+  border-color: var(--disabledBorder);
+}
+
+.flm-checkbox-input:disabled:checked + .flm-checkbox-mark {
+  background-color: var(--disabledBackground);
+  border-color: var(--disabledBorder);
+}
+
+.flm-checkbox-input:disabled:checked + .flm-checkbox-mark::after {
+  border-color: var(--disabledText);
+}
+
+.flm-checkbox-label {
+  /* Inherits from parent */
+}

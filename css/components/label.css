@@ -1,0 +1,21 @@
+/* Label */
+
+.flm-label {
+  display: inline-block;
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  font-weight: var(--fontWeightSemibold);
+  color: var(--bodyText);
+  padding: 5px 0;
+}
+
+.flm-label--required::after {
+  content: ' *';
+  color: var(--errorText);
+  padding-left: 2px;
+}
+
+.flm-label--disabled {
+  color: var(--disabledText);
+}

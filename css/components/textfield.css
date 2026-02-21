@@ -1,0 +1,136 @@
+/* TextField */
+
+.flm-textfield {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.flm-textfield-input {
+  display: block;
+  width: 100%;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid var(--inputBorder);
+  border-radius: var(--roundedCorner2);
+  background-color: var(--inputBackground);
+  color: var(--inputText);
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  outline: none;
+  box-sizing: border-box;
+}
+
+/* Textarea */
+textarea.flm-textfield-input {
+  height: auto;
+  padding: 6px 8px;
+  resize: vertical;
+}
+
+.flm-textfield-input::placeholder {
+  color: var(--inputPlaceholderText);
+}
+
+.flm-textfield-input:hover {
+  border-color: var(--inputBorderHovered);
+}
+
+.flm-textfield-input:focus {
+  border-color: var(--inputFocusBorderAlt);
+  border-bottom-width: 2px;
+  padding-bottom: 0;
+}
+
+/* Underlined variant */
+.flm-textfield--underlined .flm-textfield-input {
+  border: none;
+  border-bottom: 1px solid var(--inputBorder);
+  border-radius: 0;
+  padding-left: 0;
+}
+
+.flm-textfield--underlined .flm-textfield-input:focus {
+  border-bottom: 2px solid var(--inputFocusBorderAlt);
+}
+
+/* Borderless variant */
+.flm-textfield--borderless .flm-textfield-input {
+  border: none;
+}
+
+.flm-textfield--borderless .flm-textfield-input:focus {
+  border: none;
+  border-bottom: 2px solid var(--inputFocusBorderAlt);
+}
+
+/* Error state */
+.flm-textfield--error .flm-textfield-input {
+  border-color: var(--errorText);
+}
+
+.flm-textfield--error .flm-textfield-input:hover,
+.flm-textfield--error .flm-textfield-input:focus {
+  border-color: var(--errorText);
+}
+
+.flm-textfield-error {
+  display: block;
+  font-size: var(--fontSizeSmall);
+  line-height: var(--lineHeightSmall);
+  color: var(--errorText);
+  padding-top: 5px;
+}
+
+/* Disabled state */
+.flm-textfield--disabled .flm-textfield-input,
+.flm-textfield-input:disabled {
+  background-color: var(--disabledBackground);
+  border-color: var(--disabledBorder);
+  color: var(--disabledText);
+  cursor: default;
+}
+
+/* Prefix / Suffix wrapper */
+.flm-textfield-wrapper {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--inputBorder);
+  border-radius: var(--roundedCorner2);
+  background-color: var(--inputBackground);
+  overflow: hidden;
+}
+
+.flm-textfield-wrapper:hover {
+  border-color: var(--inputBorderHovered);
+}
+
+.flm-textfield-wrapper:focus-within {
+  border-color: var(--inputFocusBorderAlt);
+  border-bottom-width: 2px;
+}
+
+.flm-textfield-wrapper > .flm-textfield-input {
+  border: none;
+  border-radius: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.flm-textfield-wrapper > .flm-textfield-input:focus {
+  border: none;
+  padding-bottom: 0;
+}
+
+.flm-textfield-prefix,
+.flm-textfield-suffix {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  background-color: var(--bodyStandoutBackground);
+  color: var(--bodySubtext);
+  font-size: var(--fontSizeMedium);
+  white-space: nowrap;
+  user-select: none;
+}

@@ -1,0 +1,56 @@
+/* SwatchColorPicker — Color swatch grid */
+
+.flm-swatchcolorpicker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  font-family: var(--fontFamily);
+}
+
+.flm-swatchcolorpicker-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: var(--roundedCorner2);
+  cursor: pointer;
+  padding: 0;
+  box-sizing: border-box;
+  transition: box-shadow var(--duration1) var(--easeStandard),
+              transform var(--duration1) var(--easeStandard);
+}
+
+.flm-swatchcolorpicker-cell:hover {
+  transform: scale(1.15);
+}
+
+.flm-swatchcolorpicker-cell:focus-visible {
+  outline: var(--focusOutlineWidth) solid var(--focusBorder);
+  outline-offset: var(--focusOutlineOffset);
+}
+
+/* Selected swatch ring */
+.flm-swatchcolorpicker-cell--selected {
+  box-shadow: 0 0 0 2px var(--bodyBackground), 0 0 0 4px var(--bodyText);
+}
+
+/* Disabled */
+.flm-swatchcolorpicker-cell:disabled,
+.flm-swatchcolorpicker-cell--disabled {
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
+}
+
+/* Circle variant */
+.flm-swatchcolorpicker--circle .flm-swatchcolorpicker-cell {
+  border-radius: 50%;
+}
+
+/* Large size variant */
+.flm-swatchcolorpicker--large .flm-swatchcolorpicker-cell {
+  width: 32px;
+  height: 32px;
+}

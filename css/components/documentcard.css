@@ -1,0 +1,118 @@
+/* DocumentCard — File preview card */
+
+.flm-documentcard {
+  display: flex;
+  flex-direction: column;
+  width: 212px;
+  background-color: var(--bodyBackground);
+  border: 1px solid var(--variantBorder);
+  border-radius: var(--roundedCorner2);
+  box-shadow: var(--elevation4);
+  overflow: hidden;
+  cursor: pointer;
+  font-family: var(--fontFamily);
+  transition: box-shadow var(--duration2) var(--easeStandard);
+}
+
+.flm-documentcard:hover {
+  box-shadow: var(--elevation8);
+  border-color: var(--variantBorderHovered);
+}
+
+/* Preview image area */
+.flm-documentcard-preview {
+  position: relative;
+  height: 130px;
+  overflow: hidden;
+  background-color: var(--neutralLighter);
+}
+
+.flm-documentcard-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* File type icon in preview */
+.flm-documentcard-preview-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--themePrimary);
+  font-size: 32px;
+}
+
+/* Card details */
+.flm-documentcard-details {
+  padding: var(--spacingS1);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.flm-documentcard-title {
+  font-size: var(--fontSizeMedium);
+  font-weight: var(--fontWeightSemibold);
+  line-height: var(--lineHeightMedium);
+  color: var(--bodyText);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Activity row (persona + timestamp) */
+.flm-documentcard-activity {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingS2);
+  padding: 0 var(--spacingS1) var(--spacingS1);
+}
+
+.flm-documentcard-activity-name {
+  font-size: var(--fontSizeSmall);
+  line-height: var(--lineHeightSmall);
+  color: var(--bodyText);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.flm-documentcard-activity-date {
+  font-size: var(--fontSizeSmall);
+  line-height: var(--lineHeightSmall);
+  color: var(--bodySubtext);
+}
+
+/* Actions row */
+.flm-documentcard-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingS2);
+  padding: var(--spacingS2) var(--spacingS1);
+  border-top: 1px solid var(--variantBorder);
+}
+
+/* Compact variant — horizontal layout */
+.flm-documentcard--compact {
+  flex-direction: row;
+  width: auto;
+  max-width: 480px;
+  height: 90px;
+}
+
+.flm-documentcard--compact .flm-documentcard-preview {
+  width: 90px;
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.flm-documentcard--compact .flm-documentcard-details {
+  flex: 1;
+  min-width: 0;
+  justify-content: center;
+}
+
+.flm-documentcard--compact .flm-documentcard-activity {
+  padding: 0 var(--spacingS1);
+}

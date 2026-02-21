@@ -1,0 +1,186 @@
+/* ComboBox — Filterable dropdown */
+
+.flm-combobox {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  font-family: var(--fontFamily);
+}
+
+.flm-combobox-wrapper {
+  display: flex;
+  align-items: stretch;
+  height: 32px;
+  border: 1px solid var(--inputBorder);
+  border-radius: var(--roundedCorner2);
+  background-color: var(--inputBackground);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.flm-combobox-wrapper:hover {
+  border-color: var(--inputBorderHovered);
+}
+
+.flm-combobox-wrapper:focus-within {
+  border-color: var(--inputFocusBorderAlt);
+  border-bottom-width: 2px;
+}
+
+.flm-combobox-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--inputText);
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  padding: 0 8px;
+  outline: none;
+  min-width: 0;
+}
+
+.flm-combobox-input::placeholder {
+  color: var(--inputPlaceholderText);
+}
+
+/* Caret button */
+.flm-combobox-caret {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  border: none;
+  background: transparent;
+  color: var(--bodySubtext);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.flm-combobox-caret:hover {
+  background-color: var(--listItemBackgroundHovered);
+  color: var(--bodyText);
+}
+
+/* Listbox (option dropdown) */
+.flm-combobox-listbox {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin-top: 2px;
+  z-index: 1000;
+  background-color: var(--bodyBackground);
+  border: 1px solid var(--variantBorder);
+  border-radius: var(--roundedCorner2);
+  box-shadow: var(--elevation8);
+  max-height: 220px;
+  overflow-y: auto;
+  display: none;
+}
+
+.flm-combobox-listbox--open {
+  display: block;
+}
+
+/* Flip above */
+.flm-combobox-listbox--above {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+
+.flm-combobox-option {
+  display: flex;
+  align-items: center;
+  padding: 6px var(--spacingS1);
+  min-height: 32px;
+  cursor: pointer;
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  color: var(--bodyText);
+  box-sizing: border-box;
+}
+
+.flm-combobox-option:hover,
+.flm-combobox-option--highlighted {
+  background-color: var(--listItemBackgroundHovered);
+}
+
+.flm-combobox-option--selected {
+  background-color: var(--listItemBackgroundChecked);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.flm-combobox-option--disabled {
+  color: var(--disabledText);
+  cursor: default;
+  pointer-events: none;
+}
+
+.flm-combobox-option--hidden {
+  display: none;
+}
+
+/* Multi-select checkbox inside option */
+.flm-combobox-option-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  margin-right: var(--spacingS2);
+  border: 1px solid var(--smallInputBorder);
+  border-radius: var(--roundedCorner2);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.flm-combobox-option--selected .flm-combobox-option-check {
+  background-color: var(--inputBackgroundChecked);
+  border-color: var(--inputBackgroundChecked);
+}
+
+.flm-combobox-option--selected .flm-combobox-option-check::after {
+  content: '';
+  display: block;
+  width: 5px;
+  height: 8px;
+  border: solid var(--inputForegroundChecked);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  margin-top: -2px;
+}
+
+/* Disabled combobox */
+.flm-combobox--disabled .flm-combobox-wrapper {
+  border-color: var(--disabledBorder);
+  background-color: var(--disabledBackground);
+}
+
+.flm-combobox--disabled .flm-combobox-input {
+  color: var(--disabledText);
+}
+
+.flm-combobox--disabled .flm-combobox-caret {
+  color: var(--disabledText);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Error */
+.flm-combobox--error .flm-combobox-wrapper {
+  border-color: var(--errorText);
+}
+
+.flm-combobox-error {
+  display: block;
+  font-size: var(--fontSizeSmall);
+  line-height: var(--lineHeightSmall);
+  color: var(--errorText);
+  padding-top: 5px;
+}

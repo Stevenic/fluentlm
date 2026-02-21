@@ -1,0 +1,96 @@
+/* Dialog */
+
+.flm-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--overlayBackground);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration2) var(--easeStandard);
+}
+
+.flm-dialog-overlay--open {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.flm-dialog {
+  background-color: var(--bodyBackground);
+  border-radius: var(--roundedCorner4);
+  box-shadow: var(--elevation64);
+  min-width: 288px;
+  max-width: 560px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.95);
+  transition: transform var(--duration2) var(--easeDecelerate);
+}
+
+.flm-dialog-overlay--open .flm-dialog {
+  transform: scale(1);
+}
+
+.flm-dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacingM) var(--spacingL1);
+  flex-shrink: 0;
+}
+
+.flm-dialog-title {
+  font-size: var(--fontSizeXLarge);
+  font-weight: var(--fontWeightSemibold);
+  line-height: var(--lineHeightXLarge);
+  color: var(--bodyText);
+  margin: 0;
+}
+
+.flm-dialog-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: var(--roundedCorner2);
+  background: transparent;
+  color: var(--bodySubtext);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.flm-dialog-close:hover {
+  background-color: var(--buttonBackgroundHovered);
+  color: var(--bodyText);
+}
+
+.flm-dialog-body {
+  padding: 0 var(--spacingL1);
+  overflow-y: auto;
+  flex: 1;
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  color: var(--bodySubtext);
+}
+
+.flm-dialog-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacingS1);
+  padding: var(--spacingM) var(--spacingL1);
+  flex-shrink: 0;
+}
+
+/* Large header variant */
+.flm-dialog--large-header .flm-dialog-title {
+  font-size: var(--fontSizeXXLarge);
+  line-height: var(--lineHeightXXLarge);
+}

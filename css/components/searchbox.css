@@ -1,0 +1,101 @@
+/* SearchBox */
+
+.flm-searchbox {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  border: 1px solid var(--inputBorder);
+  border-radius: var(--roundedCorner2);
+  background-color: var(--inputBackground);
+  padding: 0 var(--spacingS1);
+  gap: var(--spacingS2);
+  box-sizing: border-box;
+}
+
+.flm-searchbox:hover {
+  border-color: var(--inputBorderHovered);
+}
+
+.flm-searchbox:focus-within {
+  border-color: var(--inputFocusBorderAlt);
+  border-bottom-width: 2px;
+}
+
+.flm-searchbox-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--inputIcon);
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.flm-searchbox-icon > svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+
+.flm-searchbox-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--inputText);
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  outline: none;
+  min-width: 0;
+  padding: 0;
+}
+
+.flm-searchbox-input::placeholder {
+  color: var(--inputPlaceholderText);
+}
+
+.flm-searchbox-clear {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: var(--roundedCorner2);
+  background: transparent;
+  color: var(--bodySubtext);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.flm-searchbox-clear:hover {
+  background-color: var(--buttonBackgroundHovered);
+  color: var(--bodyText);
+}
+
+/* Show clear button when input has value */
+.flm-searchbox--has-value .flm-searchbox-clear {
+  display: inline-flex;
+}
+
+/* Underlined variant */
+.flm-searchbox--underlined {
+  border: none;
+  border-bottom: 1px solid var(--inputBorder);
+  border-radius: 0;
+}
+
+.flm-searchbox--underlined:focus-within {
+  border-bottom: 2px solid var(--inputFocusBorderAlt);
+}
+
+/* Disabled */
+.flm-searchbox--disabled {
+  background-color: var(--disabledBackground);
+  border-color: var(--disabledBorder);
+  cursor: default;
+}
+
+.flm-searchbox--disabled .flm-searchbox-input {
+  color: var(--disabledText);
+}

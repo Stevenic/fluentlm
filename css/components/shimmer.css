@@ -1,0 +1,85 @@
+/* Shimmer — Loading skeleton placeholder */
+
+@keyframes flm-shimmer-wave {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.flm-shimmer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingS1);
+  font-family: var(--fontFamily);
+}
+
+/* Row variant for horizontal composition */
+.flm-shimmer--row {
+  flex-direction: row;
+  align-items: center;
+}
+
+/* Shared shimmer element base */
+.flm-shimmer-line,
+.flm-shimmer-circle,
+.flm-shimmer-rect {
+  background: linear-gradient(
+    90deg,
+    var(--neutralLighter) 25%,
+    var(--neutralLight) 50%,
+    var(--neutralLighter) 75%
+  );
+  background-size: 200% 100%;
+  animation: flm-shimmer-wave 2s ease-in-out infinite;
+  border-radius: var(--roundedCorner2);
+}
+
+/* Line — text placeholder (16px bar) */
+.flm-shimmer-line {
+  height: 16px;
+  width: 100%;
+}
+
+.flm-shimmer-line--short {
+  width: 40%;
+}
+
+.flm-shimmer-line--medium {
+  width: 70%;
+}
+
+/* Circle — avatar placeholder (40px) */
+.flm-shimmer-circle {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.flm-shimmer-circle--small {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+}
+
+.flm-shimmer-circle--large {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+}
+
+/* Rect — block placeholder (120px) */
+.flm-shimmer-rect {
+  width: 120px;
+  height: 120px;
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.flm-shimmer-rect--wide {
+  width: 200px;
+}
+
+.flm-shimmer-rect--tall {
+  height: 200px;
+}

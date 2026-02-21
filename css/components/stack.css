@@ -1,0 +1,50 @@
+/* Stack — Flexbox layout container */
+
+.flm-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.flm-stack--horizontal {
+  flex-direction: row;
+}
+
+.flm-stack--center {
+  justify-content: center;
+  align-items: center;
+}
+
+.flm-stack--end {
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.flm-stack--space-between {
+  justify-content: space-between;
+}
+
+.flm-stack--wrap {
+  flex-wrap: wrap;
+}
+
+/* Horizontal + center should only center cross-axis by default */
+.flm-stack--horizontal.flm-stack--center {
+  align-items: center;
+}
+
+/* Stack Items */
+.flm-stack-item--grow {
+  flex-grow: 1;
+}
+
+.flm-stack-item--shrink {
+  flex-shrink: 1;
+}
+
+.flm-stack-item--align-end {
+  align-self: flex-end;
+}
+
+.flm-stack-item--align-center {
+  align-self: center;
+}

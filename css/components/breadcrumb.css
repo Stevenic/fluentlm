@@ -1,0 +1,79 @@
+/* Breadcrumb */
+
+.flm-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  font-family: var(--fontFamily);
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.flm-breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.flm-breadcrumb-item + .flm-breadcrumb-item::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 var(--spacingS1);
+  border-right: 1.5px solid var(--neutralTertiary);
+  border-top: 1.5px solid var(--neutralTertiary);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.flm-breadcrumb-link {
+  color: var(--bodyText);
+  text-decoration: none;
+  padding: var(--spacingS2) 0;
+  font-size: var(--fontSizeMedium);
+  cursor: pointer;
+}
+
+.flm-breadcrumb-link:hover {
+  color: var(--linkHovered);
+  text-decoration: underline;
+}
+
+/* Current (last) item */
+.flm-breadcrumb-item:last-child .flm-breadcrumb-link {
+  color: var(--bodyText);
+  font-weight: var(--fontWeightSemibold);
+  cursor: default;
+}
+
+.flm-breadcrumb-item:last-child .flm-breadcrumb-link:hover {
+  text-decoration: none;
+  color: var(--bodyText);
+}
+
+/* Overflow button */
+.flm-breadcrumb-overflow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--bodyText);
+  cursor: pointer;
+  padding: var(--spacingS2);
+  font-size: var(--fontSizeMedium);
+}
+
+.flm-breadcrumb-overflow:hover {
+  color: var(--linkHovered);
+}
+
+/* Size variants */
+.flm-breadcrumb--small .flm-breadcrumb-link { font-size: var(--fontSizeSmall); }
+.flm-breadcrumb--large .flm-breadcrumb-link {
+  font-size: var(--fontSizeLarge);
+  font-weight: var(--fontWeightSemibold);
+}

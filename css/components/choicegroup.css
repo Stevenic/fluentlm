@@ -1,0 +1,113 @@
+/* ChoiceGroup — Radio button group */
+
+.flm-choicegroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingS2);
+  font-family: var(--fontFamily);
+}
+
+/* Horizontal variant */
+.flm-choicegroup--horizontal {
+  flex-direction: row;
+  gap: var(--spacingM);
+}
+
+.flm-choicegroup-option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacingS2);
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--fontSizeMedium);
+  line-height: var(--lineHeightMedium);
+  color: var(--bodyText);
+  position: relative;
+  padding: 2px 0;
+}
+
+/* Hide native radio */
+.flm-choicegroup-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+/* Visual radio circle */
+.flm-choicegroup-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  border: 1px solid var(--smallInputBorder);
+  border-radius: 50%;
+  background-color: var(--inputBackground);
+  transition: background-color var(--duration1) var(--easeStandard),
+              border-color var(--duration1) var(--easeStandard);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+/* Inner dot */
+.flm-choicegroup-mark::after {
+  content: '';
+  display: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--inputBackgroundChecked);
+}
+
+/* Hover */
+.flm-choicegroup-option:hover .flm-choicegroup-mark {
+  border-color: var(--inputBorderHovered);
+}
+
+/* Checked */
+.flm-choicegroup-input:checked + .flm-choicegroup-mark {
+  border-color: var(--inputBackgroundChecked);
+}
+
+.flm-choicegroup-input:checked + .flm-choicegroup-mark::after {
+  display: block;
+}
+
+/* Checked hover */
+.flm-choicegroup-option:hover .flm-choicegroup-input:checked + .flm-choicegroup-mark {
+  border-color: var(--inputBackgroundCheckedHovered);
+}
+
+.flm-choicegroup-option:hover .flm-choicegroup-input:checked + .flm-choicegroup-mark::after {
+  background-color: var(--inputBackgroundCheckedHovered);
+}
+
+/* Focus */
+.flm-choicegroup-input:focus-visible + .flm-choicegroup-mark {
+  outline: var(--focusOutlineWidth) solid var(--focusBorder);
+  outline-offset: var(--focusOutlineOffset);
+}
+
+/* Disabled */
+.flm-choicegroup-option--disabled,
+.flm-choicegroup-option:has(.flm-choicegroup-input:disabled) {
+  cursor: default;
+  color: var(--disabledText);
+}
+
+.flm-choicegroup-input:disabled + .flm-choicegroup-mark {
+  background-color: var(--disabledBackground);
+  border-color: var(--disabledBorder);
+}
+
+.flm-choicegroup-input:disabled:checked + .flm-choicegroup-mark::after {
+  background-color: var(--disabledText);
+}
+
+.flm-choicegroup-label {
+  /* Inherits from parent */
+}

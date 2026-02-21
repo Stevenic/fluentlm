@@ -1,0 +1,46 @@
+/* ProgressIndicator */
+
+.flm-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingS2);
+  font-family: var(--fontFamily);
+  width: 100%;
+}
+
+.flm-progress-label {
+  font-size: var(--fontSizeMedium);
+  font-weight: var(--fontWeightSemibold);
+  color: var(--bodyText);
+}
+
+.flm-progress-description {
+  font-size: var(--fontSizeSmall);
+  color: var(--bodySubtext);
+}
+
+.flm-progress-track {
+  width: 100%;
+  height: 2px;
+  background-color: var(--neutralLighter);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.flm-progress-bar {
+  height: 100%;
+  background-color: var(--themePrimary);
+  border-radius: 1px;
+  transition: width var(--duration3) var(--easeStandard);
+}
+
+/* Indeterminate animation */
+.flm-progress--indeterminate .flm-progress-bar {
+  width: 33%;
+  animation: flm-progress-indeterminate 2s var(--easeStandard) infinite;
+}
+
+@keyframes flm-progress-indeterminate {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
