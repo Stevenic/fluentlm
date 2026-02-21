@@ -74,10 +74,8 @@ And the following js script to the pages body:
 Always wrap the page in <html class="fluentlm"> for the light theme or <html class="fluentlm fluent-dark"> for a dark theme.
 You can switch themes at runtime using:
 
-```js
 FluentLM.setTheme('dark');
 FluentLM.setTheme('light');
-```
 
 <fluentlm-instructions>
 {paste contents of fluentlm-instructions.md here}
