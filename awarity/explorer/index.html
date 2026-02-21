@@ -1,0 +1,1826 @@
+<!DOCTYPE html>
+<html lang="en" class="fluent-awarity-dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Explore — Awarity</title>
+
+  <!-- Themes & combined library CSS -->
+  <link rel="stylesheet" href="../../dist/theme-awarity-light.css">
+  <link rel="stylesheet" href="../../dist/theme-awarity-dark.css">
+  <link rel="stylesheet" href="../../dist/fluentlm.min.css">
+
+  <style>
+    /* ── App Shell ── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+
+    .app-shell {
+      display: flex;
+      height: 100vh;
+    }
+
+    /* ── Left Nav ── */
+    .app-nav {
+      width: 220px;
+      flex-shrink: 0;
+      background-color: var(--bodyStandoutBackground);
+      border-right: 1px solid var(--bodyFrameDivider);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .app-nav-brand {
+      padding: var(--spacingM);
+      font-size: var(--fontSizeXLarge);
+      font-weight: var(--fontWeightSemibold);
+      line-height: var(--lineHeightXLarge);
+      color: var(--bodyText);
+      border-bottom: 1px solid var(--bodyFrameDivider);
+    }
+
+    .app-nav-link {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+      padding: var(--spacingS2) var(--spacingM);
+      color: var(--bodyText);
+      font-size: var(--fontSizeMedium);
+      text-decoration: none;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+    }
+
+    .app-nav-link:hover {
+      background-color: var(--listItemBackgroundHovered);
+      text-decoration: none;
+    }
+
+    .app-nav-link--active {
+      background-color: var(--listItemBackgroundChecked);
+      font-weight: var(--fontWeightSemibold);
+      border-left-color: var(--themePrimary);
+    }
+
+    .app-nav-spacer { flex: 1; }
+
+    /* ── Main Area ── */
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── CommandBar Zone ── */
+    .app-commandbar {
+      border-bottom: 1px solid var(--bodyDivider);
+    }
+
+    /* ── Breadcrumb Zone ── */
+    .app-breadcrumb {
+      padding: var(--spacingS2) var(--spacingL2);
+      border-bottom: 1px solid var(--bodyDivider);
+      background-color: var(--bodyBackground);
+    }
+
+    /* ── MessageBar Zone ── */
+    .app-messagebar-zone {
+      padding: 0 var(--spacingL2);
+    }
+    .app-messagebar-zone:empty { display: none; }
+    .app-messagebar-zone .flm-messagebar {
+      margin-top: var(--spacingS1);
+      border-radius: var(--roundedCorner4);
+    }
+
+    /* ── Content Area ── */
+    .app-content {
+      flex: 1;
+      padding: var(--spacingL2);
+      overflow-y: auto;
+      background-color: var(--bodyBackground);
+    }
+
+    /* ── Query Configuration Zone ── */
+    .query-config {
+      background-color: var(--bodyStandoutBackground);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      padding: var(--spacingL1);
+      margin-bottom: var(--spacingL1);
+    }
+
+    .query-config-title {
+      display: flex;
+      align-items: baseline;
+      gap: var(--spacingM);
+      font-size: var(--fontSizeMedium);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+      padding-bottom: var(--spacingS2);
+      margin-bottom: var(--spacingM);
+      border-bottom: 1px solid var(--bodyDivider);
+      transition: margin-bottom 0.4s ease, padding-bottom 0.4s ease;
+    }
+
+    .query-config--collapsed .query-config-title {
+      margin-bottom: 0;
+      padding-bottom: var(--spacingS2);
+    }
+
+    .query-row {
+      display: flex;
+      align-items: flex-end;
+      gap: var(--spacingM);
+      flex-wrap: wrap;
+    }
+
+    .query-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingS2);
+    }
+
+    .query-field--grow {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .query-actions {
+      display: flex;
+      gap: var(--spacingS1);
+      margin-top: var(--spacingM);
+    }
+
+    /* ── Query Config Collapse Animation ── */
+    .query-config-body {
+      overflow: hidden;
+      max-height: 600px;
+      opacity: 1;
+      transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.4s ease;
+    }
+
+    .query-config--collapsed .query-config-body {
+      max-height: 0;
+      opacity: 0;
+      margin: 0;
+    }
+
+    /* ── Config Running / Completed (inside collapsed config) ── */
+    .config-running {
+      display: none;
+      margin-top: var(--spacingM);
+    }
+
+    .query-config--running .config-running,
+    .query-config--completed .config-running {
+      display: block;
+    }
+
+    .query-config--completed .query-config-body {
+      max-height: 0;
+      opacity: 0;
+      margin: 0;
+    }
+
+    .query-config--completed .query-config-title {
+      margin-bottom: 0;
+      padding-bottom: var(--spacingS2);
+    }
+
+    /* Hide running-only elements when completed */
+    .query-config--completed .config-running-phase,
+    .query-config--completed .flm-progress,
+    .query-config--completed .config-running-subbar {
+      display: none;
+    }
+
+    /* ── Completed Fact Set ── */
+    .config-completed-stats {
+      display: none;
+    }
+
+    .query-config--completed .config-completed-stats {
+      display: grid;
+      width: 60%;
+      margin-bottom: var(--spacingM);
+      grid-template-rows: auto auto auto;
+      grid-template-columns: 20% 20% 20%;
+      grid-auto-flow: column;
+      gap: var(--spacingM) var(--spacingL2);
+    }
+
+    .config-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .config-stat-label {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+    }
+
+    .config-stat-value {
+      font-size: var(--fontSizeMedium);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .config-stat--error {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+
+    .config-stat--error .config-stat-value {
+      color: var(--red);
+      max-height: 60px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    /* ── Completed Actions ── */
+    .config-completed-actions {
+      display: none;
+      gap: var(--spacingS1);
+      margin-bottom: var(--spacingM);
+    }
+
+    .query-config--completed .config-completed-actions {
+      display: flex;
+    }
+
+    /* ── Phase step text with dots animation ── */
+    .config-running-phase {
+      font-size: var(--fontSizeMedium);
+      color: var(--bodyText);
+      margin-bottom: var(--spacingS2);
+    }
+
+    .config-running-dots {
+      display: inline-block;
+      min-width: 24px;
+    }
+
+    /* ── Sub-bar: meta left, cancel+elapsed right ── */
+    .config-running-subbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: var(--spacingS2);
+    }
+
+    .config-running-details {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+      flex-wrap: wrap;
+    }
+
+    .config-running-separator {
+      color: var(--bodyFrameDivider);
+    }
+
+    .config-running-right {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingM);
+      flex-shrink: 0;
+    }
+
+    .config-running-link {
+      font-size: var(--fontSizeSmall);
+      color: var(--themePrimary);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      padding: 0;
+    }
+
+    .config-running-link:hover {
+      text-decoration: underline;
+    }
+
+    .config-running-link--cancel {
+      color: var(--red);
+    }
+
+    .config-running-elapsed {
+      font-size: var(--fontSizeSmall);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Show Query toggle (like Advanced) ── */
+    .config-running-show-query {
+      margin-top: var(--spacingM);
+    }
+
+    .config-running-query-wrap {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height 0.35s ease, opacity 0.25s ease, margin-top 0.35s ease;
+      margin-top: 0;
+    }
+
+    .config-running-query-wrap--visible {
+      max-height: 200px;
+      opacity: 1;
+      margin-top: var(--spacingS2);
+    }
+
+    .config-running-query-text {
+      font-size: var(--fontSizeMedium);
+      color: var(--bodyText);
+      line-height: var(--lineHeightMedium);
+      white-space: pre-wrap;
+      padding: var(--spacingM);
+      background-color: var(--bodyBackground);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      max-height: 160px;
+      overflow-y: auto;
+    }
+
+    /* ── Results Zone ── */
+    .results-zone {
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Empty / Idle State ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      gap: var(--spacingM);
+      color: var(--bodySubtext);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      opacity: 0.4;
+    }
+
+    .empty-state-text {
+      font-size: var(--fontSizeLarge);
+      color: var(--bodySubtext);
+    }
+
+    .empty-state-sub {
+      font-size: var(--fontSizeMedium);
+      color: var(--bodySubtext);
+      opacity: 0.7;
+      max-width: 360px;
+      text-align: center;
+      line-height: var(--lineHeightMedium);
+    }
+
+    /* ── Complete State ── */
+    .complete-state {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    /* ── Pivot Tabs ── */
+    .pivot-bar {
+      display: flex;
+      border-bottom: 1px solid var(--bodyDivider);
+      background-color: var(--bodyStandoutBackground);
+      border-radius: var(--roundedCorner4) var(--roundedCorner4) 0 0;
+    }
+
+    .pivot-tab {
+      padding: var(--spacingS2) var(--spacingL1);
+      font-size: var(--fontSizeMedium);
+      color: var(--bodySubtext);
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      font-family: inherit;
+      transition: color 0.15s;
+    }
+
+    .pivot-tab:hover {
+      color: var(--bodyText);
+    }
+
+    .pivot-tab--active {
+      color: var(--themePrimary);
+      border-bottom-color: var(--themePrimary);
+      font-weight: var(--fontWeightSemibold);
+    }
+
+    .pivot-bar-spacer { flex: 1; }
+
+    .pivot-bar .flm-button--icon {
+      margin: 2px 4px;
+    }
+
+    .pivot-content {
+      padding: var(--spacingL1);
+      flex: 1;
+    }
+
+    .pivot-panel {
+      display: none;
+    }
+
+    .pivot-panel--active {
+      display: block;
+    }
+
+    /* ── Answer Tab ── */
+    .answer-body {
+      font-size: var(--fontSizeMedium);
+      line-height: 1.7;
+      color: var(--bodyText);
+    }
+
+    .answer-body p {
+      margin-bottom: var(--spacingM);
+    }
+
+    .answer-body strong {
+      font-weight: var(--fontWeightSemibold);
+    }
+
+    .answer-body ul, .answer-body ol {
+      margin: var(--spacingS2) 0 var(--spacingM) var(--spacingL2);
+    }
+
+    .answer-body li {
+      margin-bottom: var(--spacingS2);
+    }
+
+
+    /* ── Sources Tab ── */
+    .sources-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sources-list li {
+      padding: var(--spacingS2) 0;
+      border-bottom: 1px solid var(--bodyDivider);
+      font-size: var(--fontSizeMedium);
+      line-height: var(--lineHeightMedium);
+      color: var(--bodyText);
+    }
+
+    .sources-list li:last-child {
+      border-bottom: none;
+    }
+
+    /* ── Go to Top FAB ── */
+    .btn-go-top {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999999;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--themePrimary);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    .btn-go-top--visible {
+      display: flex;
+    }
+
+    .btn-go-top:hover {
+      opacity: 0.85;
+    }
+
+    .btn-go-top-arrow {
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    /* ── Error State ── */
+    .error-state {
+      padding: var(--spacingL1);
+      display: none;
+      flex-direction: column;
+      gap: var(--spacingM);
+    }
+
+    .error-actions {
+      display: flex;
+      gap: var(--spacingS1);
+    }
+
+    /* ── Advanced Section ── */
+    .advanced-section {
+      margin-top: var(--spacingM);
+    }
+
+    .advanced-toggle {
+      font-size: var(--fontSizeSmall);
+      color: var(--themePrimary);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
+      padding: 0;
+    }
+
+    .advanced-toggle:hover {
+      text-decoration: underline;
+    }
+
+    .advanced-body {
+      display: none;
+      margin-top: var(--spacingM);
+      padding: var(--spacingM);
+      background-color: var(--bodyBackground);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+    }
+
+    .advanced-body--visible {
+      display: block;
+    }
+
+    .advanced-row {
+      display: flex;
+      align-items: flex-end;
+      gap: var(--spacingM);
+      flex-wrap: wrap;
+    }
+
+    /* ── Logs Panel ── */
+    .log-content {
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: var(--fontSizeSmall);
+      line-height: 1.6;
+      color: var(--bodyText);
+      white-space: pre-wrap;
+      background-color: var(--bodyStandoutBackground);
+      padding: var(--spacingM);
+      border-radius: var(--roundedCorner4);
+      max-height: 500px;
+      overflow-y: auto;
+    }
+
+    .log-line-info { color: var(--bodySubtext); }
+    .log-line-warn { color: var(--yellow); }
+    .log-line-error { color: var(--red); }
+    .log-line-success { color: var(--green); }
+
+    /* ── Query Library Panel ── */
+    .library-search {
+      margin-bottom: var(--spacingM);
+    }
+
+    .library-empty {
+      text-align: center;
+      color: var(--bodySubtext);
+      font-size: var(--fontSizeMedium);
+      padding: var(--spacingL2) 0;
+    }
+
+    .library-item {
+      background-color: var(--bodyBackground);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      padding: var(--spacingM);
+      margin-bottom: var(--spacingS2);
+      cursor: pointer;
+    }
+
+    .library-item:hover {
+      border-color: var(--themePrimary);
+    }
+
+    .library-item--recent {
+      background-color: var(--listItemBackgroundChecked);
+    }
+
+    .library-item-text {
+      font-size: var(--fontSizeMedium);
+      line-height: var(--lineHeightMedium);
+      color: var(--bodyText);
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      min-height: calc(var(--lineHeightMedium) * 2);
+    }
+
+    .library-item-text--expanded {
+      -webkit-line-clamp: unset;
+    }
+
+    .library-item-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: var(--spacingS2);
+    }
+
+    .library-item-toggle {
+      font-size: var(--fontSizeSmall);
+      color: var(--themePrimary);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      font-family: inherit;
+    }
+
+    .library-item-toggle:hover {
+      text-decoration: underline;
+    }
+
+    .library-item-toggle:disabled {
+      color: var(--disabledText);
+      cursor: default;
+      text-decoration: none;
+    }
+
+    .library-item-delete {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      font-family: inherit;
+    }
+
+    .library-item-delete:hover {
+      color: var(--red);
+    }
+
+
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- ════════════════════════════════════════════════════════════════
+         LEFT NAV
+         ════════════════════════════════════════════════════════════════ -->
+    <nav class="app-nav">
+      <div class="app-nav-brand">Awarity</div>
+
+      <a class="app-nav-link" href="../home/"><i class="flm-icon" data-icon="Home"></i> Home</a>
+      <a class="app-nav-link" href="../catalogs/"><i class="flm-icon" data-icon="Database"></i> Catalogs</a>
+      <a class="app-nav-link app-nav-link--active" href="#"><i class="flm-icon" data-icon="Search"></i> Explore</a>
+      <a class="app-nav-link" href="../structure/"><i class="flm-icon" data-icon="Org"></i> Structure</a>
+      <a class="app-nav-link" href="../lenses/"><i class="flm-icon" data-icon="Filter"></i> Lenses</a>
+      <a class="app-nav-link" href="../workflows/"><i class="flm-icon" data-icon="Flow"></i> Workflows</a>
+      <a class="app-nav-link" href="../runs/"><i class="flm-icon" data-icon="Processing"></i> Runs</a>
+
+      <div class="app-nav-spacer"></div>
+
+      <a class="app-nav-link" href="../settings/"><i class="flm-icon" data-icon="Settings"></i> Settings</a>
+
+      <div style="padding: var(--spacingM);">
+        <button class="flm-button" id="themeToggle" style="width: 100%;">Switch to Light</button>
+      </div>
+    </nav>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         MAIN AREA
+         ════════════════════════════════════════════════════════════════ -->
+    <div class="app-main">
+
+      <!-- CommandBar -->
+      <div class="app-commandbar">
+        <div class="flm-commandbar">
+          <div class="flm-commandbar-items">
+            <button class="flm-button flm-button--primary" data-icon="Add" id="btn-new-query" style="margin: 4px 8px;">
+              New Query
+            </button>
+            <button class="flm-commandbar-item" data-icon="Processing" id="btn-view-runs">View Runs</button>
+            <span class="flm-commandbar-divider"></span>
+            <button class="flm-commandbar-item" data-icon="Help" id="btn-help">Help</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="app-breadcrumb">
+        <ol class="flm-breadcrumb">
+          <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="../home/">Home</a></li>
+          <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link">Explore</a></li>
+        </ol>
+      </div>
+
+      <!-- MessageBar Zone -->
+      <div class="app-messagebar-zone" id="messagebar-zone"></div>
+
+      <!-- Content -->
+      <div class="app-content">
+
+        <!-- ════════════════════════════════════════════════════════
+             ZONE 1 — Query Configuration
+             ════════════════════════════════════════════════════════ -->
+        <div class="query-config">
+          <div class="query-config-title" id="query-config-title">
+            <span class="query-config-title-text" id="query-config-title-text">Query Configuration</span>
+          </div>
+
+          <div class="query-config-body" id="query-config-body">
+          <!-- Row 1: Context Controls -->
+          <div class="query-row">
+            <div class="query-field" style="min-width: 180px;">
+              <label class="flm-label">Catalog</label>
+              <div class="flm-dropdown" id="sel-catalog">
+                <button class="flm-dropdown-trigger" type="button">
+                  <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select a catalog…</span>
+                  <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+                </button>
+                <div class="flm-dropdown-listbox">
+                  <div class="flm-dropdown-option" data-value="sec-filings">sec-filings</div>
+                  <div class="flm-dropdown-option" data-value="legal-contracts">legal-contracts</div>
+                  <div class="flm-dropdown-option" data-value="research-papers">research-papers</div>
+                  <div class="flm-dropdown-option" data-value="compliance-docs">compliance-docs</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="query-field">
+              <label class="flm-label">Mode</label>
+              <div class="flm-choicegroup" style="display: flex; gap: var(--spacingM); flex-direction: row;">
+                <label class="flm-choicegroup-option">
+                  <input type="radio" class="flm-choicegroup-input" name="query-mode" value="full" checked>
+                  <span class="flm-choicegroup-mark"></span>
+                  <span class="flm-choicegroup-label">Full ECW</span>
+                </label>
+                <label class="flm-choicegroup-option">
+                  <input type="radio" class="flm-choicegroup-input" name="query-mode" value="abstracts">
+                  <span class="flm-choicegroup-mark"></span>
+                  <span class="flm-choicegroup-label">Abstracts</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="query-field" style="min-width: 160px;">
+              <label class="flm-label">Lens</label>
+              <div class="flm-dropdown" id="sel-lens">
+                <button class="flm-dropdown-trigger" type="button">
+                  <span class="flm-dropdown-title">(none)</span>
+                  <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+                </button>
+                <div class="flm-dropdown-listbox">
+                  <div class="flm-dropdown-option flm-dropdown-option--selected" data-value="">(none)</div>
+                  <div class="flm-dropdown-option" data-value="financial-risk">financial-risk</div>
+                  <div class="flm-dropdown-option" data-value="legal-compliance">legal-compliance</div>
+                  <div class="flm-dropdown-option" data-value="executive-summary">executive-summary</div>
+                  <div class="flm-dropdown-option" data-value="technical-detail">technical-detail</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="query-field" style="min-width: 150px;">
+              <label class="flm-label">Model</label>
+              <div class="flm-dropdown" id="sel-model">
+                <button class="flm-dropdown-trigger" type="button">
+                  <span class="flm-dropdown-title">claude-sonnet</span>
+                  <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+                </button>
+                <div class="flm-dropdown-listbox">
+                  <div class="flm-dropdown-option flm-dropdown-option--selected" data-value="claude-sonnet">claude-sonnet</div>
+                  <div class="flm-dropdown-option" data-value="claude-haiku">claude-haiku</div>
+                  <div class="flm-dropdown-option" data-value="gpt-4o">gpt-4o</div>
+                  <div class="flm-dropdown-option" data-value="gpt-4o-mini">gpt-4o-mini</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Row 2: Question Input -->
+          <div style="margin-top: var(--spacingM);">
+            <div style="display: flex; align-items: baseline; justify-content: space-between;">
+              <label class="flm-label" for="input-question">Question or Goal</label>
+              <button class="config-running-link" id="btn-open-library">Saved Queries</button>
+            </div>
+            <textarea class="flm-textfield-input" id="input-question" rows="3" placeholder="What would you like to explore? e.g. 'What are the top financial risk disclosures across all SEC filings?'" style="width: 100%; resize: vertical; margin-top: var(--spacingS2);"></textarea>
+          </div>
+
+          <div class="query-actions">
+            <button class="flm-button flm-button--primary" id="btn-run" disabled>
+              <i class="flm-icon" data-icon="Search"></i> Run
+            </button>
+            <button class="flm-button" id="btn-clear">Clear</button>
+          </div>
+
+          <!-- Advanced Section -->
+          <div class="advanced-section" id="advanced-section">
+            <button class="advanced-toggle" id="btn-advanced-toggle">Advanced</button>
+            <div class="advanced-body" id="advanced-body">
+              <div class="advanced-row">
+                <div class="query-field">
+                  <label class="flm-checkbox">
+                    <input type="checkbox" class="flm-checkbox-input" id="adv-skip-inference">
+                    <span class="flm-checkbox-mark"></span>
+                    <span class="flm-label">Skip Inference</span>
+                  </label>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          </div><!-- /query-config-body -->
+
+          <!-- Running Progress (shown inside config when collapsed) -->
+          <div id="config-running" class="config-running">
+            <div class="config-running-phase">
+              <span id="running-phase">Reading documents</span><span class="config-running-dots" id="running-dots">.</span>
+            </div>
+            <div class="flm-progress">
+              <div class="flm-progress-track"><div class="flm-progress-bar" id="running-bar" style="width: 0%"></div></div>
+            </div>
+            <div class="config-running-subbar">
+              <div class="config-running-details">
+                <span id="running-catalog">sec-filings</span>
+                <span class="config-running-separator">·</span>
+                <span id="running-mode">Full ECW</span>
+                <span class="config-running-separator">·</span>
+                <span id="running-lens">(none)</span>
+                <span class="config-running-separator">·</span>
+                <span id="running-model">claude-sonnet</span>
+                <span class="config-running-separator" id="running-tokens-sep" style="display: none;">·</span>
+                <span id="running-tokens" style="display: none;">~4.2M tokens</span>
+              </div>
+              <div class="config-running-right">
+                <button class="config-running-link config-running-link--cancel" id="btn-cancel-query">Cancel</button>
+                <span class="config-running-elapsed" id="running-elapsed">0:00</span>
+              </div>
+            </div>
+            <!-- Completed: stats fact set (hidden during running, shown on complete) -->
+            <div class="config-completed-stats" id="completed-stats">
+              <!-- Col 1: Catalog, Lens, Documents -->
+              <div class="config-stat"><span class="config-stat-label">Catalog</span><span class="config-stat-value" id="stat-catalog">sec-filings</span></div>
+              <div class="config-stat"><span class="config-stat-label">Lens</span><span class="config-stat-value" id="stat-lens">(none)</span></div>
+              <div class="config-stat"><span class="config-stat-label">Documents</span><span class="config-stat-value" id="stat-documents">2,341</span></div>
+              <!-- Col 2: Model, Token usage, Mode -->
+              <div class="config-stat"><span class="config-stat-label">Model</span><span class="config-stat-value" id="stat-model">claude-sonnet</span></div>
+              <div class="config-stat"><span class="config-stat-label">Token usage</span><span class="config-stat-value" id="stat-tokens">4,218,340</span></div>
+              <div class="config-stat"><span class="config-stat-label">Mode</span><span class="config-stat-value" id="stat-mode">Full ECW</span></div>
+              <!-- Col 3: Duration, (extra for cancel/error) -->
+              <div class="config-stat"><span class="config-stat-label">Duration</span><span class="config-stat-value" id="stat-duration">0:30</span></div>
+              <div class="config-stat" id="stat-extra-wrap" style="display: none;"><span class="config-stat-label" id="stat-extra-label"></span><span class="config-stat-value" id="stat-extra-value"></span></div>
+            </div>
+
+            <!-- Completed: action buttons -->
+            <div class="config-completed-actions">
+              <button class="flm-button" id="btn-edit-query">Edit Query</button>
+              <button class="flm-button" id="btn-save-query">Save Query</button>
+            </div>
+
+            <div class="config-running-show-query">
+              <button class="config-running-link" id="btn-show-query">Show query</button>
+              <div class="config-running-query-wrap" id="running-query-wrap">
+                <div class="config-running-query-text" id="running-query-text"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ════════════════════════════════════════════════════════
+             ZONE 2 — Results Area
+             ════════════════════════════════════════════════════════ -->
+        <div class="results-zone" id="results-zone">
+
+          <!-- Idle State -->
+          <div id="state-idle" class="empty-state">
+            <i class="flm-icon empty-state-icon" data-icon="Search"></i>
+            <span class="empty-state-text">No query executed yet.</span>
+            <span class="empty-state-sub">Select a catalog and enter a question to begin.</span>
+          </div>
+
+          <!-- Complete State -->
+          <div id="state-complete" class="complete-state">
+            <div class="pivot-bar">
+              <button class="pivot-tab pivot-tab--active" data-tab="answer">Answer</button>
+              <button class="pivot-tab" data-tab="sources">Sources</button>
+              <div class="pivot-bar-spacer"></div>
+              <button class="flm-button flm-button--icon" id="btn-copy-answer" title="Copy to clipboard">
+                <i class="flm-icon" data-icon="Copy"></i>
+              </button>
+              <button class="flm-button flm-button--icon" id="btn-download-answer" title="Download">
+                <i class="flm-icon" data-icon="Download"></i>
+              </button>
+            </div>
+            <div class="pivot-content">
+              <div class="pivot-panel pivot-panel--active" id="tab-answer">
+                <div class="answer-body" id="answer-body">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+              <div class="pivot-panel" id="tab-sources">
+                <ul class="sources-list" id="sources-list">
+                  <!-- Populated by JS -->
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error State -->
+          <div id="state-error" class="error-state">
+            <div class="flm-messagebar flm-messagebar--error" id="error-message">
+              Query failed.
+            </div>
+            <div class="error-actions">
+              <button class="flm-button" id="btn-view-logs">
+                <i class="flm-icon" data-icon="TextDocument"></i> View Logs
+              </button>
+              <button class="flm-button flm-button--primary" id="btn-retry">
+                <i class="flm-icon" data-icon="Refresh"></i> Retry
+              </button>
+            </div>
+          </div>
+
+        </div><!-- /results-zone -->
+
+      </div><!-- /app-content -->
+    </div><!-- /app-main -->
+  </div><!-- /app-shell -->
+
+  <!-- Go to Top FAB — direct child of body -->
+  <button class="btn-go-top" id="btn-go-top" title="Scroll to top">
+    <span class="btn-go-top-arrow">&#8593;</span>
+  </button>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       LOGS PANEL
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-panel-overlay" id="logs-panel-overlay"></div>
+  <div class="flm-panel flm-panel--medium" id="logs-panel">
+    <div class="flm-panel-header">
+      <h2 class="flm-panel-title">Query Logs</h2>
+      <button class="flm-panel-close" data-icon="Cancel" aria-label="Close" id="logs-panel-close"></button>
+    </div>
+    <div class="flm-panel-body">
+      <div class="log-content" id="log-content">
+<span class="log-line-info">[2026-02-21 10:32:01] Starting ECW query on sec-filings</span>
+<span class="log-line-info">[2026-02-21 10:32:01] Catalog: sec-filings (2,341 docs / 18,420 chunks)</span>
+<span class="log-line-info">[2026-02-21 10:32:01] Mode: Full ECW | Model: claude-sonnet</span>
+<span class="log-line-info">[2026-02-21 10:32:01] Lens: financial-risk</span>
+<span class="log-line-info">[2026-02-21 10:32:02] Phase 1: Reading chunks…</span>
+<span class="log-line-info">[2026-02-21 10:32:15] Processed 5,000 / 18,420 chunks</span>
+<span class="log-line-info">[2026-02-21 10:32:34] Processed 10,000 / 18,420 chunks</span>
+<span class="log-line-info">[2026-02-21 10:32:51] Processed 15,000 / 18,420 chunks</span>
+<span class="log-line-info">[2026-02-21 10:33:02] Processed 18,420 / 18,420 chunks</span>
+<span class="log-line-success">[2026-02-21 10:33:02] Phase 1 complete: 847 notes extracted</span>
+<span class="log-line-info">[2026-02-21 10:33:03] Phase 2: Synthesizing answer…</span>
+<span class="log-line-error">[2026-02-21 10:33:18] ERROR: Model returned empty response</span>
+<span class="log-line-error">[2026-02-21 10:33:18] Query failed after 77 seconds</span>
+      </div>
+    </div>
+    <div class="flm-panel-footer">
+      <button class="flm-button" id="logs-panel-close-btn">Close</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       QUERY LIBRARY PANEL
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-panel-overlay" id="library-panel-overlay"></div>
+  <div class="flm-panel flm-panel--medium" id="library-panel">
+    <div class="flm-panel-header">
+      <h2 class="flm-panel-title" id="library-panel-title">Saved Queries</h2>
+      <button class="flm-panel-close" data-icon="Cancel" aria-label="Close" id="library-panel-close"></button>
+    </div>
+    <div class="flm-panel-body">
+      <div class="library-search">
+        <div class="flm-searchbox">
+          <input class="flm-searchbox-input" type="search" placeholder="Search saved queries…" id="library-search-input">
+        </div>
+      </div>
+      <div id="library-list">
+        <!-- Populated by JS -->
+      </div>
+      <div class="library-empty" id="library-empty" style="display: none;">No saved queries for this catalog.</div>
+    </div>
+    <div class="flm-panel-footer">
+      <button class="flm-button" id="library-panel-close-btn">Close</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       DELETE QUERY CONFIRMATION DIALOG
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-dialog-overlay" id="delete-query-dialog" data-light-dismiss style="z-index: 1002;">
+    <div class="flm-dialog">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title">Delete Saved Query</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
+      </div>
+      <div class="flm-dialog-body">
+        <p>Are you sure you want to delete this saved query?</p>
+        <p style="margin-top: var(--spacingS2); color: var(--bodySubtext); font-size: var(--fontSizeSmall); line-height: var(--lineHeightMedium);" id="delete-query-preview"></p>
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button flm-button--primary" style="background-color: var(--red); border-color: var(--red);" id="btn-confirm-delete-query">Delete</button>
+        <button class="flm-button" data-dialog-close>Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Combined library JS -->
+  <script src="../../dist/fluentlm.min.js"></script>
+
+  <script>
+    // ── Register custom icons ──
+    FluentIcons.register('Database',     'M8 1C4.13 1 1 2.34 1 4v8c0 1.66 3.13 3 7 3s7-1.34 7-3V4c0-1.66-3.13-3-7-3zM2 6.26C3.41 7.24 5.59 7.8 8 7.8s4.59-.56 6-1.54V8c0 .77-2.42 2-6 2S2 8.77 2 8V6.26zM8 2c3.58 0 6 1.23 6 2s-2.42 2-6 2S2 4.77 2 4s2.42-2 6-2zm0 12c-3.58 0-6-1.23-6-2v-1.74C3.41 11.24 5.59 11.8 8 11.8s4.59-.56 6-1.54V12c0 .77-2.42 2-6 2z');
+    FluentIcons.register('Org',          'M8 1a2 2 0 0 1 2 2v1h2.5a.5.5 0 0 1 .5.5V7h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5h1V5H9v1.5a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5V5H5v2h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5v-4A.5.5 0 0 1 3 7h1V4.5a.5.5 0 0 1 .5-.5H7V3a2 2 0 0 1 1-2z');
+    FluentIcons.register('Flow',         'M2 3.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .35.15L8.71 6H13.5a.5.5 0 0 1 0 1H8.71l-2.86 2.85a.5.5 0 0 1-.35.15h-3a.5.5 0 0 1 0-1h2.79L8 6.5 5.29 4H2.5a.5.5 0 0 1-.5-.5zm0 8a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .35.15L8.71 14H13.5a.5.5 0 0 1 0 1H8.71l-2.86-2.85A.5.5 0 0 0 5.5 12h-3a.5.5 0 0 1-.5-.5z');
+    FluentIcons.register('Processing',   'M8 1.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V2a.5.5 0 0 1 .5-.5zM3.05 3.05a.5.5 0 0 1 .7 0l1.42 1.42a.5.5 0 0 1-.7.7L3.05 3.76a.5.5 0 0 1 0-.7zm9.9 0a.5.5 0 0 1 0 .7l-1.42 1.42a.5.5 0 1 1-.7-.7l1.41-1.42a.5.5 0 0 1 .7 0zM1.5 8a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H2a.5.5 0 0 1-.5-.5zm10 0a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm-6.33 3.17a.5.5 0 0 1 0 .7L3.76 13.3a.5.5 0 0 1-.7-.7l1.41-1.42a.5.5 0 0 1 .7 0zm5.66 0a.5.5 0 0 1 .7 0l1.42 1.42a.5.5 0 0 1-.7.7l-1.42-1.41a.5.5 0 0 1 0-.7zM8 12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5z');
+    FluentIcons.register('TextDocument', 'M4 2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5.41a1 1 0 0 0-.3-.7L9.3 1.28a1 1 0 0 0-.71-.29H4zm1.5 5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zm0 2h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zm0 2h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1 0-1z');
+    FluentIcons.register('Refresh',      'M1.5 8a6.5 6.5 0 0 1 11.25-4.43V2a.5.5 0 0 1 1 0v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1 0-1h1.87A5.5 5.5 0 1 0 13.5 8a.5.5 0 0 1 1 0A6.5 6.5 0 1 1 1.5 8z');
+    FluentIcons.register('Download',     'M8 1.5a.5.5 0 0 1 .5.5v7.79l2.15-2.14a.5.5 0 0 1 .7.7l-3 3a.5.5 0 0 1-.7 0l-3-3a.5.5 0 1 1 .7-.7L7.5 9.79V2a.5.5 0 0 1 .5-.5zM2.5 12a.5.5 0 0 1 .5.5v1h10v-1a.5.5 0 0 1 1 0v1.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-1.5a.5.5 0 0 1 .5-.5z');
+    FluentIcons.register('Copy',         'M5.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h6a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-6zM4 3.5A1.5 1.5 0 0 1 5.5 2h6A1.5 1.5 0 0 1 13 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-6A1.5 1.5 0 0 1 4 12.5v-9zM2 5.5a.5.5 0 0 1 .5.5v7.5A1.5 1.5 0 0 0 4 15h6a.5.5 0 0 1 0 1H4a2.5 2.5 0 0 1-2.5-2.5V6a.5.5 0 0 1 .5-.5z');
+    FluentIcons.register('Help',         'M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-3.5a1.5 1.5 0 0 1 2.87.6c0 .73-.52 1.06-1 1.36l-.13.08c-.4.26-.74.5-.74 1.06a.5.5 0 0 1-1 0c0-1.03.61-1.4 1.1-1.72l.13-.08c.46-.29.64-.44.64-.7a.5.5 0 0 0-1 0 .5.5 0 0 1-1 0zM8 11.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5z');
+
+    // ── Register themes & init ──
+    FluentLM.registerTheme('awarity-light', 'fluent-awarity-light');
+    FluentLM.registerTheme('awarity-dark', 'fluent-awarity-dark');
+    FluentLM.setTheme('awarity-dark');
+
+    (function () {
+
+      // ── Mock Catalog Data ──
+      var CATALOG_DATA = {
+        'sec-filings':      { documents: 2341, chunks: 18420 },
+        'legal-contracts':  { documents: 847,  chunks: 6120 },
+        'research-papers':  { documents: 512,  chunks: 3840 },
+        'compliance-docs':  { documents: 1105, chunks: 8930 }
+      };
+
+      // ── Track whether a query has ever completed ──
+      var hasCompletedQuery = false;
+
+      // ── Mock Answer (extended) ──
+      var MOCK_ANSWER = '<p><strong>Summary of Financial Risk Disclosures Across SEC Filings</strong></p>' +
+        '<p>Analysis of 2,341 SEC filings reveals several recurring risk categories across the corpus. The following synthesis draws from structured note-taking across all documents, identifying dominant patterns, outlier disclosures, and emergent risk themes that span industries and market capitalizations.</p>' +
+        '<p><strong>1. Market &amp; Liquidity Risk</strong></p>' +
+        '<ul>' +
+        '<li>Multiple filers report declining current ratios and increasing reliance on variable-rate debt. Interest rate sensitivity is a dominant theme, with aggregate variable-rate exposure exceeding $8B across the sample. The median current ratio across all filers dropped from 1.9 in FY2023 to 1.4 in FY2025, with the sharpest declines in the manufacturing and retail sectors.</li>' +
+        '<li>Foreign currency exposure is frequently cited, with hedging strategies covering 50–70% of projected exposure on average. Notably, 23% of filers report no formal hedging program despite material international revenue (>20% of total).</li>' +
+        '<li>Credit facility covenants are tightening across the sample. Approximately 15% of filers disclosed covenant modification or waiver requests during the trailing twelve months, up from 8% in the prior year.</li>' +
+        '<li>Money market and commercial paper access was cited as a liquidity concern by 34 filers, primarily in the technology and healthcare sectors where operating cash flow variability is highest.</li>' +
+        '</ul>' +
+        '<p><strong>2. Operational &amp; Supply Chain Risk</strong></p>' +
+        '<ul>' +
+        '<li>Supply chain disruption remains the most frequently cited operational risk, particularly for companies with Southeast Asian manufacturing dependencies. 412 filers (17.6%) specifically name Vietnam, Thailand, or Malaysia as concentration points. Average lead time increases of 3–6 weeks are reported across the industrial sector.</li>' +
+        '<li>Cybersecurity incidents are increasingly disclosed as material events, with remediation costs averaging $8–15M per incident. The frequency of disclosed incidents rose 62% year-over-year. Ransomware was the most common attack vector (41% of incidents), followed by phishing-based credential theft (28%).</li>' +
+        '<li>Workforce availability and labor cost inflation appear in 38% of operational risk disclosures, particularly in logistics, healthcare, and construction. Several filers note the impact of immigration policy uncertainty on skilled labor supply.</li>' +
+        '<li>Physical infrastructure risk, including aging facilities and deferred maintenance, is an emerging sub-theme. 89 filers disclosed capital expenditure deferrals that may increase operational risk in subsequent periods.</li>' +
+        '</ul>' +
+        '<p><strong>3. Regulatory &amp; Litigation Risk</strong></p>' +
+        '<ul>' +
+        '<li>Pending regulatory approvals (FDA, EPA) are cited as binary risk events with revenue impact ranging from 15–40% of total revenue. The pharmaceutical sector shows the highest concentration of binary regulatory risk, with 67 filers awaiting decisions that could materially impact their product pipeline.</li>' +
+        '<li>Class action litigation exposure across the corpus totals an estimated $2.1B in aggregate. Securities fraud claims account for the largest share (38%), followed by product liability (24%) and employment practices (19%).</li>' +
+        '<li>Data privacy and GDPR/CCPA compliance costs are rising. 156 filers report annual compliance spend exceeding $5M, with 22 filers exceeding $20M. Several note that emerging state-level privacy laws in the US are creating a patchwork compliance burden.</li>' +
+        '<li>Antitrust scrutiny is highlighted by 45 filers, primarily in technology, media, and healthcare. Three filers disclosed active DOJ or FTC investigations that could result in structural remedies or significant fines.</li>' +
+        '<li>Tax law uncertainty — particularly around international minimum tax provisions (Pillar Two) — is cited by 198 filers as a risk to effective tax rate stability. Several multinational filers disclosed potential increases of 2–5 percentage points in their effective tax rates.</li>' +
+        '</ul>' +
+        '<p><strong>4. Climate &amp; ESG Risk</strong></p>' +
+        '<ul>' +
+        '<li>Climate risk disclosures have increased 340% year-over-year. Coastal asset vulnerability and transition risk from decarbonization mandates are the leading subtopics. 312 filers now include quantitative scenario analysis (1.5°C and 2°C pathways) in their filings, compared to just 74 in the prior year.</li>' +
+        '<li>Physical climate risk: 189 filers identified specific assets exposed to sea-level rise, wildfire, or extreme weather events. Aggregate at-risk asset value exceeds $12B across the sample. Insurance cost increases averaging 18–25% were reported for exposed facilities.</li>' +
+        '<li>Transition risk: 267 filers discuss decarbonization obligations and their financial impact. Capital expenditure requirements for emissions reduction range from $50M to $2B depending on industry and current emissions profile. Energy sector filers report the highest absolute transition costs.</li>' +
+        '<li>Scope 3 emissions reporting remains inconsistent but is accelerating. 41% of filers now attempt to quantify Scope 3 emissions, up from 18% in the prior year. Data quality and methodology divergence remain significant limitations.</li>' +
+        '<li>Water scarcity is an emerging climate sub-risk. 78 filers in agriculture, semiconductor manufacturing, and beverages disclosed water access constraints that could impact production capacity.</li>' +
+        '</ul>' +
+        '<p><strong>5. Concentration Risk</strong></p>' +
+        '<ul>' +
+        '<li>Customer concentration is a notable risk for mid-cap filers, with top-3 customer revenue share averaging 45–65% and limited contractual protections. 124 filers report that a single customer accounts for more than 20% of revenue.</li>' +
+        '<li>Geographic concentration compounds customer risk. 203 filers derive more than 50% of revenue from a single country or region, with limited geographic diversification plans disclosed.</li>' +
+        '<li>Supplier concentration mirrors customer risk patterns. 167 filers identified single-source dependencies for critical inputs, with limited qualification of alternative suppliers.</li>' +
+        '</ul>' +
+        '<p><strong>6. Technology &amp; Innovation Risk</strong></p>' +
+        '<ul>' +
+        '<li>AI and automation displacement risk is a new category appearing in 89 filings. Companies in financial services, legal services, and customer support sectors disclose potential workforce restructuring costs and competitive threats from AI-native entrants.</li>' +
+        '<li>Technical debt and legacy system risk appears in 134 filings, primarily from companies undergoing digital transformation. Average disclosed migration costs range from $25M to $200M with timelines of 2–5 years.</li>' +
+        '<li>Intellectual property risk, including patent expiration and trade secret protection, is cited by 245 filers. Pharmaceutical companies with patent cliffs in 2025–2027 represent $48B in at-risk revenue.</li>' +
+        '</ul>' +
+        '<p><strong>7. Geopolitical Risk</strong></p>' +
+        '<ul>' +
+        '<li>Trade policy uncertainty affects 456 filers (19.5% of the corpus). Tariff exposure, export controls, and sanctions compliance costs are the primary sub-themes. Companies with significant China operations (312 filers) report the highest geopolitical risk scores.</li>' +
+        '<li>Conflict zone exposure: 34 filers disclosed direct or indirect business relationships in active conflict zones, with potential for supply disruption, asset impairment, or reputational harm.</li>' +
+        '<li>Sanctions compliance costs have risen 45% year-over-year across the financial services sector, with several banks disclosing dedicated compliance teams exceeding 200 personnel.</li>' +
+        '</ul>' +
+        '<p><strong>Conclusion</strong></p>' +
+        '<p>The corpus reveals a risk landscape that is both broadening and deepening. Traditional financial risks (liquidity, interest rate, currency) remain dominant by frequency, but newer categories — climate transition, cybersecurity, AI disruption, and geopolitical fragmentation — are growing rapidly in both disclosure frequency and estimated financial impact. The shift toward quantitative risk disclosure is encouraging but uneven, with significant methodology gaps that limit cross-filer comparability. Organizations that combine structured classification with full-document reading (as this analysis demonstrates) are best positioned to identify both systemic patterns and outlier risks that narrative-level summaries miss.</p>';
+
+      // ── Mock Sources (document citations) ──
+      var MOCK_SOURCES = [
+        '10-K_ACME_2025.pdf',
+        '10-Q_BETA_Q3.pdf',
+        'DEF14A_GAMMA.pdf',
+        '10-K_DELTA_2025.pdf',
+        '8-K_EPSILON.pdf',
+        '10-K_ZETA_2025.pdf',
+        '10-Q_ETA_Q2.pdf',
+        '10-K_THETA_2025.pdf',
+        '10-K_IOTA_2025.pdf',
+        '10-K_KAPPA_2025.pdf',
+        '10-K_LAMBDA_2025.pdf',
+        '10-Q_MU_Q1.pdf',
+        'DEF14A_NU.pdf',
+        '10-K_XI_2025.pdf',
+        '10-Q_OMICRON_Q4.pdf',
+        '8-K_PI.pdf',
+        '10-K_RHO_2025.pdf',
+        '10-K_SIGMA_2025.pdf'
+      ];
+
+      // ── State ──
+      var currentState = 'idle'; // idle | running | complete | error
+      var runningInterval = null;
+      var elapsedInterval = null;
+      var dotsInterval = null;
+      var elapsedSeconds = 0;
+      var lastRunQueryText = '';  // tracks the exact text used for the last run
+      var lastRunCatalog = '';
+
+      // ── Query Library ──
+      // Simple hash: djb2
+      function hashQuery(catalog, text) {
+        var str = catalog + '/' + text.trim();
+        var hash = 5381;
+        for (var i = 0; i < str.length; i++) {
+          hash = ((hash << 5) + hash) + str.charCodeAt(i);
+          hash = hash & hash; // 32-bit int
+        }
+        return 'q' + Math.abs(hash).toString(36);
+      }
+
+      // Per-catalog saved queries: { catalog: [ { id, text, lastUsed } ] }
+      var now = Date.now();
+      var savedQueries = {
+        'sec-filings': [
+          { id: null, text: 'What are the top financial risk disclosures across all SEC filings?', lastUsed: now - 3600000 },
+          { id: null, text: 'Summarize all cybersecurity incidents and their remediation costs.', lastUsed: now - 86400000 },
+          { id: null, text: 'Which filers have the highest foreign currency exposure?', lastUsed: now - 172800000 }
+        ],
+        'legal-contracts': [
+          { id: null, text: 'Identify all non-compete clauses and their durations.', lastUsed: now - 7200000 },
+          { id: null, text: 'What are the most common termination conditions?', lastUsed: now - 259200000 }
+        ],
+        'research-papers': [],
+        'compliance-docs': [
+          { id: null, text: 'List all GDPR compliance gaps identified across the corpus.', lastUsed: now - 43200000 }
+        ]
+      };
+      // Pre-compute IDs
+      for (var cat in savedQueries) {
+        savedQueries[cat].forEach(function (q) {
+          q.id = hashQuery(cat, q.text);
+        });
+      }
+
+      // ── Helper: get value from flm-dropdown ──
+      function getDropdownValue(id) {
+        var el = document.getElementById(id);
+        return el ? (el.getAttribute('data-value') || '') : '';
+      }
+
+      // ── Refs ──
+      var selCatalog = document.getElementById('sel-catalog');
+      var inputQuestion = document.getElementById('input-question');
+      var btnRun = document.getElementById('btn-run');
+      var btnClear = document.getElementById('btn-clear');
+      var btnNewQuery = document.getElementById('btn-new-query');
+      var queryConfig = document.querySelector('.query-config');
+      var queryConfigBody = document.getElementById('query-config-body');
+      var messageZone = document.getElementById('messagebar-zone');
+
+      // ── New Query starts disabled ──
+      btnNewQuery.disabled = true;
+
+      // ── Theme Toggle ──
+      var themeBtn = document.getElementById('themeToggle');
+      function updateThemeLabel() {
+        themeBtn.textContent = FluentLM.getTheme() === 'awarity-light' ? 'Switch to Dark' : 'Switch to Light';
+      }
+      updateThemeLabel();
+      themeBtn.addEventListener('click', function () {
+        FluentLM.setTheme(FluentLM.getTheme() === 'awarity-light' ? 'awarity-dark' : 'awarity-light');
+        updateThemeLabel();
+      });
+
+      // ── Enable/Disable Run Button ──
+      function updateRunState() {
+        var hasCatalog = getDropdownValue('sel-catalog') !== '';
+        var hasQuestion = inputQuestion.value.trim() !== '';
+        btnRun.disabled = !(hasCatalog && hasQuestion);
+      }
+      selCatalog.addEventListener('change', updateRunState);
+      inputQuestion.addEventListener('input', updateRunState);
+
+      // ── State Management ──
+      var configTitleText = document.getElementById('query-config-title-text');
+
+      function showResultState(state) {
+        currentState = state;
+        var idleEl = document.getElementById('state-idle');
+        idleEl.style.display = (state === 'idle' || state === 'running') ? 'flex' : 'none';
+        idleEl.querySelector('.empty-state-text').textContent = state === 'running' ? 'Waiting for answer…' : 'No query executed yet.';
+        idleEl.querySelector('.empty-state-sub').textContent = state === 'running' ? '' : 'Select a catalog and enter a question to begin.';
+        document.getElementById('state-complete').style.display = state === 'complete' ? 'flex' : 'none';
+        document.getElementById('state-error').style.display = state === 'error' ? 'flex' : 'none';
+
+        // Title changes per state
+        if (state === 'idle') {
+          configTitleText.textContent = 'Query Configuration';
+        } else if (state === 'running') {
+          configTitleText.textContent = 'Query Running';
+        } else if (state === 'complete') {
+          configTitleText.textContent = 'Query Completed';
+        } else if (state === 'error') {
+          configTitleText.textContent = 'Query Error';
+        }
+
+        // Collapse/expand query config
+        queryConfig.classList.remove('query-config--collapsed', 'query-config--running', 'query-config--completed');
+        if (state === 'running') {
+          queryConfig.classList.add('query-config--collapsed', 'query-config--running');
+          // Reset show-query toggle
+          document.getElementById('running-query-wrap').classList.remove('config-running-query-wrap--visible');
+          document.getElementById('btn-show-query').textContent = 'Show query';
+        } else if (state === 'complete') {
+          queryConfig.classList.add('query-config--completed');
+          populateCompletedStats();
+          updateSaveButtonState();
+        }
+
+        // Stop timers when not running
+        if (state !== 'running') {
+          if (elapsedInterval) { clearInterval(elapsedInterval); elapsedInterval = null; }
+          if (dotsInterval) { clearInterval(dotsInterval); dotsInterval = null; }
+        }
+
+        // New Query button: enabled only after first completion and not while running
+        if (state === 'complete' || state === 'error') {
+          hasCompletedQuery = true;
+        }
+        btnNewQuery.disabled = !hasCompletedQuery || state === 'running';
+      }
+
+      // ── MessageBar Helper ──
+      function showMessage(type, text) {
+        messageZone.innerHTML = '<div class="flm-messagebar flm-messagebar--' + type + '">' + text + '</div>';
+        setTimeout(function () { messageZone.innerHTML = ''; }, 5000);
+      }
+
+      // ── Elapsed Timer Helper ──
+      function formatElapsed(secs) {
+        var m = Math.floor(secs / 60);
+        var s = secs % 60;
+        return m + ':' + (s < 10 ? '0' : '') + s;
+      }
+
+      // ── Populate completed stats fact set ──
+      function populateCompletedStats(opts) {
+        opts = opts || {};
+        var catalog = getDropdownValue('sel-catalog');
+        var cat = CATALOG_DATA[catalog];
+        var lens = getDropdownValue('sel-lens');
+        var model = getDropdownValue('sel-model') || 'claude-sonnet';
+        var queryMode = document.querySelector('input[name="query-mode"]:checked').value;
+
+        document.getElementById('stat-catalog').textContent = catalog;
+        document.getElementById('stat-model').textContent = model;
+        document.getElementById('stat-duration').textContent = formatElapsed(elapsedSeconds);
+        document.getElementById('stat-lens').textContent = lens || '(none)';
+        document.getElementById('stat-tokens').textContent = '4,218,340';
+        document.getElementById('stat-documents').textContent = cat ? cat.documents.toLocaleString() : '—';
+        document.getElementById('stat-mode').textContent = queryMode === 'full' ? 'Full ECW' : 'Abstracts';
+
+        // Extra stat: Operation (cancelled) or Error
+        var extraWrap = document.getElementById('stat-extra-wrap');
+        var extraLabel = document.getElementById('stat-extra-label');
+        var extraValue = document.getElementById('stat-extra-value');
+        extraWrap.style.display = 'none';
+        extraWrap.className = 'config-stat';
+
+        if (opts.cancelled) {
+          extraWrap.style.display = '';
+          extraLabel.textContent = 'Operation';
+          extraValue.textContent = 'Canceled';
+          extraValue.style.color = 'var(--yellow)';
+        } else if (opts.error) {
+          extraWrap.style.display = '';
+          extraWrap.className = 'config-stat config-stat--error';
+          extraLabel.textContent = 'Error';
+          extraValue.textContent = opts.error;
+          extraValue.style.color = '';
+        } else {
+          extraValue.style.color = '';
+        }
+      }
+
+      // ── Edit Query — return to config with query text preserved ──
+      document.getElementById('btn-edit-query').addEventListener('click', function () {
+        hasCompletedQuery = false;
+        showResultState('idle');
+        updateRunState();
+        inputQuestion.focus();
+      });
+
+      // ── Save Query ──
+      var btnSaveQuery = document.getElementById('btn-save-query');
+
+      function isQueryInLibrary(catalog, text) {
+        var list = savedQueries[catalog] || [];
+        var id = hashQuery(catalog, text.trim());
+        return list.some(function (q) { return q.id === id; });
+      }
+
+      function updateSaveButtonState() {
+        if (currentState !== 'complete') return;
+        var disabled = isQueryInLibrary(lastRunCatalog, lastRunQueryText);
+        btnSaveQuery.disabled = disabled;
+      }
+
+      btnSaveQuery.addEventListener('click', function () {
+        var catalog = lastRunCatalog;
+        var text = lastRunQueryText.trim();
+        if (!catalog || !text) return;
+        if (isQueryInLibrary(catalog, text)) return;
+
+        // Add to library
+        if (!savedQueries[catalog]) savedQueries[catalog] = [];
+        var entry = { id: hashQuery(catalog, text), text: text, lastUsed: Date.now() };
+        savedQueries[catalog].push(entry);
+
+        // Disable save button now that it's saved
+        btnSaveQuery.disabled = true;
+
+        // Highlight the just-saved query in the panel
+        justSavedQueryId = entry.id;
+
+        // Open library panel to confirm
+        openLibraryPanel(catalog);
+        showMessage('success', 'Query saved to library.');
+      });
+
+      // ── Token estimates per catalog (optional) ──
+      var CATALOG_TOKENS = {
+        'sec-filings': '~4.2M tokens',
+        'legal-contracts': '~1.8M tokens',
+        'research-papers': null,
+        'compliance-docs': '~2.6M tokens'
+      };
+
+      // ── Run Query ──
+      function executeQuery(mode) {
+        var catalog = getDropdownValue('sel-catalog');
+        var queryMode = mode || document.querySelector('input[name="query-mode"]:checked').value;
+        var lens = getDropdownValue('sel-lens');
+        var model = getDropdownValue('sel-model') || 'claude-sonnet';
+
+        // Set running metadata
+        document.getElementById('running-catalog').textContent = catalog;
+        document.getElementById('running-mode').textContent = queryMode === 'full' ? 'Full ECW' : 'Abstracts';
+        document.getElementById('running-lens').textContent = lens || '(none)';
+        document.getElementById('running-model').textContent = model;
+
+        // Show token estimate if available
+        var tokenEst = CATALOG_TOKENS[catalog];
+        var tokenEl = document.getElementById('running-tokens');
+        var tokenSep = document.getElementById('running-tokens-sep');
+        if (tokenEst) {
+          tokenEl.textContent = tokenEst;
+          tokenEl.style.display = '';
+          tokenSep.style.display = '';
+        } else {
+          tokenEl.style.display = 'none';
+          tokenSep.style.display = 'none';
+        }
+
+        // Store query text for show-query preview and library tracking
+        lastRunQueryText = inputQuestion.value;
+        lastRunCatalog = catalog;
+        document.getElementById('running-query-text').textContent = inputQuestion.value;
+
+        // Bump MRU if this query is in the library
+        var libList = savedQueries[catalog] || [];
+        var libId = hashQuery(catalog, inputQuestion.value.trim());
+        var libEntry = libList.find(function (q) { return q.id === libId; });
+        if (libEntry) libEntry.lastUsed = Date.now();
+
+        showResultState('running');
+
+        // Disable Run while processing
+        btnRun.disabled = true;
+
+        // Start elapsed timer
+        elapsedSeconds = 0;
+        var elapsedEl = document.getElementById('running-elapsed');
+        elapsedEl.textContent = '0:00';
+        if (elapsedInterval) clearInterval(elapsedInterval);
+        elapsedInterval = setInterval(function () {
+          elapsedSeconds++;
+          elapsedEl.textContent = formatElapsed(elapsedSeconds);
+        }, 1000);
+
+        // Start dots animation
+        var dotsEl = document.getElementById('running-dots');
+        var dotStates = ['', ' .', ' . .', ' . . .'];
+        var dotIdx = 0;
+        dotsEl.textContent = '';
+        if (dotsInterval) clearInterval(dotsInterval);
+        dotsInterval = setInterval(function () {
+          dotIdx = (dotIdx + 1) % dotStates.length;
+          dotsEl.textContent = dotStates[dotIdx];
+        }, 800);
+
+        // Simulate phased progress (~30 seconds total)
+        var progress = 0;
+        var barEl = document.getElementById('running-bar');
+        var phaseEl = document.getElementById('running-phase');
+
+        barEl.style.width = '0%';
+
+        // Clear any previous running interval
+        if (runningInterval) clearInterval(runningInterval);
+
+        // ~30s: tick every 1s, increment ~3.3% per tick on average
+        runningInterval = setInterval(function () {
+          progress += 2.5 + Math.random() * 1.6;
+          if (progress > 100) progress = 100;
+
+          barEl.style.width = progress + '%';
+
+          if (progress < 65) {
+            phaseEl.textContent = 'Reading documents';
+          } else if (progress < 88) {
+            phaseEl.textContent = 'Extracting notes';
+          } else {
+            phaseEl.textContent = 'Synthesizing answer';
+          }
+
+          if (progress >= 100) {
+            clearInterval(runningInterval);
+            runningInterval = null;
+            setTimeout(function () {
+              populateResults();
+              showResultState('complete');
+              updateRunState();
+            }, 800);
+          }
+        }, 1000);
+      }
+
+      btnRun.addEventListener('click', function () {
+        executeQuery();
+      });
+
+      // ── Show Query Toggle ──
+      document.getElementById('btn-show-query').addEventListener('click', function () {
+        var wrap = document.getElementById('running-query-wrap');
+        var isVisible = wrap.classList.toggle('config-running-query-wrap--visible');
+        this.textContent = isVisible ? 'Hide query' : 'Show query';
+      });
+
+      // ── Cancel Query ──
+      document.getElementById('btn-cancel-query').addEventListener('click', function () {
+        if (runningInterval) {
+          clearInterval(runningInterval);
+          runningInterval = null;
+        }
+        if (elapsedInterval) {
+          clearInterval(elapsedInterval);
+          elapsedInterval = null;
+        }
+        configTitleText.textContent = 'Query Cancelled';
+        queryConfig.classList.remove('query-config--collapsed', 'query-config--running');
+        queryConfig.classList.add('query-config--completed');
+        populateCompletedStats({ cancelled: true });
+        currentState = 'idle';
+        if (dotsInterval) { clearInterval(dotsInterval); dotsInterval = null; }
+        // Keep idle placeholder hidden, show nothing in results
+        document.getElementById('state-idle').style.display = 'flex';
+        document.getElementById('state-idle').querySelector('.empty-state-text').textContent = 'Query was cancelled.';
+        document.getElementById('state-idle').querySelector('.empty-state-sub').textContent = '';
+        document.getElementById('state-complete').style.display = 'none';
+        document.getElementById('state-error').style.display = 'none';
+        hasCompletedQuery = true;
+        btnNewQuery.disabled = false;
+        updateRunState();
+      });
+
+      // ── Populate Results ──
+      function populateResults() {
+        // Answer
+        document.getElementById('answer-body').innerHTML = MOCK_ANSWER;
+
+        // Sources
+        var sourcesHtml = MOCK_SOURCES.map(function (name) {
+          return '<li>' + name + '</li>';
+        }).join('');
+        document.getElementById('sources-list').innerHTML = sourcesHtml;
+      }
+
+      // ── Clear ──
+      btnClear.addEventListener('click', function () {
+        inputQuestion.value = '';
+        showResultState('idle');
+        updateRunState();
+      });
+
+      // ── New Query (CommandBar) ──
+      btnNewQuery.addEventListener('click', function () {
+        inputQuestion.value = '';
+        showResultState('idle');
+        updateRunState();
+        // Reset pivot to Answer tab
+        document.querySelectorAll('.pivot-tab').forEach(function (t) { t.classList.remove('pivot-tab--active'); });
+        document.querySelectorAll('.pivot-panel').forEach(function (p) { p.classList.remove('pivot-panel--active'); });
+        document.querySelector('.pivot-tab[data-tab="answer"]').classList.add('pivot-tab--active');
+        document.getElementById('tab-answer').classList.add('pivot-panel--active');
+      });
+
+      // ── View Runs ──
+      document.getElementById('btn-view-runs').addEventListener('click', function () {
+        showMessage('info', 'Navigating to Runs page…');
+      });
+
+      // ── Pivot Tabs ──
+      document.querySelectorAll('.pivot-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          document.querySelectorAll('.pivot-tab').forEach(function (t) { t.classList.remove('pivot-tab--active'); });
+          document.querySelectorAll('.pivot-panel').forEach(function (p) { p.classList.remove('pivot-panel--active'); });
+          tab.classList.add('pivot-tab--active');
+          document.getElementById('tab-' + tab.getAttribute('data-tab')).classList.add('pivot-panel--active');
+        });
+      });
+
+      // ── Copy Answer ──
+      document.getElementById('btn-copy-answer').addEventListener('click', function () {
+        var text = document.getElementById('answer-body').innerText;
+        navigator.clipboard.writeText(text).then(function () {
+          showMessage('success', 'Answer copied to clipboard.');
+        });
+      });
+
+      // ── Download Answer ──
+      document.getElementById('btn-download-answer').addEventListener('click', function () {
+        var text = document.getElementById('answer-body').innerText;
+        var blob = new Blob([text], { type: 'text/plain' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        var catalog = getDropdownValue('sel-catalog') || 'query';
+        a.download = catalog + '-answer.md';
+        a.click();
+        URL.revokeObjectURL(url);
+        showMessage('success', 'Answer downloaded.');
+      });
+
+      // ── Advanced Section Toggle ──
+      document.getElementById('btn-advanced-toggle').addEventListener('click', function () {
+        var body = document.getElementById('advanced-body');
+        body.classList.toggle('advanced-body--visible');
+        this.textContent = body.classList.contains('advanced-body--visible') ? 'Hide Advanced' : 'Advanced';
+      });
+
+      // ── Error State Buttons ──
+      document.getElementById('btn-retry').addEventListener('click', function () {
+        executeQuery();
+      });
+
+      // ── Logs Panel ──
+      var logsPanel = document.getElementById('logs-panel');
+      var logsOverlay = document.getElementById('logs-panel-overlay');
+
+      function openLogsPanel() {
+        logsPanel.classList.add('flm-panel--open');
+        logsOverlay.classList.add('flm-panel-overlay--visible');
+      }
+
+      function closeLogsPanel() {
+        logsPanel.classList.remove('flm-panel--open');
+        logsOverlay.classList.remove('flm-panel-overlay--visible');
+      }
+
+      document.getElementById('btn-view-logs').addEventListener('click', openLogsPanel);
+      document.getElementById('logs-panel-close').addEventListener('click', closeLogsPanel);
+      document.getElementById('logs-panel-close-btn').addEventListener('click', closeLogsPanel);
+      logsOverlay.addEventListener('click', closeLogsPanel);
+
+      // ── Go to Top Button ──
+      var appContent = document.querySelector('.app-content');
+      var btnGoTop = document.getElementById('btn-go-top');
+
+      appContent.addEventListener('scroll', function () {
+        // Show when scrolled past the query config panel
+        btnGoTop.classList.toggle('btn-go-top--visible', appContent.scrollTop > 300);
+      });
+
+      btnGoTop.addEventListener('click', function () {
+        appContent.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+
+      // ── Error state: show stats with error info ──
+      var origShowResultState = showResultState;
+      window._showError = function (msg) {
+        configTitleText.textContent = 'Query Error';
+        queryConfig.classList.remove('query-config--collapsed', 'query-config--running');
+        queryConfig.classList.add('query-config--completed');
+        populateCompletedStats({ error: msg || 'Unknown error' });
+        currentState = 'error';
+        if (dotsInterval) { clearInterval(dotsInterval); dotsInterval = null; }
+        if (elapsedInterval) { clearInterval(elapsedInterval); elapsedInterval = null; }
+        if (runningInterval) { clearInterval(runningInterval); runningInterval = null; }
+        document.getElementById('state-idle').style.display = 'none';
+        document.getElementById('state-complete').style.display = 'none';
+        document.getElementById('state-error').style.display = 'flex';
+        hasCompletedQuery = true;
+        btnNewQuery.disabled = false;
+      };
+
+      // ── Query Library Panel ──
+      var libraryPanel = document.getElementById('library-panel');
+      var libraryOverlay = document.getElementById('library-panel-overlay');
+      var libraryList = document.getElementById('library-list');
+      var libraryEmpty = document.getElementById('library-empty');
+      var librarySearchInput = document.getElementById('library-search-input');
+      var currentLibraryCatalog = '';
+      var justSavedQueryId = null;
+
+      function openLibraryPanel(catalog) {
+        catalog = catalog || getDropdownValue('sel-catalog');
+        if (!catalog) {
+          showMessage('warning', 'Select a catalog first.');
+          return;
+        }
+        currentLibraryCatalog = catalog;
+        document.getElementById('library-panel-title').textContent = 'Saved Queries — ' + catalog;
+        librarySearchInput.value = '';
+        renderLibraryList(catalog, '');
+        libraryPanel.classList.add('flm-panel--open');
+        libraryOverlay.classList.add('flm-panel-overlay--visible');
+      }
+
+      function closeLibraryPanel() {
+        libraryPanel.classList.remove('flm-panel--open');
+        libraryOverlay.classList.remove('flm-panel-overlay--visible');
+        justSavedQueryId = null;
+      }
+
+      function renderLibraryList(catalog, filter) {
+        var list = (savedQueries[catalog] || []).slice();
+        // Sort MRU — most recently used first
+        list.sort(function (a, b) { return b.lastUsed - a.lastUsed; });
+        var filtered = list.filter(function (q) {
+          return !filter || q.text.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+        });
+
+        if (filtered.length === 0) {
+          libraryList.innerHTML = '';
+          libraryEmpty.style.display = 'block';
+          libraryEmpty.textContent = filter ? 'No matching queries.' : 'No saved queries for this catalog.';
+          return;
+        }
+
+        libraryEmpty.style.display = 'none';
+        libraryList.innerHTML = filtered.map(function (q) {
+          var recentClass = q.id === justSavedQueryId ? ' library-item--recent' : '';
+          return '<div class="library-item' + recentClass + '" data-query-id="' + q.id + '">' +
+            '<div class="library-item-text" data-query-id="' + q.id + '">' + q.text.replace(/</g, '&lt;') + '</div>' +
+            '<div class="library-item-footer">' +
+            '<button class="library-item-toggle" data-query-id="' + q.id + '">more</button>' +
+            '<button class="library-item-delete" data-query-id="' + q.id + '">Delete</button>' +
+            '</div>' +
+            '</div>';
+        }).join('');
+
+        // Disable more/less on cards that don't overflow
+        requestAnimationFrame(function () {
+          libraryList.querySelectorAll('.library-item-text').forEach(function (el) {
+            var overflows = el.scrollHeight > el.clientHeight;
+            var toggle = el.parentElement.querySelector('.library-item-toggle');
+            if (toggle) toggle.disabled = !overflows;
+          });
+        });
+      }
+
+      // Search within library
+      librarySearchInput.addEventListener('input', function () {
+        renderLibraryList(currentLibraryCatalog, this.value);
+      });
+
+      // Click to select a query, toggle more/less, or delete
+      libraryList.addEventListener('click', function (e) {
+        // Handle delete button
+        var deleteBtn = e.target.closest('.library-item-delete');
+        if (deleteBtn) {
+          e.stopPropagation();
+          pendingDeleteQueryId = deleteBtn.getAttribute('data-query-id');
+          var entry = (savedQueries[currentLibraryCatalog] || []).find(function (q) { return q.id === pendingDeleteQueryId; });
+          document.getElementById('delete-query-preview').textContent = entry ? '"' + entry.text + '"' : '';
+          deleteQueryDialog.classList.add('flm-dialog-overlay--open');
+          return;
+        }
+
+        // Handle more/less toggle
+        var toggleBtn = e.target.closest('.library-item-toggle');
+        if (toggleBtn) {
+          e.stopPropagation();
+          var qid = toggleBtn.getAttribute('data-query-id');
+          var textEl = libraryList.querySelector('.library-item-text[data-query-id="' + qid + '"]');
+          if (textEl) {
+            var expanded = textEl.classList.toggle('library-item-text--expanded');
+            toggleBtn.textContent = expanded ? 'less' : 'more';
+          }
+          return;
+        }
+
+        // Handle item click — paste into textarea
+        var item = e.target.closest('.library-item');
+        if (item) {
+          var qid = item.getAttribute('data-query-id');
+          var entry = (savedQueries[currentLibraryCatalog] || []).find(function (q) { return q.id === qid; });
+          if (entry) {
+            entry.lastUsed = Date.now();
+            inputQuestion.value = entry.text;
+            updateRunState();
+            closeLibraryPanel();
+          }
+        }
+      });
+
+      // Open/close library panel
+      document.getElementById('btn-open-library').addEventListener('click', function () {
+        openLibraryPanel();
+      });
+      document.getElementById('library-panel-close').addEventListener('click', closeLibraryPanel);
+      document.getElementById('library-panel-close-btn').addEventListener('click', closeLibraryPanel);
+      libraryOverlay.addEventListener('click', closeLibraryPanel);
+
+      // ── Delete Query Confirmation Dialog ──
+      var deleteQueryDialog = document.getElementById('delete-query-dialog');
+      var pendingDeleteQueryId = null;
+
+      // Close dialog on Cancel / X / light-dismiss
+      deleteQueryDialog.addEventListener('click', function (e) {
+        if (e.target.hasAttribute('data-dialog-close') || e.target === deleteQueryDialog) {
+          deleteQueryDialog.classList.remove('flm-dialog-overlay--open');
+          pendingDeleteQueryId = null;
+        }
+      });
+
+      // Confirm delete
+      document.getElementById('btn-confirm-delete-query').addEventListener('click', function () {
+        if (pendingDeleteQueryId && savedQueries[currentLibraryCatalog]) {
+          savedQueries[currentLibraryCatalog] = savedQueries[currentLibraryCatalog].filter(function (q) {
+            return q.id !== pendingDeleteQueryId;
+          });
+          renderLibraryList(currentLibraryCatalog, librarySearchInput.value);
+          showMessage('success', 'Saved query deleted.');
+          // Re-enable save button if the deleted query was the current one
+          if (currentState === 'complete') updateSaveButtonState();
+        }
+        deleteQueryDialog.classList.remove('flm-dialog-overlay--open');
+        pendingDeleteQueryId = null;
+      });
+
+      // ── Demo: expose state switcher ──
+      window.showState = function (state) {
+        if (state === 'complete') populateResults();
+        if (state === 'error') { window._showError('Model returned empty response'); return; }
+        showResultState(state);
+      };
+
+      // Default: idle
+      showResultState('idle');
+
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="en" class="fluent-awarity-light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Awarity — FluentLM</title>
+
+  <!-- Themes & combined library CSS -->
+  <link rel="stylesheet" href="dist/theme-awarity-light.css">
+  <link rel="stylesheet" href="dist/theme-awarity-dark.css">
+  <link rel="stylesheet" href="dist/fluentlm.min.css">
+
+  <style>
+    /* Demo page layout — not part of the library */
+    .demo-shell { display: flex; min-height: 100vh; }
+    .demo-nav {
+      width: 240px; flex-shrink: 0;
+      background-color: var(--bodyStandoutBackground);
+      border-right: 1px solid var(--bodyFrameDivider);
+      padding: var(--spacingM);
+      display: flex; flex-direction: column; gap: var(--spacingS2);
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    }
+    .demo-nav-header {
+      font-size: var(--fontSizeXLarge); font-weight: var(--fontWeightSemibold);
+      line-height: var(--lineHeightXLarge); color: var(--bodyText);
+      margin-bottom: var(--spacingS1);
+    }
+    .demo-nav-link {
+      display: block; padding: var(--spacingS2) var(--spacingS1);
+      border-radius: var(--roundedCorner4); color: var(--bodyText);
+      font-size: var(--fontSizeMedium); text-decoration: none; cursor: pointer;
+    }
+    .demo-nav-link:hover { background-color: var(--listItemBackgroundHovered); text-decoration: none; }
+    .demo-nav-link.active { background-color: var(--listItemBackgroundChecked); font-weight: var(--fontWeightSemibold); }
+    .demo-main { flex: 1; padding: var(--spacingL2); overflow-y: auto; }
+    .demo-section { margin-bottom: var(--spacingL2); }
+    .demo-section-title {
+      font-size: var(--fontSizeXLarge); font-weight: var(--fontWeightSemibold);
+      line-height: var(--lineHeightXLarge); color: var(--bodyText);
+      margin-bottom: var(--spacingS1); padding-bottom: var(--spacingS2);
+      border-bottom: 1px solid var(--bodyDivider);
+    }
+    .demo-row { display: flex; flex-wrap: wrap; gap: var(--spacingM); align-items: flex-start; margin-bottom: var(--spacingM); }
+    .demo-card {
+      background-color: var(--cardStandoutBackground); border: 1px solid var(--variantBorder);
+      border-radius: var(--roundedCorner4); box-shadow: var(--cardShadow);
+      padding: var(--spacingM); min-width: 280px;
+    }
+    .demo-card-title {
+      font-size: var(--fontSizeMediumPlus); font-weight: var(--fontWeightSemibold);
+      line-height: var(--lineHeightMediumPlus); color: var(--bodyText);
+      margin-bottom: var(--spacingS1);
+    }
+    .demo-swatch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--spacingS2); }
+    .demo-swatch { border-radius: var(--roundedCorner4); padding: var(--spacingS1); font-size: var(--fontSizeSmall); line-height: var(--lineHeightSmall); text-align: center; border: 1px solid var(--variantBorder); }
+    .demo-swatch-label { opacity: 0.85; font-size: var(--fontSizeTiny); margin-top: 2px; }
+    .demo-elevation { background-color: var(--bodyBackground); border-radius: var(--roundedCorner4); padding: var(--spacingM); text-align: center; font-size: var(--fontSizeSmall); color: var(--bodySubtext); }
+    .demo-spacer { height: var(--spacingS1); }
+  </style>
+</head>
+<body>
+  <div class="demo-shell">
+
+    <!-- Sidebar Navigation -->
+    <nav class="demo-nav">
+      <div class="demo-nav-header">Awarity</div>
+
+      <span class="flm-text flm-text--small flm-text--secondary" style="padding: var(--spacingS2) var(--spacingS1);">COMPONENTS</span>
+      <a class="demo-nav-link active" href="#buttons">Button</a>
+      <a class="demo-nav-link" href="#text">Text &amp; Label</a>
+      <a class="demo-nav-link" href="#links">Link &amp; Icon</a>
+      <a class="demo-nav-link" href="#textfield">TextField</a>
+      <a class="demo-nav-link" href="#checkbox">Checkbox</a>
+      <a class="demo-nav-link" href="#toggle">Toggle</a>
+      <a class="demo-nav-link" href="#dropdown">Dropdown</a>
+      <a class="demo-nav-link" href="#stack">Stack</a>
+      <a class="demo-nav-link" href="#separator">Separator</a>
+      <a class="demo-nav-link" href="#spinner">Spinner</a>
+      <a class="demo-nav-link" href="#messagebar">MessageBar</a>
+
+      <span class="flm-text flm-text--small flm-text--secondary" style="padding: var(--spacingS2) var(--spacingS1); margin-top: var(--spacingS1);">TIER 2</span>
+      <a class="demo-nav-link" href="#dialog">Dialog</a>
+      <a class="demo-nav-link" href="#panel">Panel</a>
+      <a class="demo-nav-link" href="#callout">Callout</a>
+      <a class="demo-nav-link" href="#commandbar">CommandBar</a>
+      <a class="demo-nav-link" href="#nav-demo">Nav</a>
+      <a class="demo-nav-link" href="#breadcrumb">Breadcrumb</a>
+      <a class="demo-nav-link" href="#pivot">Pivot</a>
+      <a class="demo-nav-link" href="#detailslist">DetailsList</a>
+      <a class="demo-nav-link" href="#searchbox">SearchBox</a>
+      <a class="demo-nav-link" href="#contextmenu">ContextualMenu</a>
+      <a class="demo-nav-link" href="#progress">ProgressIndicator</a>
+      <a class="demo-nav-link" href="#tooltip">Tooltip</a>
+      <a class="demo-nav-link" href="#persona">Persona</a>
+
+      <span class="flm-text flm-text--small flm-text--secondary" style="padding: var(--spacingS2) var(--spacingS1); margin-top: var(--spacingS1);">TIER 3</span>
+      <a class="demo-nav-link" href="#choicegroup">ChoiceGroup</a>
+      <a class="demo-nav-link" href="#shimmer">Shimmer</a>
+      <a class="demo-nav-link" href="#list">List</a>
+      <a class="demo-nav-link" href="#groupedlist">GroupedList</a>
+      <a class="demo-nav-link" href="#rating">Rating</a>
+      <a class="demo-nav-link" href="#facepile">Facepile</a>
+      <a class="demo-nav-link" href="#swatchcolorpicker">SwatchColorPicker</a>
+      <a class="demo-nav-link" href="#documentcard">DocumentCard</a>
+      <a class="demo-nav-link" href="#spinbutton">SpinButton</a>
+      <a class="demo-nav-link" href="#slider">Slider</a>
+      <a class="demo-nav-link" href="#combobox">ComboBox</a>
+      <a class="demo-nav-link" href="#teachingbubble">TeachingBubble</a>
+      <a class="demo-nav-link" href="#hovercard">HoverCard</a>
+      <a class="demo-nav-link" href="#coachmark">Coachmark</a>
+      <a class="demo-nav-link" href="#datepicker">DatePicker</a>
+
+      <span class="flm-text flm-text--small flm-text--secondary" style="padding: var(--spacingS2) var(--spacingS1); margin-top: var(--spacingS1);">TIER 4</span>
+      <a class="demo-nav-link" href="#tagpicker">TagPicker</a>
+      <a class="demo-nav-link" href="#overflowset">OverflowSet</a>
+      <a class="demo-nav-link" href="#timepicker">TimePicker</a>
+
+      <span class="flm-text flm-text--small flm-text--secondary" style="padding: var(--spacingS2) var(--spacingS1); margin-top: var(--spacingS1);">TOKENS</span>
+      <a class="demo-nav-link" href="#palette">Palette</a>
+      <a class="demo-nav-link" href="#typography">Typography</a>
+      <a class="demo-nav-link" href="#elevation">Elevation</a>
+      <a class="demo-nav-link" href="#spacing">Spacing</a>
+
+      <button class="flm-button" id="themeToggle" style="margin-top: auto;">Switch to Dark</button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="demo-main">
+
+      <!-- ============================================================
+           BUTTON
+           ============================================================ -->
+      <section id="buttons" class="demo-section">
+        <div class="demo-section-title">Button</div>
+
+        <div class="demo-card" style="margin-bottom: var(--spacingM);">
+          <div class="demo-card-title">Variants</div>
+          <div class="flm-stack flm-stack--horizontal flm-stack--wrap" style="gap: var(--spacingS1);">
+            <button class="flm-button">Default</button>
+            <button class="flm-button flm-button--primary">Primary</button>
+            <button class="flm-button flm-button--subtle">Subtle</button>
+            <button class="flm-button" disabled>Disabled</button>
+            <button class="flm-button flm-button--primary" disabled>Primary Disabled</button>
+          </div>
+        </div>
+
+        <div class="demo-card" style="margin-bottom: var(--spacingM);">
+          <div class="demo-card-title">With Icons</div>
+          <div class="flm-stack flm-stack--horizontal flm-stack--wrap" style="gap: var(--spacingS1);">
+            <button class="flm-button" data-icon="Add">New Item</button>
+            <button class="flm-button flm-button--primary" data-icon="Save">Save</button>
+            <button class="flm-button" data-icon="Mail">Send Mail</button>
+            <button class="flm-button flm-button--icon" data-icon="Settings" aria-label="Settings"></button>
+            <button class="flm-button flm-button--icon" data-icon="Delete" aria-label="Delete"></button>
+            <button class="flm-button flm-button--icon" data-icon="Search" aria-label="Search"></button>
+            <button class="flm-button flm-button--icon" data-icon="More" aria-label="More options"></button>
+          </div>
+        </div>
+
+        <div class="demo-card" style="margin-bottom: var(--spacingM);">
+          <div class="demo-card-title">Compound</div>
+          <div class="flm-stack flm-stack--horizontal flm-stack--wrap" style="gap: var(--spacingS1);">
+            <button class="flm-button flm-button--compound">
+              <span class="flm-button-label">Send Mail</span>
+              <span class="flm-button-description">Via Outlook</span>
+            </button>
+            <button class="flm-button flm-button--compound flm-button--primary">
+              <span class="flm-button-label">Create Account</span>
+              <span class="flm-button-description">Start your free trial</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="demo-card">
+          <div class="demo-card-title">Split Button</div>
+          <div class="flm-stack flm-stack--horizontal flm-stack--wrap" style="gap: var(--spacingS1);">
+            <button class="flm-button" data-split>Save</button>
+            <button class="flm-button flm-button--primary" data-split>Send</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           TEXT & LABEL
+           ============================================================ -->
+      <section id="text" class="demo-section">
+        <div class="demo-section-title">Text &amp; Label</div>
+
+        <div class="demo-card" style="margin-bottom: var(--spacingM);">
+          <div class="demo-card-title">Text Sizes</div>
+          <div class="flm-stack" style="gap: var(--spacingS2);">
+            <span class="flm-text flm-text--tiny">tiny (10px)</span>
+            <span class="flm-text flm-text--small">small (12px)</span>
+            <span class="flm-text">medium (14px — default)</span>
+            <span class="flm-text flm-text--mediumPlus">mediumPlus (16px)</span>
+            <span class="flm-text flm-text--large">large (18px)</span>
+            <span class="flm-text flm-text--xLarge">xLarge (20px / semibold)</span>
+            <span class="flm-text flm-text--xxLarge">xxLarge (28px / semibold)</span>
+          </div>
+        </div>
+
+        <div class="demo-row">
+          <div class="demo-card">
+            <div class="demo-card-title">Text Colors</div>
+            <div class="flm-stack" style="gap: var(--spacingS2);">
+              <span class="flm-text">Default body text</span>
+              <span class="flm-text flm-text--secondary">Secondary text</span>
+              <span class="flm-text flm-text--disabled">Disabled text</span>
+              <span class="flm-text flm-text--error">Error text</span>
+              <span class="flm-text flm-text--success">Success text</span>
+              <span class="flm-text flm-text--semibold">Semibold text</span>
+              <span class="flm-text flm-text--bold">Bold text</span>
+            </div>
+          </div>
+
+          <div class="demo-card">
+            <div class="demo-card-title">Labels</div>
+            <div class="flm-stack" style="gap: var(--spacingS2);">
+              <label class="flm-label">Standard Label</label>
+              <label class="flm-label flm-label--required">Required Label</label>
+              <label class="flm-label flm-label--disabled">Disabled Label</label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           LINK & ICON
+           ============================================================ -->
+      <section id="links" class="demo-section">
+        <div class="demo-section-title">Link &amp; Icon</div>
+
+        <div class="demo-row">
+          <div class="demo-card">
+            <div class="demo-card-title">Links</div>
+            <div class="flm-stack" style="gap: var(--spacingS1);">
+              <a class="flm-link" href="#">Standard link</a>
+              <a class="flm-link flm-link--disabled">Disabled link</a>
+            </div>
+          </div>
+
+          <div class="demo-card">
+            <div class="demo-card-title">Icons</div>
+            <div class="flm-stack flm-stack--horizontal flm-stack--wrap" style="gap: var(--spacingM);">
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Add"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Add</span>
+              </span>
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Delete"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Delete</span>
+              </span>
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Edit"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Edit</span>
+              </span>
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Save"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Save</span>
+              </span>
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Mail"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Mail</span>
+              </span>
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Send"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Send</span>
+              </span>
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Settings"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Settings</span>
+              </span>
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Search"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Search</span>
+              </span>
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Home"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Home</span>
+              </span>
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Calendar"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Calendar</span>
+              </span>
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Person"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Person</span>
+              </span>
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Document"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Document</span>
+              </span>
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Filter"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Filter</span>
+              </span>
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Copy"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Copy</span>
+              </span>
+              <span class="flm-stack" style="gap: 4px; align-items: center;">
+                <i class="flm-icon" data-icon="Share"></i>
+                <span class="flm-text flm-text--tiny flm-text--secondary">Share</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           TEXTFIELD
+           ============================================================ -->
+      <section id="textfield" class="demo-section">
+        <div class="demo-section-title">TextField</div>
+
+        <div class="demo-row">
+          <div class="demo-card" style="max-width: 360px;">
+            <div class="demo-card-title">Standard</div>
+            <div class="flm-stack" style="gap: var(--spacingS1);">
+              <div class="flm-textfield">
+                <label class="flm-label" for="tf1">Name</label>
+                <input class="flm-textfield-input" id="tf1" placeholder="Enter your name">
+              </div>
+              <div class="flm-textfield flm-textfield--required">
+                <label class="flm-label flm-label--required" for="tf2">Email</label>
+                <input class="flm-textfield-input" id="tf2" type="email" required placeholder="user@example.com">
+              </div>
+              <div class="flm-textfield flm-textfield--error">
+                <label class="flm-label" for="tf3">Age</label>
+                <input class="flm-textfield-input" id="tf3" value="-1">
+                <span class="flm-textfield-error">Must be a positive number</span>
+              </div>
+              <div class="flm-textfield flm-textfield--disabled">
+                <label class="flm-label flm-label--disabled" for="tf4">Read-only</label>
+                <input class="flm-textfield-input" id="tf4" value="Cannot edit" disabled>
+              </div>
+            </div>
+          </div>
+
+          <div class="demo-card" style="max-width: 360px;">
+            <div class="demo-card-title">Variants</div>
+            <div class="flm-stack" style="gap: var(--spacingS1);">
+              <div class="flm-textfield flm-textfield--underlined">
+                <label class="flm-label" for="tf5">Underlined</label>
+                <input class="flm-textfield-input" id="tf5" placeholder="Bottom border only">
+              </div>
+              <div class="flm-textfield flm-textfield--borderless">
+                <label class="flm-label" for="tf6">Borderless</label>
+                <input class="flm-textfield-input" id="tf6" placeholder="No border">
+              </div>
+              <div class="flm-textfield">
+                <label class="flm-label" for="tf7">With prefix</label>
+                <div class="flm-textfield-wrapper">
+                  <span class="flm-textfield-prefix">https://</span>
+                  <input class="flm-textfield-input" id="tf7" placeholder="example.com">
+                </div>
+              </div>
+              <div class="flm-textfield">
+                <label class="flm-label" for="tf8">Multiline</label>
+                <textarea class="flm-textfield-input" id="tf8" rows="3" placeholder="Enter description..."></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           CHECKBOX
+           ============================================================ -->
+      <section id="checkbox" class="demo-section">
+        <div class="demo-section-title">Checkbox</div>
+
+        <div class="demo-card">
+          <div class="flm-stack" style="gap: var(--spacingS1);">
+            <label class="flm-checkbox">
+              <input type="checkbox" class="flm-checkbox-input">
+              <span class="flm-checkbox-mark"></span>
+              <span class="flm-checkbox-label">Unchecked</span>
+            </label>
+            <label class="flm-checkbox">
+              <input type="checkbox" class="flm-checkbox-input" checked>
+              <span class="flm-checkbox-mark"></span>
+              <span class="flm-checkbox-label">Checked</span>
+            </label>
+            <label class="flm-checkbox">
+              <input type="checkbox" class="flm-checkbox-input" disabled>
+              <span class="flm-checkbox-mark"></span>
+              <span class="flm-checkbox-label">Disabled unchecked</span>
+            </label>
+            <label class="flm-checkbox">
+              <input type="checkbox" class="flm-checkbox-input" checked disabled>
+              <span class="flm-checkbox-mark"></span>
+              <span class="flm-checkbox-label">Disabled checked</span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           TOGGLE
+           ============================================================ -->
+      <section id="toggle" class="demo-section">
+        <div class="demo-section-title">Toggle</div>
+
+        <div class="demo-card">
+          <div class="flm-stack" style="gap: var(--spacingM);">
+            <label class="flm-toggle">
+              <span class="flm-toggle-label">Notifications</span>
+              <input type="checkbox" class="flm-toggle-input">
+              <span class="flm-toggle-track"><span class="flm-toggle-thumb"></span></span>
+              <span class="flm-toggle-state" data-on="On" data-off="Off"></span>
+            </label>
+            <label class="flm-toggle">
+              <span class="flm-toggle-label">Dark mode</span>
+              <input type="checkbox" class="flm-toggle-input" checked>
+              <span class="flm-toggle-track"><span class="flm-toggle-thumb"></span></span>
+              <span class="flm-toggle-state" data-on="Enabled" data-off="Disabled"></span>
+            </label>
+            <label class="flm-toggle">
+              <span class="flm-toggle-label">Locked setting</span>
+              <input type="checkbox" class="flm-toggle-input" disabled>
+              <span class="flm-toggle-track"><span class="flm-toggle-thumb"></span></span>
+              <span class="flm-toggle-state" data-on="On" data-off="Off"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           DROPDOWN
+           ============================================================ -->
+      <section id="dropdown" class="demo-section">
+        <div class="demo-section-title">Dropdown</div>
+
+        <div class="demo-row">
+          <div class="demo-card" style="max-width: 320px;">
+            <div class="flm-stack" style="gap: var(--spacingS1);">
+              <div class="flm-dropdown">
+                <label class="flm-label">Country</label>
+                <button class="flm-dropdown-trigger">
+                  <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select a country…</span>
+                  <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+                </button>
+                <div class="flm-dropdown-listbox">
+                  <div class="flm-dropdown-option" data-value="us">United States</div>
+                  <div class="flm-dropdown-option" data-value="gb">United Kingdom</div>
+                  <div class="flm-dropdown-option" data-value="de">Germany</div>
+                  <div class="flm-dropdown-option" data-value="jp">Japan</div>
+                </div>
+              </div>
+              <div class="flm-dropdown flm-dropdown--error">
+                <label class="flm-label">Priority</label>
+                <button class="flm-dropdown-trigger">
+                  <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select…</span>
+                  <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+                </button>
+                <div class="flm-dropdown-listbox">
+                  <div class="flm-dropdown-option" data-value="low">Low</div>
+                  <div class="flm-dropdown-option" data-value="medium">Medium</div>
+                  <div class="flm-dropdown-option" data-value="high">High</div>
+                  <div class="flm-dropdown-option" data-value="critical">Critical</div>
+                </div>
+                <span class="flm-dropdown-error">Selection is required</span>
+              </div>
+              <div class="flm-dropdown flm-dropdown--disabled">
+                <label class="flm-label flm-label--disabled">Region</label>
+                <button class="flm-dropdown-trigger" disabled>
+                  <span class="flm-dropdown-title">Locked</span>
+                  <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+                </button>
+                <div class="flm-dropdown-listbox"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           STACK
+           ============================================================ -->
+      <section id="stack" class="demo-section">
+        <div class="demo-section-title">Stack</div>
+
+        <div class="demo-row">
+          <div class="demo-card">
+            <div class="demo-card-title">Vertical (default)</div>
+            <div class="flm-stack" style="gap: var(--spacingS1); border: 1px dashed var(--variantBorder); padding: var(--spacingS1);">
+              <div style="background: var(--themeLighter); padding: var(--spacingS2) var(--spacingS1); border-radius: var(--roundedCorner2);">Row 1</div>
+              <div style="background: var(--themeLighter); padding: var(--spacingS2) var(--spacingS1); border-radius: var(--roundedCorner2);">Row 2</div>
+              <div style="background: var(--themeLighter); padding: var(--spacingS2) var(--spacingS1); border-radius: var(--roundedCorner2);">Row 3</div>
+            </div>
+          </div>
+
+          <div class="demo-card">
+            <div class="demo-card-title">Horizontal + grow</div>
+            <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingS1); border: 1px dashed var(--variantBorder); padding: var(--spacingS1);">
+              <div class="flm-stack-item--grow" style="background: var(--themeLighter); padding: var(--spacingS2) var(--spacingS1); border-radius: var(--roundedCorner2);">Grows</div>
+              <div style="background: var(--themeLighter); padding: var(--spacingS2) var(--spacingS1); border-radius: var(--roundedCorner2);">Fixed</div>
+              <div style="background: var(--themeLighter); padding: var(--spacingS2) var(--spacingS1); border-radius: var(--roundedCorner2);">Fixed</div>
+            </div>
+          </div>
+
+          <div class="demo-card">
+            <div class="demo-card-title">Horizontal + center</div>
+            <div class="flm-stack flm-stack--horizontal flm-stack--center" style="gap: var(--spacingS1); border: 1px dashed var(--variantBorder); padding: var(--spacingS1); min-height: 80px;">
+              <div style="background: var(--themeLighter); padding: var(--spacingS2) var(--spacingS1); border-radius: var(--roundedCorner2);">Centered</div>
+              <div style="background: var(--themeLighter); padding: var(--spacingS2) var(--spacingS1); border-radius: var(--roundedCorner2);">Items</div>
+            </div>
+          </div>
+
+          <div class="demo-card">
+            <div class="demo-card-title">Horizontal + wrap</div>
+            <div class="flm-stack flm-stack--horizontal flm-stack--wrap" style="gap: var(--spacingS2); border: 1px dashed var(--variantBorder); padding: var(--spacingS1); max-width: 200px;">
+              <div style="background: var(--themeLighter); padding: var(--spacingS2) var(--spacingS1); border-radius: var(--roundedCorner2);">Tag 1</div>
+              <div style="background: var(--themeLighter); padding: var(--spacingS2) var(--spacingS1); border-radius: var(--roundedCorner2);">Tag 2</div>
+              <div style="background: var(--themeLighter); padding: var(--spacingS2) var(--spacingS1); border-radius: var(--roundedCorner2);">Tag 3</div>
+              <div style="background: var(--themeLighter); padding: var(--spacingS2) var(--spacingS1); border-radius: var(--roundedCorner2);">Tag 4</div>
+              <div style="background: var(--themeLighter); padding: var(--spacingS2) var(--spacingS1); border-radius: var(--roundedCorner2);">Tag 5</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SEPARATOR
+           ============================================================ -->
+      <section id="separator" class="demo-section">
+        <div class="demo-section-title">Separator</div>
+
+        <div class="demo-card">
+          <div class="flm-stack" style="gap: var(--spacingS1);">
+            <span class="flm-text">Above separator</span>
+            <hr class="flm-separator">
+            <span class="flm-text">Below separator</span>
+          </div>
+          <div class="demo-spacer"></div>
+          <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingM); height: 40px; align-items: center;">
+            <span class="flm-text">Left</span>
+            <hr class="flm-separator flm-separator--vertical">
+            <span class="flm-text">Middle</span>
+            <hr class="flm-separator flm-separator--vertical">
+            <span class="flm-text">Right</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SPINNER
+           ============================================================ -->
+      <section id="spinner" class="demo-section">
+        <div class="demo-section-title">Spinner</div>
+
+        <div class="demo-card">
+          <div class="flm-stack flm-stack--horizontal flm-stack--wrap" style="gap: var(--spacingL2); align-items: flex-end;">
+            <div class="flm-stack" style="align-items: center; gap: var(--spacingS2);">
+              <div class="flm-spinner flm-spinner--xSmall"><div class="flm-spinner-circle"></div></div>
+              <span class="flm-text flm-text--tiny flm-text--secondary">xSmall</span>
+            </div>
+            <div class="flm-stack" style="align-items: center; gap: var(--spacingS2);">
+              <div class="flm-spinner flm-spinner--small"><div class="flm-spinner-circle"></div></div>
+              <span class="flm-text flm-text--tiny flm-text--secondary">small</span>
+            </div>
+            <div class="flm-stack" style="align-items: center; gap: var(--spacingS2);">
+              <div class="flm-spinner"><div class="flm-spinner-circle"></div></div>
+              <span class="flm-text flm-text--tiny flm-text--secondary">medium</span>
+            </div>
+            <div class="flm-spinner flm-spinner--large">
+              <div class="flm-spinner-circle"></div>
+              <span class="flm-spinner-label">Loading…</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           MESSAGEBAR
+           ============================================================ -->
+      <section id="messagebar" class="demo-section">
+        <div class="demo-section-title">MessageBar</div>
+
+        <div class="flm-stack" style="gap: var(--spacingS1);">
+          <div class="flm-messagebar flm-messagebar--info">This is an informational message.</div>
+          <div class="flm-messagebar flm-messagebar--success">Operation completed successfully.</div>
+          <div class="flm-messagebar flm-messagebar--warning">Please review before continuing.</div>
+          <div class="flm-messagebar flm-messagebar--severeWarning">Immediate action is required.</div>
+          <div class="flm-messagebar flm-messagebar--error">Something went wrong. Please try again.</div>
+          <div class="flm-messagebar flm-messagebar--blocked">This action is blocked by your organization.</div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           DIALOG
+           ============================================================ -->
+      <section id="dialog" class="demo-section">
+        <div class="demo-section-title">Dialog</div>
+        <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingS1);">
+          <button class="flm-button" data-dialog-open="demo-dialog">Open Dialog</button>
+          <button class="flm-button" data-dialog-open="demo-dialog-large">Large Header</button>
+        </div>
+
+        <div class="flm-dialog-overlay" id="demo-dialog" data-light-dismiss>
+          <div class="flm-dialog">
+            <div class="flm-dialog-header">
+              <h2 class="flm-dialog-title">Confirm Action</h2>
+              <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
+            </div>
+            <div class="flm-dialog-body">
+              <p>Are you sure you want to proceed? This action cannot be undone.</p>
+            </div>
+            <div class="flm-dialog-footer">
+              <button class="flm-button" data-dialog-close>Cancel</button>
+              <button class="flm-button flm-button--primary" data-dialog-close>Confirm</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="flm-dialog-overlay" id="demo-dialog-large" data-light-dismiss>
+          <div class="flm-dialog flm-dialog--large-header">
+            <div class="flm-dialog-header">
+              <h2 class="flm-dialog-title">Welcome</h2>
+              <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
+            </div>
+            <div class="flm-dialog-body">
+              <p>This dialog has a large header variant for prominent headings.</p>
+            </div>
+            <div class="flm-dialog-footer">
+              <button class="flm-button flm-button--primary" data-dialog-close>Got it</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           PANEL
+           ============================================================ -->
+      <section id="panel" class="demo-section">
+        <div class="demo-section-title">Panel</div>
+        <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingS1);">
+          <button class="flm-button" data-panel-open="demo-panel">Open Panel</button>
+          <button class="flm-button" data-panel-open="demo-panel-medium">Medium Panel</button>
+        </div>
+
+        <div class="flm-panel-overlay"></div>
+        <div class="flm-panel" id="demo-panel">
+          <div class="flm-panel-header">
+            <h2 class="flm-panel-title">Settings</h2>
+            <button class="flm-panel-close" data-icon="Cancel" aria-label="Close"></button>
+          </div>
+          <div class="flm-panel-body">
+            <div class="flm-stack" style="gap: var(--spacingM);">
+              <div class="flm-textfield">
+                <label class="flm-label" for="panel-f1">Display name</label>
+                <input class="flm-textfield-input" id="panel-f1" value="John Doe">
+              </div>
+              <label class="flm-toggle">
+                <span class="flm-toggle-label">Email notifications</span>
+                <input type="checkbox" class="flm-toggle-input" checked>
+                <span class="flm-toggle-track"><span class="flm-toggle-thumb"></span></span>
+                <span class="flm-toggle-state" data-on="On" data-off="Off"></span>
+              </label>
+            </div>
+          </div>
+          <div class="flm-panel-footer">
+            <button class="flm-button" data-panel-close>Cancel</button>
+            <button class="flm-button flm-button--primary" data-panel-close>Save</button>
+          </div>
+        </div>
+
+        <div class="flm-panel-overlay"></div>
+        <div class="flm-panel flm-panel--medium" id="demo-panel-medium">
+          <div class="flm-panel-header">
+            <h2 class="flm-panel-title">Medium Panel</h2>
+            <button class="flm-panel-close" data-icon="Cancel" aria-label="Close"></button>
+          </div>
+          <div class="flm-panel-body">
+            <p class="flm-text">This is a medium-width panel (592px).</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           CALLOUT
+           ============================================================ -->
+      <section id="callout" class="demo-section">
+        <div class="demo-section-title">Callout</div>
+        <button class="flm-button" data-callout-toggle="demo-callout">Toggle Callout</button>
+        <div class="flm-callout" id="demo-callout">
+          <div class="flm-callout-beak"></div>
+          <div class="flm-callout-body">
+            <span class="flm-text flm-text--semibold flm-text--block" style="margin-bottom: var(--spacingS2);">Callout Title</span>
+            <span class="flm-text flm-text--secondary">This is a callout with helpful information anchored to the button above.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           COMMANDBAR
+           ============================================================ -->
+      <section id="commandbar" class="demo-section">
+        <div class="demo-section-title">CommandBar</div>
+        <div class="demo-card" style="padding: 0; overflow: hidden;">
+          <div class="flm-commandbar">
+            <div class="flm-commandbar-items">
+              <button class="flm-commandbar-item" data-icon="Add">New</button>
+              <button class="flm-commandbar-item" data-icon="Edit">Edit</button>
+              <button class="flm-commandbar-item" data-icon="Share">Share</button>
+              <span class="flm-commandbar-divider"></span>
+              <button class="flm-commandbar-item" data-icon="Copy">Copy</button>
+              <button class="flm-commandbar-item" data-icon="Delete">Delete</button>
+            </div>
+            <div class="flm-commandbar-far">
+              <button class="flm-commandbar-item" data-icon="Filter">Filter</button>
+              <button class="flm-commandbar-item" data-icon="Settings" aria-label="Settings"></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           NAV
+           ============================================================ -->
+      <section id="nav-demo" class="demo-section">
+        <div class="demo-section-title">Nav</div>
+        <div class="demo-card" style="max-width: 280px;">
+          <nav class="flm-nav">
+            <div class="flm-nav-group">
+              <button class="flm-nav-group-header">
+                <i class="flm-nav-chevron flm-nav-chevron--expanded" data-icon="ChevronRight"></i>
+                Pages
+              </button>
+              <div class="flm-nav-group-items">
+                <a class="flm-nav-link flm-nav-link--active" href="#">Home</a>
+                <a class="flm-nav-link" href="#">Documents</a>
+                <a class="flm-nav-link" href="#">Contacts</a>
+                <a class="flm-nav-link flm-nav-link--disabled">Archived</a>
+              </div>
+            </div>
+            <div class="flm-nav-group">
+              <button class="flm-nav-group-header">
+                <i class="flm-nav-chevron flm-nav-chevron--expanded" data-icon="ChevronRight"></i>
+                Settings
+              </button>
+              <div class="flm-nav-group-items">
+                <a class="flm-nav-link" href="#">Profile</a>
+                <a class="flm-nav-link" href="#">Preferences</a>
+              </div>
+            </div>
+          </nav>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           BREADCRUMB
+           ============================================================ -->
+      <section id="breadcrumb" class="demo-section">
+        <div class="demo-section-title">Breadcrumb</div>
+        <div class="flm-stack" style="gap: var(--spacingM);">
+          <ol class="flm-breadcrumb">
+            <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#">Home</a></li>
+            <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#">Documents</a></li>
+            <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#">Projects</a></li>
+            <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link">Current File</a></li>
+          </ol>
+          <ol class="flm-breadcrumb flm-breadcrumb--large">
+            <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#">Root</a></li>
+            <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link">Large Breadcrumb</a></li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           PIVOT
+           ============================================================ -->
+      <section id="pivot" class="demo-section">
+        <div class="demo-section-title">Pivot</div>
+        <div class="demo-card">
+          <div class="flm-pivot">
+            <div class="flm-pivot-tabs" role="tablist">
+              <button class="flm-pivot-tab flm-pivot-tab--active" data-panel="pivot-p1" role="tab">Overview</button>
+              <button class="flm-pivot-tab" data-panel="pivot-p2" role="tab">Details</button>
+              <button class="flm-pivot-tab" data-panel="pivot-p3" role="tab">History</button>
+              <button class="flm-pivot-tab flm-pivot-tab--disabled" role="tab">Disabled</button>
+            </div>
+            <div class="flm-pivot-panel flm-pivot-panel--active" id="pivot-p1" role="tabpanel">
+              <p class="flm-text">Overview content goes here. This is the first tab panel.</p>
+            </div>
+            <div class="flm-pivot-panel" id="pivot-p2" role="tabpanel">
+              <p class="flm-text">Details content with more information.</p>
+            </div>
+            <div class="flm-pivot-panel" id="pivot-p3" role="tabpanel">
+              <p class="flm-text">History of changes and activity.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           DETAILSLIST
+           ============================================================ -->
+      <section id="detailslist" class="demo-section">
+        <div class="demo-section-title">DetailsList</div>
+        <div class="demo-card" style="padding: 0; overflow: hidden;">
+          <div class="flm-detailslist">
+            <div class="flm-detailslist-header">
+              <div class="flm-detailslist-check">
+                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label>
+              </div>
+              <div class="flm-detailslist-header-cell" style="width: 240px;">Name</div>
+              <div class="flm-detailslist-header-cell" style="width: 120px;">Status</div>
+              <div class="flm-detailslist-header-cell" style="width: 140px;">Modified</div>
+              <div class="flm-detailslist-header-cell" style="flex: 1;">Owner</div>
+            </div>
+            <div class="flm-detailslist-row">
+              <div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label></div>
+              <div class="flm-detailslist-cell" style="width: 240px;">Quarterly Report.docx</div>
+              <div class="flm-detailslist-cell" style="width: 120px;">Active</div>
+              <div class="flm-detailslist-cell" style="width: 140px;">Feb 20, 2026</div>
+              <div class="flm-detailslist-cell" style="flex: 1;">Jane Doe</div>
+            </div>
+            <div class="flm-detailslist-row flm-detailslist-row--selected">
+              <div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" checked><span class="flm-checkbox-mark"></span></label></div>
+              <div class="flm-detailslist-cell" style="width: 240px;">Budget 2026.xlsx</div>
+              <div class="flm-detailslist-cell" style="width: 120px;">Draft</div>
+              <div class="flm-detailslist-cell" style="width: 140px;">Feb 18, 2026</div>
+              <div class="flm-detailslist-cell" style="flex: 1;">John Smith</div>
+            </div>
+            <div class="flm-detailslist-row">
+              <div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label></div>
+              <div class="flm-detailslist-cell" style="width: 240px;">Presentation.pptx</div>
+              <div class="flm-detailslist-cell" style="width: 120px;">Active</div>
+              <div class="flm-detailslist-cell" style="width: 140px;">Feb 15, 2026</div>
+              <div class="flm-detailslist-cell" style="flex: 1;">Alex Johnson</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SEARCHBOX
+           ============================================================ -->
+      <section id="searchbox" class="demo-section">
+        <div class="demo-section-title">SearchBox</div>
+        <div class="demo-row">
+          <div class="demo-card" style="max-width: 320px;">
+            <div class="flm-stack" style="gap: var(--spacingS1);">
+              <div class="flm-searchbox">
+                <input class="flm-searchbox-input" type="search" placeholder="Search…">
+              </div>
+              <div class="flm-searchbox flm-searchbox--underlined">
+                <input class="flm-searchbox-input" type="search" placeholder="Underlined search…">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           CONTEXTUAL MENU
+           ============================================================ -->
+      <section id="contextmenu" class="demo-section">
+        <div class="demo-section-title">ContextualMenu</div>
+        <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingS1);">
+          <button class="flm-button" data-contextmenu-toggle="demo-ctxmenu">Click for Menu</button>
+          <div style="border: 1px dashed var(--variantBorder); padding: var(--spacingS1) var(--spacingM); border-radius: var(--roundedCorner4);" data-contextmenu="demo-ctxmenu2">Right-click here</div>
+        </div>
+
+        <div class="flm-contextmenu" id="demo-ctxmenu">
+          <div class="flm-contextmenu-header">File</div>
+          <button class="flm-contextmenu-item"><span class="flm-contextmenu-item-text">New</span></button>
+          <button class="flm-contextmenu-item"><span class="flm-contextmenu-item-text">Open</span></button>
+          <button class="flm-contextmenu-item"><span class="flm-contextmenu-item-text">Save</span></button>
+          <div class="flm-contextmenu-divider"></div>
+          <button class="flm-contextmenu-item" disabled><span class="flm-contextmenu-item-text">Print</span></button>
+        </div>
+
+        <div class="flm-contextmenu" id="demo-ctxmenu2">
+          <button class="flm-contextmenu-item"><span class="flm-contextmenu-item-text">Cut</span></button>
+          <button class="flm-contextmenu-item"><span class="flm-contextmenu-item-text">Copy</span></button>
+          <button class="flm-contextmenu-item"><span class="flm-contextmenu-item-text">Paste</span></button>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           PROGRESS INDICATOR
+           ============================================================ -->
+      <section id="progress" class="demo-section">
+        <div class="demo-section-title">ProgressIndicator</div>
+        <div class="demo-row">
+          <div class="demo-card" style="max-width: 400px;">
+            <div class="flm-stack" style="gap: var(--spacingM);">
+              <div class="flm-progress">
+                <span class="flm-progress-label">Uploading files…</span>
+                <div class="flm-progress-track"><div class="flm-progress-bar" style="width: 65%"></div></div>
+                <span class="flm-progress-description">65% complete</span>
+              </div>
+              <div class="flm-progress">
+                <span class="flm-progress-label">Complete</span>
+                <div class="flm-progress-track"><div class="flm-progress-bar" style="width: 100%"></div></div>
+              </div>
+              <div class="flm-progress flm-progress--indeterminate">
+                <span class="flm-progress-label">Processing…</span>
+                <div class="flm-progress-track"><div class="flm-progress-bar"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           TOOLTIP
+           ============================================================ -->
+      <section id="tooltip" class="demo-section">
+        <div class="demo-section-title">Tooltip</div>
+        <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingL2);">
+          <span data-tooltip="This is a simple text tooltip.">Hover for tooltip</span>
+          <button class="flm-button flm-button--icon" data-icon="Info" aria-label="Info" data-tooltip="More information available."></button>
+          <a class="flm-link" href="#" data-tooltip="Navigate to the help section.">Help link</a>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           PERSONA
+           ============================================================ -->
+      <section id="persona" class="demo-section">
+        <div class="demo-section-title">Persona</div>
+        <div class="demo-row">
+          <div class="demo-card">
+            <div class="demo-card-title">Sizes &amp; Presence</div>
+            <div class="flm-stack" style="gap: var(--spacingM);">
+              <div class="flm-persona flm-persona--size32">
+                <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available">JD</div>
+                <div class="flm-persona-details">
+                  <span class="flm-persona-name">Jane Doe</span>
+                </div>
+              </div>
+              <div class="flm-persona flm-persona--size40">
+                <div class="flm-persona-coin flm-persona-presence flm-persona-presence--busy">JS</div>
+                <div class="flm-persona-details">
+                  <span class="flm-persona-name">John Smith</span>
+                  <span class="flm-persona-secondary">Software Engineer</span>
+                </div>
+              </div>
+              <div class="flm-persona flm-persona--size48">
+                <div class="flm-persona-coin flm-persona-presence flm-persona-presence--away">AJ</div>
+                <div class="flm-persona-details">
+                  <span class="flm-persona-name">Alex Johnson</span>
+                  <span class="flm-persona-secondary">Product Manager</span>
+                  <span class="flm-persona-tertiary">Contoso Ltd</span>
+                </div>
+              </div>
+              <div class="flm-persona flm-persona--size56">
+                <div class="flm-persona-coin flm-persona-presence flm-persona-presence--offline">MK</div>
+                <div class="flm-persona-details">
+                  <span class="flm-persona-name">Maria Kim</span>
+                  <span class="flm-persona-secondary">Designer</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           CHOICEGROUP
+           ============================================================ -->
+      <section id="choicegroup" class="demo-section">
+        <div class="demo-section-title">ChoiceGroup</div>
+        <div class="demo-row">
+          <div class="demo-card">
+            <div class="demo-card-title">Vertical (default)</div>
+            <div class="flm-choicegroup">
+              <label class="flm-choicegroup-option">
+                <input type="radio" class="flm-choicegroup-input" name="cg1" value="a" checked>
+                <span class="flm-choicegroup-mark"></span>
+                <span class="flm-choicegroup-label">Option A</span>
+              </label>
+              <label class="flm-choicegroup-option">
+                <input type="radio" class="flm-choicegroup-input" name="cg1" value="b">
+                <span class="flm-choicegroup-mark"></span>
+                <span class="flm-choicegroup-label">Option B</span>
+              </label>
+              <label class="flm-choicegroup-option">
+                <input type="radio" class="flm-choicegroup-input" name="cg1" value="c">
+                <span class="flm-choicegroup-mark"></span>
+                <span class="flm-choicegroup-label">Option C</span>
+              </label>
+              <label class="flm-choicegroup-option">
+                <input type="radio" class="flm-choicegroup-input" name="cg1" value="d" disabled>
+                <span class="flm-choicegroup-mark"></span>
+                <span class="flm-choicegroup-label">Disabled</span>
+              </label>
+            </div>
+          </div>
+          <div class="demo-card">
+            <div class="demo-card-title">Horizontal</div>
+            <div class="flm-choicegroup flm-choicegroup--horizontal">
+              <label class="flm-choicegroup-option">
+                <input type="radio" class="flm-choicegroup-input" name="cg2" value="s">
+                <span class="flm-choicegroup-mark"></span>
+                <span class="flm-choicegroup-label">Small</span>
+              </label>
+              <label class="flm-choicegroup-option">
+                <input type="radio" class="flm-choicegroup-input" name="cg2" value="m" checked>
+                <span class="flm-choicegroup-mark"></span>
+                <span class="flm-choicegroup-label">Medium</span>
+              </label>
+              <label class="flm-choicegroup-option">
+                <input type="radio" class="flm-choicegroup-input" name="cg2" value="l">
+                <span class="flm-choicegroup-mark"></span>
+                <span class="flm-choicegroup-label">Large</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SHIMMER
+           ============================================================ -->
+      <section id="shimmer" class="demo-section">
+        <div class="demo-section-title">Shimmer</div>
+        <div class="demo-row">
+          <div class="demo-card">
+            <div class="demo-card-title">Lines</div>
+            <div class="flm-shimmer" style="width: 300px;">
+              <div class="flm-shimmer-line"></div>
+              <div class="flm-shimmer-line flm-shimmer-line--medium"></div>
+              <div class="flm-shimmer-line flm-shimmer-line--short"></div>
+            </div>
+          </div>
+          <div class="demo-card">
+            <div class="demo-card-title">Row with avatar</div>
+            <div class="flm-shimmer flm-shimmer--row" style="gap: var(--spacingS1);">
+              <div class="flm-shimmer-circle"></div>
+              <div class="flm-shimmer" style="flex: 1; gap: var(--spacingS2);">
+                <div class="flm-shimmer-line"></div>
+                <div class="flm-shimmer-line flm-shimmer-line--medium"></div>
+              </div>
+            </div>
+          </div>
+          <div class="demo-card">
+            <div class="demo-card-title">Block</div>
+            <div class="flm-shimmer flm-shimmer--row" style="gap: var(--spacingS1);">
+              <div class="flm-shimmer-rect"></div>
+              <div class="flm-shimmer" style="flex: 1; gap: var(--spacingS2);">
+                <div class="flm-shimmer-line"></div>
+                <div class="flm-shimmer-line"></div>
+                <div class="flm-shimmer-line flm-shimmer-line--short"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           LIST
+           ============================================================ -->
+      <section id="list" class="demo-section">
+        <div class="demo-section-title">List</div>
+        <div class="demo-row">
+          <div class="demo-card" style="max-width: 320px;">
+            <div class="demo-card-title">Bordered &amp; Scrollable</div>
+            <div class="flm-list flm-list--bordered flm-list--scrollable" style="max-height: 180px;">
+              <div class="flm-list-item flm-list-item--selected">
+                <span class="flm-list-item-primary">Selected Item</span>
+              </div>
+              <div class="flm-list-item">
+                <span class="flm-list-item-primary">Second Item</span>
+              </div>
+              <div class="flm-list-item">
+                <div class="flm-list-item-content">
+                  <span class="flm-list-item-primary">Two-line Item</span>
+                  <span class="flm-list-item-secondary">Secondary text here</span>
+                </div>
+              </div>
+              <div class="flm-list-item flm-list-item--disabled">
+                <span class="flm-list-item-primary">Disabled Item</span>
+              </div>
+              <div class="flm-list-item">
+                <span class="flm-list-item-primary">Fifth Item</span>
+              </div>
+              <div class="flm-list-item">
+                <span class="flm-list-item-primary">Sixth Item</span>
+              </div>
+            </div>
+          </div>
+          <div class="demo-card" style="max-width: 320px;">
+            <div class="demo-card-title">Compact</div>
+            <div class="flm-list flm-list--bordered flm-list--compact">
+              <div class="flm-list-item">Item Alpha</div>
+              <div class="flm-list-item">Item Beta</div>
+              <div class="flm-list-item">Item Gamma</div>
+              <div class="flm-list-item">Item Delta</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           GROUPEDLIST
+           ============================================================ -->
+      <section id="groupedlist" class="demo-section">
+        <div class="demo-section-title">GroupedList</div>
+        <div class="demo-card" style="max-width: 320px;">
+          <div class="flm-groupedlist">
+            <div class="flm-groupedlist-group">
+              <button class="flm-groupedlist-header">
+                <i class="flm-groupedlist-chevron flm-groupedlist-chevron--expanded" data-icon="ChevronRight"></i>
+                Active Items <span class="flm-groupedlist-count">(3)</span>
+              </button>
+              <div class="flm-groupedlist-items">
+                <div class="flm-groupedlist-item">Document.docx</div>
+                <div class="flm-groupedlist-item flm-groupedlist-item--selected">Report.xlsx</div>
+                <div class="flm-groupedlist-item">Slides.pptx</div>
+              </div>
+            </div>
+            <div class="flm-groupedlist-group">
+              <button class="flm-groupedlist-header">
+                <i class="flm-groupedlist-chevron flm-groupedlist-chevron--expanded" data-icon="ChevronRight"></i>
+                Archived <span class="flm-groupedlist-count">(2)</span>
+              </button>
+              <div class="flm-groupedlist-items">
+                <div class="flm-groupedlist-item">OldFile.doc</div>
+                <div class="flm-groupedlist-item flm-groupedlist-item--disabled">Locked.pdf</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           RATING
+           ============================================================ -->
+      <section id="rating" class="demo-section">
+        <div class="demo-section-title">Rating</div>
+        <div class="demo-row">
+          <div class="demo-card">
+            <div class="demo-card-title">Interactive</div>
+            <div class="flm-rating">
+              <input type="radio" class="flm-rating-input" name="r1" value="5"><label class="flm-rating-star"></label>
+              <input type="radio" class="flm-rating-input" name="r1" value="4"><label class="flm-rating-star"></label>
+              <input type="radio" class="flm-rating-input" name="r1" value="3" checked><label class="flm-rating-star"></label>
+              <input type="radio" class="flm-rating-input" name="r1" value="2"><label class="flm-rating-star"></label>
+              <input type="radio" class="flm-rating-input" name="r1" value="1"><label class="flm-rating-star"></label>
+            </div>
+          </div>
+          <div class="demo-card">
+            <div class="demo-card-title">Readonly (4 stars)</div>
+            <div class="flm-rating flm-rating--readonly">
+              <span class="flm-rating-star flm-rating-star--empty"></span>
+              <span class="flm-rating-star flm-rating-star--filled"></span>
+              <span class="flm-rating-star flm-rating-star--filled"></span>
+              <span class="flm-rating-star flm-rating-star--filled"></span>
+              <span class="flm-rating-star flm-rating-star--filled"></span>
+            </div>
+          </div>
+          <div class="demo-card">
+            <div class="demo-card-title">Large</div>
+            <div class="flm-rating flm-rating--large">
+              <input type="radio" class="flm-rating-input" name="r2" value="5"><label class="flm-rating-star"></label>
+              <input type="radio" class="flm-rating-input" name="r2" value="4" checked><label class="flm-rating-star"></label>
+              <input type="radio" class="flm-rating-input" name="r2" value="3"><label class="flm-rating-star"></label>
+              <input type="radio" class="flm-rating-input" name="r2" value="2"><label class="flm-rating-star"></label>
+              <input type="radio" class="flm-rating-input" name="r2" value="1"><label class="flm-rating-star"></label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           FACEPILE
+           ============================================================ -->
+      <section id="facepile" class="demo-section">
+        <div class="demo-section-title">Facepile</div>
+        <div class="demo-row">
+          <div class="demo-card">
+            <div class="demo-card-title">Default (all visible)</div>
+            <div class="flm-facepile">
+              <span class="flm-facepile-member"><span class="flm-persona-coin">JD</span></span>
+              <span class="flm-facepile-member"><span class="flm-persona-coin" style="background-color: var(--green);">AB</span></span>
+              <span class="flm-facepile-member"><span class="flm-persona-coin" style="background-color: var(--purple);">MK</span></span>
+            </div>
+          </div>
+          <div class="demo-card">
+            <div class="demo-card-title">With overflow (max 3)</div>
+            <div class="flm-facepile" data-max="3">
+              <span class="flm-facepile-member"><span class="flm-persona-coin">JD</span></span>
+              <span class="flm-facepile-member"><span class="flm-persona-coin" style="background-color: var(--green);">AB</span></span>
+              <span class="flm-facepile-member"><span class="flm-persona-coin" style="background-color: var(--purple);">MK</span></span>
+              <span class="flm-facepile-member"><span class="flm-persona-coin" style="background-color: var(--orange);">TW</span></span>
+              <span class="flm-facepile-member"><span class="flm-persona-coin" style="background-color: var(--teal);">SR</span></span>
+            </div>
+          </div>
+          <div class="demo-card">
+            <div class="demo-card-title">With add button</div>
+            <div class="flm-facepile">
+              <span class="flm-facepile-member"><span class="flm-persona-coin">JD</span></span>
+              <span class="flm-facepile-member"><span class="flm-persona-coin" style="background-color: var(--green);">AB</span></span>
+              <button class="flm-facepile-add" aria-label="Add person">+</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SWATCHCOLORPICKER
+           ============================================================ -->
+      <section id="swatchcolorpicker" class="demo-section">
+        <div class="demo-section-title">SwatchColorPicker</div>
+        <div class="demo-row">
+          <div class="demo-card">
+            <div class="demo-card-title">Square</div>
+            <div class="flm-swatchcolorpicker">
+              <button class="flm-swatchcolorpicker-cell" style="background-color: #ff1744;" data-color="#ff1744"></button>
+              <button class="flm-swatchcolorpicker-cell" style="background-color: #f50057;" data-color="#f50057"></button>
+              <button class="flm-swatchcolorpicker-cell" style="background-color: #d500f9;" data-color="#d500f9"></button>
+              <button class="flm-swatchcolorpicker-cell" style="background-color: #651fff;" data-color="#651fff"></button>
+              <button class="flm-swatchcolorpicker-cell flm-swatchcolorpicker-cell--selected" style="background-color: #2979ff;" data-color="#2979ff"></button>
+              <button class="flm-swatchcolorpicker-cell" style="background-color: #00b0ff;" data-color="#00b0ff"></button>
+              <button class="flm-swatchcolorpicker-cell" style="background-color: #00e5ff;" data-color="#00e5ff"></button>
+              <button class="flm-swatchcolorpicker-cell" style="background-color: #1de9b6;" data-color="#1de9b6"></button>
+              <button class="flm-swatchcolorpicker-cell" style="background-color: #00e676;" data-color="#00e676"></button>
+              <button class="flm-swatchcolorpicker-cell" style="background-color: #76ff03;" data-color="#76ff03"></button>
+            </div>
+          </div>
+          <div class="demo-card">
+            <div class="demo-card-title">Circle</div>
+            <div class="flm-swatchcolorpicker flm-swatchcolorpicker--circle">
+              <button class="flm-swatchcolorpicker-cell" style="background-color: #0078d4;" data-color="#0078d4"></button>
+              <button class="flm-swatchcolorpicker-cell" style="background-color: #2b88d8;" data-color="#2b88d8"></button>
+              <button class="flm-swatchcolorpicker-cell" style="background-color: #71afe5;" data-color="#71afe5"></button>
+              <button class="flm-swatchcolorpicker-cell" style="background-color: #c7e0f4;" data-color="#c7e0f4"></button>
+              <button class="flm-swatchcolorpicker-cell" style="background-color: #deecf9;" data-color="#deecf9"></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           DOCUMENTCARD
+           ============================================================ -->
+      <section id="documentcard" class="demo-section">
+        <div class="demo-section-title">DocumentCard</div>
+        <div class="demo-row">
+          <div class="flm-documentcard">
+            <div class="flm-documentcard-preview">
+              <div class="flm-documentcard-preview-icon"><i class="flm-icon flm-icon--large" data-icon="Document"></i></div>
+            </div>
+            <div class="flm-documentcard-details">
+              <span class="flm-documentcard-title">Quarterly Report.docx</span>
+            </div>
+            <div class="flm-documentcard-activity">
+              <span class="flm-persona-coin" style="width:24px;height:24px;font-size:10px;">JD</span>
+              <div>
+                <span class="flm-documentcard-activity-name">Jane Doe</span>
+                <span class="flm-documentcard-activity-date">Modified Feb 20</span>
+              </div>
+            </div>
+          </div>
+          <div class="flm-documentcard flm-documentcard--compact">
+            <div class="flm-documentcard-preview">
+              <div class="flm-documentcard-preview-icon"><i class="flm-icon" data-icon="Document"></i></div>
+            </div>
+            <div class="flm-documentcard-details">
+              <span class="flm-documentcard-title">Budget 2026.xlsx</span>
+              <span class="flm-documentcard-activity-date" style="font-size: var(--fontSizeSmall); color: var(--bodySubtext);">John Smith &middot; Feb 18</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SPINBUTTON
+           ============================================================ -->
+      <section id="spinbutton" class="demo-section">
+        <div class="demo-section-title">SpinButton</div>
+        <div class="demo-row">
+          <div class="demo-card" style="max-width: 220px;">
+            <div class="demo-card-title">Default</div>
+            <div class="flm-spinbutton-wrapper">
+              <label class="flm-label" for="sb1">Quantity</label>
+              <div class="flm-spinbutton">
+                <button class="flm-spinbutton-btn flm-spinbutton-btn--decrement" data-icon="ChevronDown" aria-label="Decrease"></button>
+                <input class="flm-spinbutton-input" id="sb1" type="number" value="5" min="0" max="100" step="1">
+                <button class="flm-spinbutton-btn flm-spinbutton-btn--increment" data-icon="ChevronUp" aria-label="Increase"></button>
+              </div>
+            </div>
+          </div>
+          <div class="demo-card" style="max-width: 220px;">
+            <div class="demo-card-title">Disabled</div>
+            <div class="flm-spinbutton-wrapper">
+              <label class="flm-label flm-label--disabled" for="sb2">Count</label>
+              <div class="flm-spinbutton flm-spinbutton--disabled">
+                <button class="flm-spinbutton-btn flm-spinbutton-btn--decrement" data-icon="ChevronDown" aria-label="Decrease" disabled></button>
+                <input class="flm-spinbutton-input" id="sb2" type="number" value="10" disabled>
+                <button class="flm-spinbutton-btn flm-spinbutton-btn--increment" data-icon="ChevronUp" aria-label="Increase" disabled></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SLIDER
+           ============================================================ -->
+      <section id="slider" class="demo-section">
+        <div class="demo-section-title">Slider</div>
+        <div class="demo-row">
+          <div class="demo-card" style="max-width: 360px;">
+            <div class="demo-card-title">Horizontal</div>
+            <div class="flm-slider">
+              <div class="flm-slider-label">
+                <label class="flm-label" for="sl1">Volume</label>
+              </div>
+              <div class="flm-slider-container">
+                <input class="flm-slider-input" id="sl1" type="range" min="0" max="100" value="60">
+                <span class="flm-slider-value">60</span>
+              </div>
+            </div>
+          </div>
+          <div class="demo-card" style="max-width: 360px;">
+            <div class="demo-card-title">Disabled</div>
+            <div class="flm-slider flm-slider--disabled">
+              <div class="flm-slider-label">
+                <label class="flm-label flm-label--disabled" for="sl2">Brightness</label>
+              </div>
+              <div class="flm-slider-container">
+                <input class="flm-slider-input" id="sl2" type="range" min="0" max="100" value="40" disabled>
+                <span class="flm-slider-value">40</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           COMBOBOX
+           ============================================================ -->
+      <section id="combobox" class="demo-section">
+        <div class="demo-section-title">ComboBox</div>
+        <div class="demo-row">
+          <div class="demo-card" style="max-width: 320px;">
+            <div class="demo-card-title">Single select</div>
+            <div class="flm-combobox">
+              <label class="flm-label">Fruit</label>
+              <div class="flm-combobox-wrapper">
+                <input class="flm-combobox-input" placeholder="Select a fruit…">
+                <button class="flm-combobox-caret" data-icon="ChevronDown" aria-label="Toggle"></button>
+              </div>
+              <div class="flm-combobox-listbox">
+                <div class="flm-combobox-option" data-value="apple">Apple</div>
+                <div class="flm-combobox-option" data-value="banana">Banana</div>
+                <div class="flm-combobox-option" data-value="cherry">Cherry</div>
+                <div class="flm-combobox-option" data-value="grape">Grape</div>
+                <div class="flm-combobox-option" data-value="mango">Mango</div>
+                <div class="flm-combobox-option" data-value="orange">Orange</div>
+                <div class="flm-combobox-option" data-value="peach">Peach</div>
+              </div>
+            </div>
+          </div>
+          <div class="demo-card" style="max-width: 320px;">
+            <div class="demo-card-title">Multi-select</div>
+            <div class="flm-combobox" data-multiselect>
+              <label class="flm-label">Toppings</label>
+              <div class="flm-combobox-wrapper">
+                <input class="flm-combobox-input" placeholder="Choose toppings…">
+                <button class="flm-combobox-caret" data-icon="ChevronDown" aria-label="Toggle"></button>
+              </div>
+              <div class="flm-combobox-listbox">
+                <div class="flm-combobox-option" data-value="cheese"><span class="flm-combobox-option-check"></span> Cheese</div>
+                <div class="flm-combobox-option" data-value="pepperoni"><span class="flm-combobox-option-check"></span> Pepperoni</div>
+                <div class="flm-combobox-option" data-value="mushrooms"><span class="flm-combobox-option-check"></span> Mushrooms</div>
+                <div class="flm-combobox-option" data-value="olives"><span class="flm-combobox-option-check"></span> Olives</div>
+                <div class="flm-combobox-option" data-value="onions"><span class="flm-combobox-option-check"></span> Onions</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           TEACHINGBUBBLE
+           ============================================================ -->
+      <section id="teachingbubble" class="demo-section">
+        <div class="demo-section-title">TeachingBubble</div>
+        <button class="flm-button" data-teachingbubble-toggle="demo-tb">Show TeachingBubble</button>
+        <div class="flm-teachingbubble" id="demo-tb">
+          <div class="flm-teachingbubble-beak"></div>
+          <div class="flm-teachingbubble-header">
+            <h3 class="flm-teachingbubble-headline">Welcome to FluentLM!</h3>
+            <button class="flm-teachingbubble-close" data-icon="Cancel" aria-label="Close"></button>
+          </div>
+          <div class="flm-teachingbubble-body">
+            This is a teaching bubble. It draws attention to a feature and provides guidance to help users understand it.
+          </div>
+          <div class="flm-teachingbubble-footer">
+            <button class="flm-button">Maybe later</button>
+            <button class="flm-button flm-button--primary">Got it!</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           HOVERCARD
+           ============================================================ -->
+      <section id="hovercard" class="demo-section">
+        <div class="demo-section-title">HoverCard</div>
+        <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingM);">
+          <span data-hovercard-id="demo-hc" class="flm-link" style="cursor: pointer;">Hover for details</span>
+        </div>
+        <div class="flm-hovercard" id="demo-hc">
+          <div class="flm-hovercard-compact">
+            <div class="flm-hovercard-title">Jane Doe</div>
+            <div class="flm-hovercard-subtitle">Software Engineer &middot; Contoso</div>
+          </div>
+          <div class="flm-hovercard-expanded">
+            <div class="flm-hovercard-body">
+              <p class="flm-text flm-text--small">jane.doe@contoso.com</p>
+              <p class="flm-text flm-text--small flm-text--secondary">Building 42, Room 3014</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           COACHMARK
+           ============================================================ -->
+      <section id="coachmark" class="demo-section">
+        <div class="demo-section-title">Coachmark</div>
+        <div style="position: relative; padding: var(--spacingL2); display: inline-block;">
+          <span class="flm-text">Click the pulsing dot to see the teaching bubble:</span>
+          <div class="flm-coachmark" data-teachingbubble-toggle="demo-cm-tb" style="position: relative; display: inline-flex; margin-left: var(--spacingM);">
+            <div class="flm-coachmark-dot"></div>
+            <div class="flm-coachmark-ring"></div>
+          </div>
+          <div class="flm-teachingbubble" id="demo-cm-tb">
+            <div class="flm-teachingbubble-beak"></div>
+            <div class="flm-teachingbubble-header">
+              <h3 class="flm-teachingbubble-headline">New Feature</h3>
+              <button class="flm-teachingbubble-close" data-icon="Cancel" aria-label="Close"></button>
+            </div>
+            <div class="flm-teachingbubble-body">
+              This coachmark highlights a new feature. The beacon disappears once dismissed.
+            </div>
+            <div class="flm-teachingbubble-footer">
+              <button class="flm-button flm-button--primary">Got it!</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           DATEPICKER
+           ============================================================ -->
+      <section id="datepicker" class="demo-section">
+        <div class="demo-section-title">DatePicker</div>
+        <div class="demo-row">
+          <div class="demo-card" style="max-width: 320px;">
+            <div class="demo-card-title">Default</div>
+            <div class="flm-datepicker">
+              <label class="flm-label" for="dp1">Start date</label>
+              <div class="flm-datepicker-wrapper">
+                <input class="flm-datepicker-input" id="dp1" placeholder="MM/DD/YYYY">
+                <button class="flm-datepicker-icon" data-icon="Calendar" aria-label="Open calendar"></button>
+              </div>
+            </div>
+          </div>
+          <div class="demo-card" style="max-width: 320px;">
+            <div class="demo-card-title">With constraints</div>
+            <div class="flm-datepicker" data-min-date="01/01/2026" data-max-date="12/31/2026">
+              <label class="flm-label" for="dp2">Date (2026 only)</label>
+              <div class="flm-datepicker-wrapper">
+                <input class="flm-datepicker-input" id="dp2" placeholder="MM/DD/YYYY">
+                <button class="flm-datepicker-icon" data-icon="Calendar" aria-label="Open calendar"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           TAG PICKER
+           ============================================================ -->
+      <section id="tagpicker" class="demo-section">
+        <div class="demo-section-title">TagPicker</div>
+        <div class="demo-row">
+          <div class="demo-card" style="max-width: 400px;">
+            <div class="demo-card-title">Default</div>
+            <div class="flm-tagpicker">
+              <label class="flm-label">Tags</label>
+              <div class="flm-tagpicker-well">
+                <input class="flm-tagpicker-input" placeholder="Add tags…">
+              </div>
+              <div class="flm-tagpicker-listbox">
+                <div class="flm-tagpicker-option" data-value="react">React</div>
+                <div class="flm-tagpicker-option" data-value="angular">Angular</div>
+                <div class="flm-tagpicker-option" data-value="vue">Vue</div>
+                <div class="flm-tagpicker-option" data-value="svelte">Svelte</div>
+                <div class="flm-tagpicker-option" data-value="typescript">TypeScript</div>
+                <div class="flm-tagpicker-option" data-value="javascript">JavaScript</div>
+              </div>
+            </div>
+          </div>
+          <div class="demo-card" style="max-width: 400px;">
+            <div class="demo-card-title">Max 3 tags</div>
+            <div class="flm-tagpicker" data-max-tags="3">
+              <label class="flm-label">Fruits (max 3)</label>
+              <div class="flm-tagpicker-well">
+                <input class="flm-tagpicker-input" placeholder="Pick up to 3…">
+              </div>
+              <div class="flm-tagpicker-listbox">
+                <div class="flm-tagpicker-option" data-value="apple">Apple</div>
+                <div class="flm-tagpicker-option" data-value="banana">Banana</div>
+                <div class="flm-tagpicker-option" data-value="cherry">Cherry</div>
+                <div class="flm-tagpicker-option" data-value="grape">Grape</div>
+                <div class="flm-tagpicker-option" data-value="mango">Mango</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-row">
+          <div class="demo-card" style="max-width: 400px;">
+            <div class="demo-card-title">PeoplePicker</div>
+            <div class="flm-tagpicker flm-tagpicker--people">
+              <label class="flm-label">People</label>
+              <div class="flm-tagpicker-well">
+                <input class="flm-tagpicker-input" placeholder="Search people…">
+              </div>
+              <div class="flm-tagpicker-listbox">
+                <div class="flm-tagpicker-option" data-value="jane" data-initials="JD" data-secondary="Software Engineer">
+                  <span class="flm-tagpicker-option-coin">JD</span>
+                  <span class="flm-tagpicker-option-details">
+                    <span class="flm-tagpicker-option-name">Jane Doe</span>
+                    <span class="flm-tagpicker-option-secondary">Software Engineer</span>
+                  </span>
+                </div>
+                <div class="flm-tagpicker-option" data-value="john" data-initials="JS" data-secondary="Product Manager">
+                  <span class="flm-tagpicker-option-coin">JS</span>
+                  <span class="flm-tagpicker-option-details">
+                    <span class="flm-tagpicker-option-name">John Smith</span>
+                    <span class="flm-tagpicker-option-secondary">Product Manager</span>
+                  </span>
+                </div>
+                <div class="flm-tagpicker-option" data-value="alice" data-initials="AW" data-secondary="Designer">
+                  <span class="flm-tagpicker-option-coin">AW</span>
+                  <span class="flm-tagpicker-option-details">
+                    <span class="flm-tagpicker-option-name">Alice Wang</span>
+                    <span class="flm-tagpicker-option-secondary">Designer</span>
+                  </span>
+                </div>
+                <div class="flm-tagpicker-option" data-value="bob" data-initials="BJ" data-secondary="QA Engineer">
+                  <span class="flm-tagpicker-option-coin">BJ</span>
+                  <span class="flm-tagpicker-option-details">
+                    <span class="flm-tagpicker-option-name">Bob Johnson</span>
+                    <span class="flm-tagpicker-option-secondary">QA Engineer</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="demo-card" style="max-width: 400px;">
+            <div class="demo-card-title">Disabled</div>
+            <div class="flm-tagpicker flm-tagpicker--disabled">
+              <label class="flm-label">Tags (disabled)</label>
+              <div class="flm-tagpicker-well">
+                <span class="flm-tagpicker-chip" data-value="react">
+                  <span class="flm-tagpicker-chip-text">React</span>
+                </span>
+                <span class="flm-tagpicker-chip" data-value="vue">
+                  <span class="flm-tagpicker-chip-text">Vue</span>
+                </span>
+                <input class="flm-tagpicker-input" placeholder="Add tags…" disabled>
+              </div>
+              <div class="flm-tagpicker-listbox"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           OVERFLOW SET
+           ============================================================ -->
+      <section id="overflowset" class="demo-section">
+        <div class="demo-section-title">OverflowSet</div>
+        <div class="demo-card" style="margin-bottom: var(--spacingM);">
+          <div class="demo-card-title">Resize the container to see overflow</div>
+          <div style="border: 1px dashed var(--variantBorder); padding: var(--spacingS2); border-radius: var(--roundedCorner4); resize: horizontal; overflow: hidden; max-width: 100%; min-width: 120px; width: 500px;">
+            <div class="flm-overflowset">
+              <div class="flm-overflowset-items">
+                <button class="flm-overflowset-item flm-button" data-label="New" data-icon="Add" data-overflow-order="1">New</button>
+                <button class="flm-overflowset-item flm-button" data-label="Edit" data-icon="Edit" data-overflow-order="2">Edit</button>
+                <button class="flm-overflowset-item flm-button" data-label="Share" data-icon="Share" data-overflow-order="3">Share</button>
+                <button class="flm-overflowset-item flm-button" data-label="Download" data-icon="Download" data-overflow-order="4">Download</button>
+                <button class="flm-overflowset-item flm-button" data-label="Delete" data-icon="Delete" data-overflow-order="5">Delete</button>
+              </div>
+              <button class="flm-overflowset-overflow" aria-label="More items">...</button>
+            </div>
+          </div>
+        </div>
+        <div class="demo-card">
+          <div class="demo-card-title">With far-side items</div>
+          <div style="border: 1px dashed var(--variantBorder); padding: var(--spacingS2); border-radius: var(--roundedCorner4); resize: horizontal; overflow: hidden; max-width: 100%; min-width: 160px; width: 480px;">
+            <div class="flm-overflowset">
+              <div class="flm-overflowset-items">
+                <button class="flm-overflowset-item flm-button" data-label="New" data-icon="Add">New</button>
+                <button class="flm-overflowset-item flm-button" data-label="Upload" data-icon="Upload">Upload</button>
+                <button class="flm-overflowset-item flm-button" data-label="Copy" data-icon="Copy">Copy</button>
+                <button class="flm-overflowset-item flm-button" data-label="Move" data-icon="MoveToFolder">Move</button>
+              </div>
+              <button class="flm-overflowset-overflow" aria-label="More items">...</button>
+              <div class="flm-overflowset-far">
+                <button class="flm-button flm-button--icon" data-icon="Filter" aria-label="Filter"></button>
+                <button class="flm-button flm-button--icon" data-icon="Settings" aria-label="Settings"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           TIMEPICKER
+           ============================================================ -->
+      <section id="timepicker" class="demo-section">
+        <div class="demo-section-title">TimePicker</div>
+        <div class="demo-row">
+          <div class="demo-card" style="max-width: 320px;">
+            <div class="demo-card-title">Default (24h, 30-min)</div>
+            <div class="flm-timepicker">
+              <label class="flm-label" for="tp1">Time</label>
+              <div class="flm-timepicker-wrapper">
+                <input class="flm-timepicker-input" id="tp1" placeholder="HH:MM">
+                <button class="flm-timepicker-icon" data-icon="Clock" aria-label="Open time picker"></button>
+              </div>
+            </div>
+          </div>
+          <div class="demo-card" style="max-width: 320px;">
+            <div class="demo-card-title">12-hour AM/PM</div>
+            <div class="flm-timepicker" data-use-12h>
+              <label class="flm-label" for="tp2">Time</label>
+              <div class="flm-timepicker-wrapper">
+                <input class="flm-timepicker-input" id="tp2" placeholder="H:MM AM/PM">
+                <button class="flm-timepicker-icon" data-icon="Clock" aria-label="Open time picker"></button>
+              </div>
+            </div>
+          </div>
+          <div class="demo-card" style="max-width: 320px;">
+            <div class="demo-card-title">Business hours (15-min)</div>
+            <div class="flm-timepicker" data-min-time="09:00" data-max-time="17:00" data-increment="15">
+              <label class="flm-label" for="tp3">Meeting time</label>
+              <div class="flm-timepicker-wrapper">
+                <input class="flm-timepicker-input" id="tp3" placeholder="Select time…">
+                <button class="flm-timepicker-icon" data-icon="Clock" aria-label="Open time picker"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           PALETTE (kept from original)
+           ============================================================ -->
+      <section id="palette" class="demo-section">
+        <div class="demo-section-title">Palette</div>
+        <div class="demo-card" style="margin-bottom: var(--spacingM);">
+          <div class="demo-card-title">Brand / Theme</div>
+          <div class="demo-swatch-grid">
+            <div class="demo-swatch" style="background: var(--themeDarker); color: #fff;">themeDarker<div class="demo-swatch-label">#004578</div></div>
+            <div class="demo-swatch" style="background: var(--themeDark); color: #fff;">themeDark<div class="demo-swatch-label">#005a9e</div></div>
+            <div class="demo-swatch" style="background: var(--themeDarkAlt); color: #fff;">themeDarkAlt<div class="demo-swatch-label">#106ebe</div></div>
+            <div class="demo-swatch" style="background: var(--themePrimary); color: #fff;">themePrimary<div class="demo-swatch-label">#0078d4</div></div>
+            <div class="demo-swatch" style="background: var(--themeSecondary); color: #fff;">themeSecondary<div class="demo-swatch-label">#2b88d8</div></div>
+            <div class="demo-swatch" style="background: var(--themeTertiary); color: #000;">themeTertiary<div class="demo-swatch-label">#71afe5</div></div>
+            <div class="demo-swatch" style="background: var(--themeLight); color: #000;">themeLight<div class="demo-swatch-label">#c7e0f4</div></div>
+            <div class="demo-swatch" style="background: var(--themeLighter); color: #000;">themeLighter<div class="demo-swatch-label">#deecf9</div></div>
+            <div class="demo-swatch" style="background: var(--themeLighterAlt); color: #000;">themeLighterAlt<div class="demo-swatch-label">#eff6fc</div></div>
+          </div>
+        </div>
+        <div class="demo-card" style="margin-bottom: var(--spacingM);">
+          <div class="demo-card-title">Neutrals</div>
+          <div class="demo-swatch-grid">
+            <div class="demo-swatch" style="background: var(--black); color: #fff;">black</div>
+            <div class="demo-swatch" style="background: var(--neutralDark); color: #fff;">neutralDark</div>
+            <div class="demo-swatch" style="background: var(--neutralPrimary); color: #fff;">neutralPrimary</div>
+            <div class="demo-swatch" style="background: var(--neutralSecondary); color: #fff;">neutralSecondary</div>
+            <div class="demo-swatch" style="background: var(--neutralTertiary); color: #000;">neutralTertiary</div>
+            <div class="demo-swatch" style="background: var(--neutralQuaternary); color: #000;">neutralQuaternary</div>
+            <div class="demo-swatch" style="background: var(--neutralLight); color: #000;">neutralLight</div>
+            <div class="demo-swatch" style="background: var(--neutralLighter); color: #000;">neutralLighter</div>
+            <div class="demo-swatch" style="background: var(--neutralLighterAlt); color: #000;">neutralLighterAlt</div>
+            <div class="demo-swatch" style="background: var(--white); color: #000;">white</div>
+          </div>
+        </div>
+        <div class="demo-card">
+          <div class="demo-card-title">Status</div>
+          <div class="demo-swatch-grid">
+            <div class="demo-swatch" style="background: var(--red); color: #fff;">red</div>
+            <div class="demo-swatch" style="background: var(--orange); color: #fff;">orange</div>
+            <div class="demo-swatch" style="background: var(--yellow); color: #000;">yellow</div>
+            <div class="demo-swatch" style="background: var(--green); color: #fff;">green</div>
+            <div class="demo-swatch" style="background: var(--teal); color: #fff;">teal</div>
+            <div class="demo-swatch" style="background: var(--blue); color: #fff;">blue</div>
+            <div class="demo-swatch" style="background: var(--purple); color: #fff;">purple</div>
+            <div class="demo-swatch" style="background: var(--magenta); color: #fff;">magenta</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           TYPOGRAPHY
+           ============================================================ -->
+      <section id="typography" class="demo-section">
+        <div class="demo-section-title">Typography</div>
+        <div class="demo-card">
+          <div class="flm-stack" style="gap: var(--spacingS1);">
+            <span class="flm-text flm-text--tiny">tiny — 10px</span>
+            <span class="flm-text flm-text--small">small — 12px</span>
+            <span class="flm-text">medium — 14px (default)</span>
+            <span class="flm-text flm-text--mediumPlus">mediumPlus — 16px</span>
+            <span class="flm-text flm-text--large">large — 18px</span>
+            <span class="flm-text flm-text--xLarge">xLarge — 20px / semibold</span>
+            <span class="flm-text flm-text--xxLarge">xxLarge — 28px / semibold</span>
+            <span class="flm-text flm-text--superLarge">superLarge — 42px</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           ELEVATION
+           ============================================================ -->
+      <section id="elevation" class="demo-section">
+        <div class="demo-section-title">Elevation</div>
+        <div class="demo-row">
+          <div class="demo-elevation" style="box-shadow: none; border: 1px solid var(--variantBorder); min-width: 140px;">depth 0</div>
+          <div class="demo-elevation" style="box-shadow: var(--elevation4); min-width: 140px;">depth 4</div>
+          <div class="demo-elevation" style="box-shadow: var(--elevation8); min-width: 140px;">depth 8</div>
+          <div class="demo-elevation" style="box-shadow: var(--elevation16); min-width: 140px;">depth 16</div>
+          <div class="demo-elevation" style="box-shadow: var(--elevation64); min-width: 140px;">depth 64</div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+           SPACING
+           ============================================================ -->
+      <section id="spacing" class="demo-section">
+        <div class="demo-section-title">Spacing</div>
+        <div class="flm-stack" style="gap: var(--spacingS1);">
+          <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingS1); align-items: center;">
+            <div style="width: 4px; height: 24px; background: var(--themePrimary); border-radius: 2px;"></div>
+            <code>--spacingS2</code> — 4px
+          </div>
+          <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingS1); align-items: center;">
+            <div style="width: 8px; height: 24px; background: var(--themePrimary); border-radius: 2px;"></div>
+            <code>--spacingS1</code> — 8px
+          </div>
+          <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingS1); align-items: center;">
+            <div style="width: 16px; height: 24px; background: var(--themePrimary); border-radius: 2px;"></div>
+            <code>--spacingM</code> — 16px
+          </div>
+          <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingS1); align-items: center;">
+            <div style="width: 20px; height: 24px; background: var(--themePrimary); border-radius: 2px;"></div>
+            <code>--spacingL1</code> — 20px
+          </div>
+          <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingS1); align-items: center;">
+            <div style="width: 32px; height: 24px; background: var(--themePrimary); border-radius: 2px;"></div>
+            <code>--spacingL2</code> — 32px
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Combined library JS -->
+  <script src="dist/fluentlm.min.js"></script>
+
+  <script>
+    // Register Awarity themes
+    FluentLM.registerTheme('awarity-light', 'fluent-awarity-light');
+    FluentLM.registerTheme('awarity-dark', 'fluent-awarity-dark');
+    FluentLM.setTheme('awarity-light');
+
+    // Wire up demo theme toggle button
+    (function () {
+      var btn = document.getElementById('themeToggle');
+      function updateLabel() {
+        btn.textContent = FluentLM.getTheme() === 'awarity-light' ? 'Switch to Dark' : 'Switch to Light';
+      }
+      updateLabel();
+      btn.addEventListener('click', function () {
+        FluentLM.setTheme(FluentLM.getTheme() === 'awarity-light' ? 'awarity-dark' : 'awarity-light');
+        updateLabel();
+      });
+
+      // Active nav link tracking
+      var links = document.querySelectorAll('.demo-nav-link[href]');
+      links.forEach(function (link) {
+        link.addEventListener('click', function () {
+          links.forEach(function (l) { l.classList.remove('active'); });
+          link.classList.add('active');
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

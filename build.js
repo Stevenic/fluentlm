@@ -26,8 +26,10 @@ const combinedCss = cssParts.join("\n");
 fs.writeFileSync(path.join(dist, "fluentlm.css"), combinedCss);
 
 // Copy theme files
-fs.copyFileSync(path.join(cssDir, "theme-dark.css"), path.join(dist, "theme-dark.css"));
-fs.copyFileSync(path.join(cssDir, "theme-light.css"), path.join(dist, "theme-light.css"));
+fs.readdirSync(cssDir)
+  .filter((f) => f.startsWith("theme-") && f.endsWith(".css"))
+  .sort()
+  .forEach((f) => fs.copyFileSync(path.join(cssDir, f), path.join(dist, f)));
 
 // Minify CSS
 execSync(`npx --yes clean-css-cli -o "${path.join(dist, "fluentlm.min.css")}" "${path.join(dist, "fluentlm.css")}"`, { stdio: "inherit" });

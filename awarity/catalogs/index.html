@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="en" class="fluent-awarity-dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catalogs — Awarity</title>
+
+  <!-- Themes & combined library CSS -->
+  <link rel="stylesheet" href="../../dist/theme-awarity-light.css">
+  <link rel="stylesheet" href="../../dist/theme-awarity-dark.css">
+  <link rel="stylesheet" href="../../dist/fluentlm.min.css">
+
+  <style>
+    /* ── App Shell ── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Left Nav ── */
+    .app-nav {
+      width: 220px;
+      flex-shrink: 0;
+      background-color: var(--bodyStandoutBackground);
+      border-right: 1px solid var(--bodyFrameDivider);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .app-nav-brand {
+      padding: var(--spacingM);
+      font-size: var(--fontSizeXLarge);
+      font-weight: var(--fontWeightSemibold);
+      line-height: var(--lineHeightXLarge);
+      color: var(--bodyText);
+      border-bottom: 1px solid var(--bodyFrameDivider);
+    }
+
+    .app-nav-section {
+      padding: var(--spacingS2) var(--spacingM);
+      margin-top: var(--spacingM);
+      font-size: var(--fontSizeTiny);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodySubtext);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .app-nav-link {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+      padding: var(--spacingS2) var(--spacingM);
+      color: var(--bodyText);
+      font-size: var(--fontSizeMedium);
+      text-decoration: none;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+    }
+
+    .app-nav-link:hover {
+      background-color: var(--listItemBackgroundHovered);
+      text-decoration: none;
+    }
+
+    .app-nav-link--active {
+      background-color: var(--listItemBackgroundChecked);
+      font-weight: var(--fontWeightSemibold);
+      border-left-color: var(--themePrimary);
+    }
+
+    .app-nav-spacer { flex: 1; }
+
+    /* ── Main Area ── */
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── CommandBar Zone ── */
+    .app-commandbar {
+      border-bottom: 1px solid var(--bodyDivider);
+    }
+
+    /* ── Breadcrumb Zone ── */
+    .app-breadcrumb {
+      padding: var(--spacingS2) var(--spacingL2);
+      border-bottom: 1px solid var(--bodyDivider);
+      background-color: var(--bodyBackground);
+    }
+
+    /* ── MessageBar Zone ── */
+    .app-messagebar-zone {
+      padding: 0 var(--spacingL2);
+    }
+    .app-messagebar-zone:empty { display: none; }
+    .app-messagebar-zone .flm-messagebar {
+      margin-top: var(--spacingS1);
+      border-radius: var(--roundedCorner4);
+    }
+
+    /* ── Content Area ── */
+    .app-content {
+      flex: 1;
+      padding: var(--spacingL2);
+      overflow-y: auto;
+      background-color: var(--bodyBackground);
+    }
+
+    /* ── Empty State ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      gap: var(--spacingM);
+      color: var(--bodySubtext);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      opacity: 0.4;
+    }
+
+    .empty-state-text {
+      font-size: var(--fontSizeLarge);
+      color: var(--bodySubtext);
+    }
+
+    .empty-state-sub {
+      font-size: var(--fontSizeMedium);
+      color: var(--bodySubtext);
+      opacity: 0.7;
+      max-width: 360px;
+      text-align: center;
+      line-height: var(--lineHeightMedium);
+    }
+
+    /* ── Status Badges ── */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px var(--spacingS1);
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+      font-weight: var(--fontWeightSemibold);
+    }
+
+    .status-badge--ready {
+      background-color: color-mix(in srgb, var(--green) 15%, transparent);
+      color: var(--green);
+    }
+
+    .status-badge--warning {
+      background-color: color-mix(in srgb, var(--yellow) 15%, transparent);
+      color: var(--yellow);
+    }
+
+    .status-badge--processing {
+      background-color: color-mix(in srgb, var(--blue) 15%, transparent);
+      color: var(--blue);
+    }
+
+    .status-badge--error {
+      background-color: color-mix(in srgb, var(--red) 15%, transparent);
+      color: var(--red);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: currentColor;
+    }
+
+    /* ── Inline Progress (in table row) ── */
+    .row-progress {
+      margin-top: 4px;
+    }
+    .row-progress .flm-progress-track {
+      height: 3px;
+    }
+
+    /* ── Panel Sections ── */
+    .panel-section {
+      margin-bottom: var(--spacingL2);
+    }
+
+    .panel-section-title {
+      font-size: var(--fontSizeMedium);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+      margin-bottom: var(--spacingS1);
+      text-transform: uppercase;
+      font-size: var(--fontSizeTiny);
+      letter-spacing: 0.5px;
+      color: var(--bodySubtext);
+    }
+
+    .panel-meta {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--spacingS2) var(--spacingM);
+      font-size: var(--fontSizeMedium);
+    }
+
+    .panel-meta-label {
+      color: var(--bodySubtext);
+    }
+
+    .panel-meta-value {
+      color: var(--bodyText);
+    }
+
+    .panel-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingS2);
+    }
+
+    .panel-actions .flm-button {
+      justify-content: flex-start;
+    }
+
+    .panel-activity-item {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--spacingS2) 0;
+      border-bottom: 1px solid var(--bodyDivider);
+      font-size: var(--fontSizeSmall);
+    }
+
+    .panel-activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .panel-activity-label { color: var(--bodyText); }
+    .panel-activity-time { color: var(--bodySubtext); }
+
+    /* ── Clickable rows ── */
+    .flm-detailslist-row { cursor: pointer; }
+
+    /* ── New Catalog Panel Form ── */
+    .new-catalog-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingM);
+    }
+
+    /* ── Shimmer loading table ── */
+    .shimmer-table {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingS2);
+    }
+
+    .shimmer-row {
+      display: flex;
+      gap: var(--spacingM);
+      padding: var(--spacingS1) 0;
+    }
+
+    /* ── Number cells right-aligned ── */
+    .cell-number {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- ════════════════════════════════════════════════════════════════
+         LEFT NAV
+         ════════════════════════════════════════════════════════════════ -->
+    <nav class="app-nav">
+      <div class="app-nav-brand">Awarity</div>
+
+      <a class="app-nav-link" href="#"><i class="flm-icon" data-icon="Home"></i> Home</a>
+      <a class="app-nav-link app-nav-link--active" href="#"><i class="flm-icon" data-icon="Database"></i> Catalogs</a>
+      <a class="app-nav-link" href="#"><i class="flm-icon" data-icon="Search"></i> Explore</a>
+      <a class="app-nav-link" href="#"><i class="flm-icon" data-icon="Org"></i> Structure</a>
+      <a class="app-nav-link" href="#"><i class="flm-icon" data-icon="Filter"></i> Lenses</a>
+      <a class="app-nav-link" href="#"><i class="flm-icon" data-icon="Flow"></i> Workflows</a>
+      <a class="app-nav-link" href="#"><i class="flm-icon" data-icon="Processing"></i> Runs</a>
+
+      <div class="app-nav-spacer"></div>
+
+      <a class="app-nav-link" href="#"><i class="flm-icon" data-icon="Settings"></i> Settings</a>
+
+      <div style="padding: var(--spacingM);">
+        <button class="flm-button" id="themeToggle" style="width: 100%;">Switch to Dark</button>
+      </div>
+    </nav>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         MAIN AREA
+         ════════════════════════════════════════════════════════════════ -->
+    <div class="app-main">
+
+      <!-- CommandBar -->
+      <div class="app-commandbar">
+        <div class="flm-commandbar">
+          <div class="flm-commandbar-items">
+            <button class="flm-button flm-button--primary" data-icon="Add" id="btn-new-catalog" style="margin: 4px 8px;">
+              New Catalog
+            </button>
+            <button class="flm-commandbar-item" data-icon="TextDocument" id="btn-generate" disabled>Generate Abstracts</button>
+            <button class="flm-commandbar-item" data-icon="Delete" id="btn-delete" disabled>Delete</button>
+            <span class="flm-commandbar-divider"></span>
+            <button class="flm-commandbar-item" data-icon="Refresh" id="btn-refresh">Refresh</button>
+          </div>
+          <div class="flm-commandbar-far" style="align-items: center; padding-right: 8px;">
+            <div class="flm-searchbox" style="min-width: 220px;">
+              <input class="flm-searchbox-input" type="search" placeholder="Search catalogs…" id="search-input">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="app-breadcrumb">
+        <ol class="flm-breadcrumb">
+          <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#">Home</a></li>
+          <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link">Catalogs</a></li>
+        </ol>
+      </div>
+
+      <!-- MessageBar Zone -->
+      <div class="app-messagebar-zone" id="messagebar-zone"></div>
+
+      <!-- Content -->
+      <div class="app-content" id="content-area">
+
+        <!-- ── Loading State (Shimmer) ── -->
+        <div id="state-loading" style="display: none;">
+          <div class="shimmer-table">
+            <div class="shimmer-row">
+              <div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+            </div>
+            <div class="shimmer-row">
+              <div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+            </div>
+            <div class="shimmer-row">
+              <div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+            </div>
+            <div class="shimmer-row">
+              <div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+            </div>
+            <div class="shimmer-row">
+              <div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Empty State ── -->
+        <div id="state-empty" style="display: none;">
+          <div class="empty-state">
+            <i class="flm-icon empty-state-icon" data-icon="Database"></i>
+            <span class="empty-state-text">No catalogs yet</span>
+            <span class="empty-state-sub">Catalogs store your document corpus. Create one to begin reasoning over your data.</span>
+            <button class="flm-button flm-button--primary" data-icon="Add" id="btn-empty-create">
+              <i class="flm-icon" data-icon="Add"></i> Create your first catalog
+            </button>
+          </div>
+        </div>
+
+        <!-- ── Data State (DetailsList) ── -->
+        <div id="state-data" style="display: block;">
+          <div class="flm-detailslist" id="catalogs-list">
+            <div class="flm-detailslist-header">
+              <div class="flm-detailslist-check">
+                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="check-all"><span class="flm-checkbox-mark"></span></label>
+              </div>
+              <div class="flm-detailslist-header-cell" style="width: 200px;">Name</div>
+              <div class="flm-detailslist-header-cell cell-number" style="width: 100px;">Documents</div>
+              <div class="flm-detailslist-header-cell cell-number" style="width: 100px;">Chunks</div>
+              <div class="flm-detailslist-header-cell cell-number" style="width: 100px;">Abstracts</div>
+              <div class="flm-detailslist-header-cell cell-number" style="width: 120px;">Classifications</div>
+              <div class="flm-detailslist-header-cell" style="width: 140px;">Last Updated</div>
+              <div class="flm-detailslist-header-cell" style="flex: 1;">Status</div>
+            </div>
+
+            <!-- Row 1: Ready -->
+            <div class="flm-detailslist-row" data-catalog="sec-filings">
+              <div class="flm-detailslist-check">
+                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label>
+              </div>
+              <div class="flm-detailslist-cell" style="width: 200px; font-weight: var(--fontWeightSemibold);">sec-filings</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">2,341</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">18,420</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">2,341</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 120px;">3</div>
+              <div class="flm-detailslist-cell" style="width: 140px;">Feb 20, 2026</div>
+              <div class="flm-detailslist-cell" style="flex: 1;">
+                <span class="status-badge status-badge--ready"><span class="status-dot"></span> Ready</span>
+              </div>
+            </div>
+
+            <!-- Row 2: Abstracts Missing -->
+            <div class="flm-detailslist-row" data-catalog="legal-contracts">
+              <div class="flm-detailslist-check">
+                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label>
+              </div>
+              <div class="flm-detailslist-cell" style="width: 200px; font-weight: var(--fontWeightSemibold);">legal-contracts</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">847</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">6,120</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">0</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 120px;">0</div>
+              <div class="flm-detailslist-cell" style="width: 140px;">Feb 19, 2026</div>
+              <div class="flm-detailslist-cell" style="flex: 1;">
+                <span class="status-badge status-badge--warning"><span class="status-dot"></span> Abstracts Missing</span>
+              </div>
+            </div>
+
+            <!-- Row 3: Processing -->
+            <div class="flm-detailslist-row" data-catalog="research-papers">
+              <div class="flm-detailslist-check">
+                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label>
+              </div>
+              <div class="flm-detailslist-cell" style="width: 200px; font-weight: var(--fontWeightSemibold);">research-papers</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">512</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">3,840</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">287</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 120px;">1</div>
+              <div class="flm-detailslist-cell" style="width: 140px;">Feb 21, 2026</div>
+              <div class="flm-detailslist-cell" style="flex: 1;">
+                <span class="status-badge status-badge--processing"><span class="status-dot"></span> Processing</span>
+                <div class="row-progress">
+                  <div class="flm-progress">
+                    <div class="flm-progress-track"><div class="flm-progress-bar" style="width: 56%"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Row 4: Error -->
+            <div class="flm-detailslist-row" data-catalog="email-archive">
+              <div class="flm-detailslist-check">
+                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label>
+              </div>
+              <div class="flm-detailslist-cell" style="width: 200px; font-weight: var(--fontWeightSemibold);">email-archive</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">4,200</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">—</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">—</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 120px;">0</div>
+              <div class="flm-detailslist-cell" style="width: 140px;">Feb 18, 2026</div>
+              <div class="flm-detailslist-cell" style="flex: 1;">
+                <span class="status-badge status-badge--error"><span class="status-dot"></span> Error</span>
+              </div>
+            </div>
+
+            <!-- Row 5: Ready -->
+            <div class="flm-detailslist-row" data-catalog="compliance-docs">
+              <div class="flm-detailslist-check">
+                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label>
+              </div>
+              <div class="flm-detailslist-cell" style="width: 200px; font-weight: var(--fontWeightSemibold);">compliance-docs</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">1,105</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">8,930</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 100px;">1,105</div>
+              <div class="flm-detailslist-cell cell-number" style="width: 120px;">5</div>
+              <div class="flm-detailslist-cell" style="width: 140px;">Feb 17, 2026</div>
+              <div class="flm-detailslist-cell" style="flex: 1;">
+                <span class="status-badge status-badge--ready"><span class="status-dot"></span> Ready</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div><!-- /app-content -->
+    </div><!-- /app-main -->
+  </div><!-- /app-shell -->
+
+  <!-- ════════════════════════════════════════════════════════════════
+       DETAIL PANEL (right slide-over)
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-panel-overlay" id="detail-panel-overlay"></div>
+  <div class="flm-panel flm-panel--medium" id="detail-panel">
+    <div class="flm-panel-header">
+      <h2 class="flm-panel-title" id="detail-panel-title">sec-filings</h2>
+      <button class="flm-panel-close" data-icon="Cancel" aria-label="Close" id="detail-panel-close"></button>
+    </div>
+    <div class="flm-panel-body">
+
+      <!-- Error banner (shown for error catalogs) -->
+      <div id="detail-error-bar" style="display: none; margin-bottom: var(--spacingM);">
+        <div class="flm-messagebar flm-messagebar--error">Ingest failed: unable to parse 12 documents. Check source files for encoding issues.</div>
+      </div>
+
+      <!-- Overview -->
+      <div class="panel-section">
+        <div class="panel-section-title">Overview</div>
+        <div class="panel-meta">
+          <span class="panel-meta-label">Documents</span>
+          <span class="panel-meta-value" id="detail-documents">2,341</span>
+          <span class="panel-meta-label">Chunks</span>
+          <span class="panel-meta-value" id="detail-chunks">18,420</span>
+          <span class="panel-meta-label">Abstracts</span>
+          <span class="panel-meta-value" id="detail-abstracts">2,341</span>
+          <span class="panel-meta-label">Classifications</span>
+          <span class="panel-meta-value" id="detail-classifications">3</span>
+          <span class="panel-meta-label">Storage</span>
+          <span class="panel-meta-value" id="detail-storage">~/.awarity/catalogs/sec-filings</span>
+          <span class="panel-meta-label">Created</span>
+          <span class="panel-meta-value" id="detail-created">Feb 14, 2026</span>
+          <span class="panel-meta-label">Status</span>
+          <span class="panel-meta-value" id="detail-status"><span class="status-badge status-badge--ready"><span class="status-dot"></span> Ready</span></span>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="panel-section">
+        <div class="panel-section-title">Actions</div>
+        <div class="panel-actions">
+          <button class="flm-button"><i class="flm-icon" data-icon="TextDocument"></i> Generate Abstracts</button>
+          <button class="flm-button"><i class="flm-icon" data-icon="Search"></i> Ask Question</button>
+          <button class="flm-button"><i class="flm-icon" data-icon="Tag"></i> Run Classification</button>
+          <button class="flm-button" id="btn-delete-catalog" style="color: var(--red);"><i class="flm-icon" data-icon="Delete"></i> Delete Catalog</button>
+        </div>
+      </div>
+
+      <!-- Error-specific actions -->
+      <div class="panel-section" id="detail-error-actions" style="display: none;">
+        <div class="panel-section-title">Troubleshoot</div>
+        <div class="panel-actions">
+          <button class="flm-button"><i class="flm-icon" data-icon="TextDocument"></i> View Logs</button>
+          <button class="flm-button flm-button--primary"><i class="flm-icon" data-icon="Refresh"></i> Retry Ingest</button>
+        </div>
+      </div>
+
+      <!-- Activity -->
+      <div class="panel-section">
+        <div class="panel-section-title">Recent Activity</div>
+        <div id="detail-activity">
+          <div class="panel-activity-item">
+            <span class="panel-activity-label">Classification: risk-type</span>
+            <span class="panel-activity-time">2 hours ago</span>
+          </div>
+          <div class="panel-activity-item">
+            <span class="panel-activity-label">Abstracts generated</span>
+            <span class="panel-activity-time">1 day ago</span>
+          </div>
+          <div class="panel-activity-item">
+            <span class="panel-activity-label">Catalog ingested</span>
+            <span class="panel-activity-time">6 days ago</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="flm-panel-footer">
+      <button class="flm-button" id="detail-panel-close-btn">Close</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       NEW CATALOG PANEL
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-panel-overlay" id="new-panel-overlay"></div>
+  <div class="flm-panel flm-panel--medium" id="new-panel">
+    <div class="flm-panel-header">
+      <h2 class="flm-panel-title">New Catalog</h2>
+      <button class="flm-panel-close" data-icon="Cancel" aria-label="Close" id="new-panel-close"></button>
+    </div>
+    <div class="flm-panel-body">
+      <div class="new-catalog-form" id="new-catalog-form">
+
+        <div class="flm-textfield flm-textfield--required">
+          <label class="flm-label" for="new-name">Catalog Name</label>
+          <input class="flm-textfield-input" id="new-name" placeholder="e.g. sec-filings">
+        </div>
+
+        <div>
+          <label class="flm-label">Source Type</label>
+          <div class="flm-choicegroup" style="margin-top: var(--spacingS2);">
+            <label class="flm-choicegroup-option">
+              <input type="radio" class="flm-choicegroup-input" name="source-type" value="folder" checked>
+              <span class="flm-choicegroup-mark"></span>
+              <span class="flm-choicegroup-label">Folder</span>
+            </label>
+            <label class="flm-choicegroup-option">
+              <input type="radio" class="flm-choicegroup-input" name="source-type" value="filelist">
+              <span class="flm-choicegroup-mark"></span>
+              <span class="flm-choicegroup-label">File list</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="flm-textfield flm-textfield--required">
+          <label class="flm-label" for="new-path">Path</label>
+          <div class="flm-textfield-wrapper">
+            <input class="flm-textfield-input" id="new-path" placeholder="/path/to/documents">
+            <button class="flm-button flm-button--icon" type="button" id="btn-browse" aria-label="Browse" data-tooltip="Browse for folder" style="flex-shrink: 0; border: none; background: transparent;"><i class="flm-icon" data-icon="FolderOpen"></i></button>
+          </div>
+          <input type="file" id="file-picker" webkitdirectory style="display: none;">
+        </div>
+
+        <label class="flm-checkbox" style="margin-top: var(--spacingS2);">
+          <input type="checkbox" class="flm-checkbox-input" id="new-auto-abstracts">
+          <span class="flm-checkbox-mark"></span>
+          <span class="flm-label">Auto-generate abstracts after ingest</span>
+        </label>
+
+        <!-- Progress (shown during creation) -->
+        <div id="new-progress" style="display: none;">
+          <div class="flm-progress flm-progress--indeterminate">
+            <span class="flm-progress-label">Creating catalog…</span>
+            <div class="flm-progress-track"><div class="flm-progress-bar"></div></div>
+          </div>
+        </div>
+
+        <!-- Inline message bar for errors -->
+        <div id="new-messagebar" style="display: none;"></div>
+
+      </div>
+    </div>
+    <div class="flm-panel-footer">
+      <button class="flm-button flm-button--primary" id="btn-create-catalog">Create</button>
+      <button class="flm-button" id="new-panel-cancel">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       DELETE CONFIRMATION DIALOG
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-dialog-overlay" id="delete-dialog" data-light-dismiss style="z-index: 1002;">
+    <div class="flm-dialog">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title">Delete Catalog</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
+      </div>
+      <div class="flm-dialog-body">
+        <p>Are you sure you want to delete <strong id="delete-catalog-name">sec-filings</strong>? This will remove all chunks, abstracts, and classification data. This action cannot be undone.</p>
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button flm-button--primary" style="background-color: var(--red); border-color: var(--red);" id="btn-confirm-delete">Delete</button>
+        <button class="flm-button" data-dialog-close>Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Combined library JS -->
+  <script src="../../dist/fluentlm.min.js"></script>
+
+  <script>
+    // ── Register custom icons for nav ──
+    FluentIcons.register('Database',   'M8 1C4.13 1 1 2.34 1 4v8c0 1.66 3.13 3 7 3s7-1.34 7-3V4c0-1.66-3.13-3-7-3zM2 6.26C3.41 7.24 5.59 7.8 8 7.8s4.59-.56 6-1.54V8c0 .77-2.42 2-6 2S2 8.77 2 8V6.26zM8 2c3.58 0 6 1.23 6 2s-2.42 2-6 2S2 4.77 2 4s2.42-2 6-2zm0 12c-3.58 0-6-1.23-6-2v-1.74C3.41 11.24 5.59 11.8 8 11.8s4.59-.56 6-1.54V12c0 .77-2.42 2-6 2z');
+    FluentIcons.register('Org',        'M8 1a2 2 0 0 1 2 2v1h2.5a.5.5 0 0 1 .5.5V7h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5h1V5H9v1.5a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5V5H5v2h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5v-4A.5.5 0 0 1 3 7h1V4.5a.5.5 0 0 1 .5-.5H7V3a2 2 0 0 1 1-2z');
+    FluentIcons.register('Flow',       'M2 3.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .35.15L8.71 6H13.5a.5.5 0 0 1 0 1H8.71l-2.86 2.85a.5.5 0 0 1-.35.15h-3a.5.5 0 0 1 0-1h2.79L8 6.5 5.29 4H2.5a.5.5 0 0 1-.5-.5zm0 8a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .35.15L8.71 14H13.5a.5.5 0 0 1 0 1H8.71l-2.86-2.85A.5.5 0 0 0 5.5 12h-3a.5.5 0 0 1-.5-.5z');
+    FluentIcons.register('Processing', 'M8 1.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V2a.5.5 0 0 1 .5-.5zM3.05 3.05a.5.5 0 0 1 .7 0l1.42 1.42a.5.5 0 0 1-.7.7L3.05 3.76a.5.5 0 0 1 0-.7zm9.9 0a.5.5 0 0 1 0 .7l-1.42 1.42a.5.5 0 1 1-.7-.7l1.41-1.42a.5.5 0 0 1 .7 0zM1.5 8a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H2a.5.5 0 0 1-.5-.5zm10 0a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm-6.33 3.17a.5.5 0 0 1 0 .7L3.76 13.3a.5.5 0 0 1-.7-.7l1.41-1.42a.5.5 0 0 1 .7 0zm5.66 0a.5.5 0 0 1 .7 0l1.42 1.42a.5.5 0 0 1-.7.7l-1.42-1.41a.5.5 0 0 1 0-.7zM8 12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5z');
+    FluentIcons.register('TextDocument','M4 2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5.41a1 1 0 0 0-.3-.7L9.3 1.28a1 1 0 0 0-.71-.29H4zm1.5 5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zm0 2h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zm0 2h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1 0-1z');
+    FluentIcons.register('Refresh',    'M1.5 8a6.5 6.5 0 0 1 11.25-4.43V2a.5.5 0 0 1 1 0v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1 0-1h1.87A5.5 5.5 0 1 0 13.5 8a.5.5 0 0 1 1 0A6.5 6.5 0 1 1 1.5 8z');
+    FluentIcons.register('Tag',        'M2 3.5A1.5 1.5 0 0 1 3.5 2h3.59a1.5 1.5 0 0 1 1.06.44l5.41 5.41a1.5 1.5 0 0 1 0 2.12l-3.59 3.59a1.5 1.5 0 0 1-2.12 0L2.44 8.15A1.5 1.5 0 0 1 2 7.09V3.5zM5 4a1 1 0 1 0 0 2 1 1 0 0 0 0-2z');
+    FluentIcons.register('Download',   'M8 1.5a.5.5 0 0 1 .5.5v7.79l2.15-2.14a.5.5 0 0 1 .7.7l-3 3a.5.5 0 0 1-.7 0l-3-3a.5.5 0 1 1 .7-.7L7.5 9.79V2a.5.5 0 0 1 .5-.5zM2.5 12a.5.5 0 0 1 .5.5v1h10v-1a.5.5 0 0 1 1 0v1.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-1.5a.5.5 0 0 1 .5-.5z');
+    FluentIcons.register('FolderOpen', 'M2 4.5A1.5 1.5 0 0 1 3.5 3h3.09a1.5 1.5 0 0 1 1.06.44L8.71 4.5H12.5A1.5 1.5 0 0 1 14 6v.5h.25a.75.75 0 0 1 .72.96l-1.5 5.25A1.5 1.5 0 0 1 12.03 14H3.5A1.5 1.5 0 0 1 2 12.5v-8zM3.5 4a.5.5 0 0 0-.5.5V6h4.5a.5.5 0 0 0 .35-.15L6.79 4.79A.5.5 0 0 0 6.59 4H3.5z');
+
+    // ── Register themes & init ──
+    FluentLM.registerTheme('awarity-light', 'fluent-awarity-light');
+    FluentLM.registerTheme('awarity-dark', 'fluent-awarity-dark');
+    FluentLM.setTheme('awarity-dark');
+
+    (function () {
+      // ── Mock Data ──
+      var MOCK_CATALOGS = [
+        {
+          name: 'sec-filings',
+          documents: 2341,
+          chunks: 18420,
+          abstracts: 2341,
+          classifications: 3,
+          status: 'ready',
+          lastUpdated: 'Feb 20, 2026',
+          storage: '~/.awarity/catalogs/sec-filings',
+          created: 'Feb 14, 2026',
+          activity: [
+            { label: 'Classification: risk-type', time: '2 hours ago' },
+            { label: 'Abstracts generated', time: '1 day ago' },
+            { label: 'Catalog ingested', time: '6 days ago' }
+          ]
+        },
+        {
+          name: 'legal-contracts',
+          documents: 847,
+          chunks: 6120,
+          abstracts: 0,
+          classifications: 0,
+          status: 'abstracts-missing',
+          lastUpdated: 'Feb 19, 2026',
+          storage: '~/.awarity/catalogs/legal-contracts',
+          created: 'Feb 16, 2026',
+          activity: [
+            { label: 'Catalog ingested', time: '3 days ago' }
+          ]
+        },
+        {
+          name: 'research-papers',
+          documents: 512,
+          chunks: 3840,
+          abstracts: 287,
+          classifications: 1,
+          status: 'processing',
+          lastUpdated: 'Feb 21, 2026',
+          storage: '~/.awarity/catalogs/research-papers',
+          created: 'Feb 10, 2026',
+          activity: [
+            { label: 'Generating abstracts (56%)', time: 'In progress' },
+            { label: 'Classification: domain', time: '2 days ago' },
+            { label: 'Catalog ingested', time: '11 days ago' }
+          ]
+        },
+        {
+          name: 'email-archive',
+          documents: 4200,
+          chunks: null,
+          abstracts: null,
+          classifications: 0,
+          status: 'error',
+          lastUpdated: 'Feb 18, 2026',
+          storage: '~/.awarity/catalogs/email-archive',
+          created: 'Feb 18, 2026',
+          error: 'Ingest failed: unable to parse 12 documents. Check source files for encoding issues.',
+          activity: [
+            { label: 'Ingest failed', time: '3 days ago' }
+          ]
+        },
+        {
+          name: 'compliance-docs',
+          documents: 1105,
+          chunks: 8930,
+          abstracts: 1105,
+          classifications: 5,
+          status: 'ready',
+          lastUpdated: 'Feb 17, 2026',
+          storage: '~/.awarity/catalogs/compliance-docs',
+          created: 'Feb 5, 2026',
+          activity: [
+            { label: 'Classification: regulation-type', time: '4 days ago' },
+            { label: 'Classification: risk-level', time: '5 days ago' },
+            { label: 'Abstracts generated', time: '2 weeks ago' },
+            { label: 'Catalog ingested', time: '2 weeks ago' }
+          ]
+        }
+      ];
+
+      // ── Refs ──
+      var detailPanel = document.getElementById('detail-panel');
+      var detailOverlay = document.getElementById('detail-panel-overlay');
+      var detailTitle = document.getElementById('detail-panel-title');
+      var newPanel = document.getElementById('new-panel');
+      var newOverlay = document.getElementById('new-panel-overlay');
+      var deleteDialog = document.getElementById('delete-dialog');
+      var messageZone = document.getElementById('messagebar-zone');
+
+      // ── Theme Toggle ──
+      var themeBtn = document.getElementById('themeToggle');
+      function updateThemeLabel() {
+        themeBtn.textContent = FluentLM.getTheme() === 'awarity-light' ? 'Switch to Dark' : 'Switch to Light';
+      }
+      updateThemeLabel();
+      themeBtn.addEventListener('click', function () {
+        FluentLM.setTheme(FluentLM.getTheme() === 'awarity-light' ? 'awarity-dark' : 'awarity-light');
+        updateThemeLabel();
+      });
+
+      // ── Panel Helpers ──
+      function openPanel(panel, overlay) {
+        panel.classList.add('flm-panel--open');
+        overlay.classList.add('flm-panel-overlay--visible');
+      }
+
+      function closePanel(panel, overlay) {
+        panel.classList.remove('flm-panel--open');
+        overlay.classList.remove('flm-panel-overlay--visible');
+      }
+
+      // ── Detail Panel ──
+      function openDetailPanel(catalogName) {
+        var cat = MOCK_CATALOGS.find(function (c) { return c.name === catalogName; });
+        if (!cat) return;
+
+        detailTitle.textContent = cat.name;
+        document.getElementById('detail-documents').textContent = cat.documents ? cat.documents.toLocaleString() : '—';
+        document.getElementById('detail-chunks').textContent = cat.chunks ? cat.chunks.toLocaleString() : '—';
+        document.getElementById('detail-abstracts').textContent = cat.abstracts != null ? cat.abstracts.toLocaleString() : '—';
+        document.getElementById('detail-classifications').textContent = cat.classifications;
+        document.getElementById('detail-storage').textContent = cat.storage;
+        document.getElementById('detail-created').textContent = cat.created;
+
+        // Status badge
+        var statusMap = {
+          'ready': '<span class="status-badge status-badge--ready"><span class="status-dot"></span> Ready</span>',
+          'abstracts-missing': '<span class="status-badge status-badge--warning"><span class="status-dot"></span> Abstracts Missing</span>',
+          'processing': '<span class="status-badge status-badge--processing"><span class="status-dot"></span> Processing</span>',
+          'error': '<span class="status-badge status-badge--error"><span class="status-dot"></span> Error</span>'
+        };
+        document.getElementById('detail-status').innerHTML = statusMap[cat.status] || cat.status;
+
+        // Error state
+        document.getElementById('detail-error-bar').style.display = cat.status === 'error' ? 'block' : 'none';
+        document.getElementById('detail-error-actions').style.display = cat.status === 'error' ? 'block' : 'none';
+
+        // Activity
+        var activityHtml = cat.activity.map(function (a) {
+          return '<div class="panel-activity-item"><span class="panel-activity-label">' + a.label + '</span><span class="panel-activity-time">' + a.time + '</span></div>';
+        }).join('');
+        document.getElementById('detail-activity').innerHTML = activityHtml;
+
+        openPanel(detailPanel, detailOverlay);
+      }
+
+      // Close detail panel
+      document.getElementById('detail-panel-close').addEventListener('click', function () { closePanel(detailPanel, detailOverlay); });
+      document.getElementById('detail-panel-close-btn').addEventListener('click', function () { closePanel(detailPanel, detailOverlay); });
+      detailOverlay.addEventListener('click', function () { closePanel(detailPanel, detailOverlay); });
+
+      // ── Row Clicks ──
+      document.querySelectorAll('.flm-detailslist-row[data-catalog]').forEach(function (row) {
+        row.addEventListener('click', function (e) {
+          // Don't open panel when clicking checkbox
+          if (e.target.closest('.flm-detailslist-check')) return;
+          openDetailPanel(row.getAttribute('data-catalog'));
+        });
+      });
+
+      // ── New Catalog Panel ──
+      function openNewPanel() {
+        document.getElementById('new-name').value = '';
+        document.getElementById('new-path').value = '';
+        document.getElementById('new-auto-abstracts').checked = false;
+        document.getElementById('new-progress').style.display = 'none';
+        document.getElementById('new-messagebar').style.display = 'none';
+        document.querySelector('input[name="source-type"][value="folder"]').checked = true;
+        openPanel(newPanel, newOverlay);
+      }
+
+      // ── Browse for folder ──
+      var filePicker = document.getElementById('file-picker');
+      document.getElementById('btn-browse').addEventListener('click', function () {
+        filePicker.click();
+      });
+      filePicker.addEventListener('change', function () {
+        if (filePicker.files.length > 0) {
+          var path = filePicker.files[0].webkitRelativePath.split('/')[0];
+          document.getElementById('new-path').value = path;
+        }
+      });
+
+      document.getElementById('btn-new-catalog').addEventListener('click', openNewPanel);
+      document.getElementById('btn-empty-create').addEventListener('click', openNewPanel);
+      document.getElementById('new-panel-close').addEventListener('click', function () { closePanel(newPanel, newOverlay); });
+      document.getElementById('new-panel-cancel').addEventListener('click', function () { closePanel(newPanel, newOverlay); });
+      newOverlay.addEventListener('click', function () { closePanel(newPanel, newOverlay); });
+
+      // Create button
+      document.getElementById('btn-create-catalog').addEventListener('click', function () {
+        var name = document.getElementById('new-name').value.trim();
+        var path = document.getElementById('new-path').value.trim();
+
+        if (!name || !path) {
+          document.getElementById('new-messagebar').style.display = 'block';
+          document.getElementById('new-messagebar').innerHTML = '<div class="flm-messagebar flm-messagebar--error">Please fill in all required fields.</div>';
+          return;
+        }
+
+        // Show progress
+        document.getElementById('new-progress').style.display = 'block';
+        document.getElementById('new-messagebar').style.display = 'none';
+
+        // Simulate creation
+        setTimeout(function () {
+          closePanel(newPanel, newOverlay);
+          showMessage('success', 'Catalog "' + name + '" created successfully.');
+        }, 1500);
+      });
+
+      // ── Delete Dialog ──
+      var currentDeleteCatalog = '';
+
+      document.getElementById('btn-delete-catalog').addEventListener('click', function () {
+        currentDeleteCatalog = detailTitle.textContent;
+        document.getElementById('delete-catalog-name').textContent = currentDeleteCatalog;
+        deleteDialog.classList.add('flm-dialog-overlay--open');
+      });
+
+      // Commandbar Delete button (bulk)
+      document.getElementById('btn-delete').addEventListener('click', function () {
+        var checked = document.querySelectorAll('.flm-detailslist-row[data-catalog] .flm-checkbox-input:checked');
+        if (checked.length === 0) return;
+        var names = [];
+        checked.forEach(function (cb) { names.push(cb.closest('.flm-detailslist-row').getAttribute('data-catalog')); });
+        currentDeleteCatalog = names.join(', ');
+        document.getElementById('delete-catalog-name').textContent = currentDeleteCatalog;
+        deleteDialog.classList.add('flm-dialog-overlay--open');
+      });
+
+      document.getElementById('btn-confirm-delete').addEventListener('click', function () {
+        deleteDialog.classList.remove('flm-dialog-overlay--open');
+        closePanel(detailPanel, detailOverlay);
+        showMessage('success', 'Catalog "' + currentDeleteCatalog + '" deleted.');
+      });
+
+      // ── MessageBar helper ──
+      function showMessage(type, text) {
+        messageZone.innerHTML = '<div class="flm-messagebar flm-messagebar--' + type + '">' + text + '</div>';
+        setTimeout(function () { messageZone.innerHTML = ''; }, 5000);
+      }
+
+      // ── Selection & toolbar state ──
+      var btnGenerate = document.getElementById('btn-generate');
+      var btnDelete = document.getElementById('btn-delete');
+      var checkAll = document.getElementById('check-all');
+      var rowCheckboxes = document.querySelectorAll('.flm-detailslist-row[data-catalog] .flm-checkbox-input');
+
+      function updateToolbarState() {
+        var count = document.querySelectorAll('.flm-detailslist-row[data-catalog] .flm-checkbox-input:checked').length;
+        btnGenerate.disabled = count === 0;
+        btnDelete.disabled = count === 0;
+        // Sync check-all state
+        checkAll.checked = count > 0 && count === rowCheckboxes.length;
+        checkAll.indeterminate = count > 0 && count < rowCheckboxes.length;
+      }
+
+      checkAll.addEventListener('change', function () {
+        var checked = checkAll.checked;
+        rowCheckboxes.forEach(function (cb) { cb.checked = checked; });
+        updateToolbarState();
+      });
+
+      rowCheckboxes.forEach(function (cb) {
+        cb.addEventListener('change', updateToolbarState);
+      });
+
+      // ── Search filter ──
+      document.getElementById('search-input').addEventListener('input', function () {
+        var query = this.value.toLowerCase();
+        document.querySelectorAll('.flm-detailslist-row[data-catalog]').forEach(function (row) {
+          var name = row.getAttribute('data-catalog');
+          row.style.display = name.indexOf(query) !== -1 ? '' : 'none';
+        });
+      });
+
+      // ── Refresh button ──
+      document.getElementById('btn-refresh').addEventListener('click', function () {
+        showMessage('info', 'Catalog list refreshed.');
+      });
+
+      // ── State switcher (for demo: toggle via console) ──
+      // Usage: showState('loading'), showState('empty'), showState('data')
+      window.showState = function (state) {
+        document.getElementById('state-loading').style.display = state === 'loading' ? 'block' : 'none';
+        document.getElementById('state-empty').style.display = state === 'empty' ? 'flex' : 'none';
+        document.getElementById('state-data').style.display = state === 'data' ? 'block' : 'none';
+      };
+
+      // Default: show data state
+      window.showState('data');
+
+    })();
+  </script>
+</body>
+</html>
