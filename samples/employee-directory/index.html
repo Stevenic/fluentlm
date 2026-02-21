@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html class="fluentlm" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Directory</title>
+  <link rel="stylesheet" href="../../dist/theme-light.css">
+  <link rel="stylesheet" href="../../dist/theme-dark.css">
+  <link rel="stylesheet" href="../../dist/fluentlm.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: var(--spacingL1);
+      background: var(--bodyBackground);
+      color: var(--bodyText);
+      font-family: var(--fontFamily);
+    }
+    .employee-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--spacingM);
+    }
+    .employee-card {
+      background: var(--bodyStandoutBackground);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      padding: var(--spacingM);
+      cursor: pointer;
+      transition: box-shadow var(--duration2) var(--easeStandard);
+    }
+    .employee-card:hover {
+      box-shadow: var(--elevation8);
+    }
+    .presence-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: var(--spacingS2);
+    }
+    .presence-dot--available { background: var(--green); }
+    .presence-dot--away { background: var(--yellow); }
+    .presence-dot--busy { background: var(--red); }
+    .presence-dot--offline { background: var(--neutralTertiary); }
+    .profile-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacingS1) var(--spacingL1);
+    }
+    .profile-info-grid dt {
+      margin: 0;
+      font-weight: var(--fontWeightSemibold);
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+    }
+    .profile-info-grid dd {
+      margin: 0 0 var(--spacingS1) 0;
+      font-size: var(--fontSizeMedium);
+    }
+  </style>
+</head>
+<body>
+  <div class="flm-stack" style="gap: var(--spacingM); max-width: 1200px; margin: 0 auto;">
+
+    <!-- Header: Breadcrumb + Theme Toggle -->
+    <div class="flm-stack flm-stack--horizontal flm-stack--space-between" style="gap: var(--spacingM); align-items: center;">
+      <ol class="flm-breadcrumb">
+        <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#">Home</a></li>
+        <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#">People</a></li>
+        <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link">All Employees</a></li>
+      </ol>
+      <label class="flm-toggle flm-toggle--inline">
+        <span class="flm-toggle-label">Dark Mode</span>
+        <input type="checkbox" class="flm-toggle-input" id="themeToggle">
+        <span class="flm-toggle-track"><span class="flm-toggle-thumb"></span></span>
+        <span class="flm-toggle-state" data-on="On" data-off="Off"></span>
+      </label>
+    </div>
+
+    <!-- Page Title -->
+    <span class="flm-text flm-text--xxLarge flm-text--block">Employee Directory</span>
+
+    <!-- Search + Filter Row -->
+    <div class="flm-stack flm-stack--horizontal flm-stack--wrap" style="gap: var(--spacingM); align-items: flex-end;">
+      <div class="flm-stack-item flm-stack-item--grow" style="min-width: 250px;">
+        <div class="flm-searchbox">
+          <input class="flm-searchbox-input" id="searchInput" type="text" placeholder="Search by name, title, or department...">
+        </div>
+      </div>
+      <div class="flm-dropdown" id="deptFilter" style="min-width: 180px;">
+        <label class="flm-label">Department</label>
+        <button class="flm-dropdown-trigger">
+          <span class="flm-dropdown-title">All</span>
+          <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+        </button>
+        <div class="flm-dropdown-listbox">
+          <div class="flm-dropdown-option flm-dropdown-option--selected" data-value="All">All</div>
+          <div class="flm-dropdown-option" data-value="Engineering">Engineering</div>
+          <div class="flm-dropdown-option" data-value="Design">Design</div>
+          <div class="flm-dropdown-option" data-value="Marketing">Marketing</div>
+          <div class="flm-dropdown-option" data-value="Sales">Sales</div>
+          <div class="flm-dropdown-option" data-value="HR">HR</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Employee Count -->
+    <span class="flm-text flm-text--small flm-text--secondary flm-text--block" id="employeeCount">Showing 8 of 142 employees</span>
+
+    <hr class="flm-separator">
+
+    <!-- Employee Grid -->
+    <div class="employee-grid" id="employeeGrid"></div>
+
+  </div>
+
+  <!-- Employee Detail Panel -->
+  <div class="flm-panel-overlay" id="panelOverlay"></div>
+  <div class="flm-panel flm-panel--medium" id="employeePanel">
+    <div class="flm-panel-header">
+      <h2 class="flm-panel-title" id="panelTitle">Employee Profile</h2>
+      <button class="flm-panel-close" data-icon="Cancel" aria-label="Close" data-panel-close></button>
+    </div>
+    <div class="flm-panel-body">
+      <div id="panelContent"></div>
+    </div>
+  </div>
+
+  <script src="../../dist/fluentlm.min.js"></script>
+  <script>
+    // Employee data
+    const employees = [
+      {
+        id: 1, name: 'Sarah Chen', initials: 'SC', title: 'Senior Software Engineer',
+        department: 'Engineering', email: 'sarah.chen@contoso.com', phone: '+1 (425) 555-0123',
+        office: 'Building 25, Room 3012', manager: 'David Park',
+        presence: 'available',
+        reports: [
+          { name: 'Alex Rivera', initials: 'AR', title: 'Software Engineer' },
+          { name: 'Mei Lin', initials: 'ML', title: 'Software Engineer' },
+          { name: 'Tom Baker', initials: 'TB', title: 'Junior Developer' }
+        ]
+      },
+      {
+        id: 2, name: 'James Wilson', initials: 'JW', title: 'UX Designer',
+        department: 'Design', email: 'james.wilson@contoso.com', phone: '+1 (425) 555-0456',
+        office: 'Building 18, Room 2045', manager: 'Lisa Nguyen',
+        presence: 'available',
+        reports: [
+          { name: 'Priya Sharma', initials: 'PS', title: 'Visual Designer' }
+        ]
+      },
+      {
+        id: 3, name: 'Maria Garcia', initials: 'MG', title: 'Engineering Manager',
+        department: 'Engineering', email: 'maria.garcia@contoso.com', phone: '+1 (425) 555-0789',
+        office: 'Building 25, Room 4001', manager: 'Robert Kim',
+        presence: 'available',
+        reports: [
+          { name: 'Sarah Chen', initials: 'SC', title: 'Senior Software Engineer' },
+          { name: 'Jordan Lee', initials: 'JL', title: 'Software Engineer' },
+          { name: 'Chris Martin', initials: 'CM', title: 'DevOps Engineer' },
+          { name: 'Nina Patel', initials: 'NP', title: 'QA Engineer' }
+        ]
+      },
+      {
+        id: 4, name: 'David Park', initials: 'DP', title: 'Content Strategist',
+        department: 'Marketing', email: 'david.park@contoso.com', phone: '+1 (425) 555-0234',
+        office: 'Building 12, Room 1020', manager: 'Angela Torres',
+        presence: 'away',
+        reports: [
+          { name: 'Emma Scott', initials: 'ES', title: 'Content Writer' },
+          { name: 'Ryan Cooper', initials: 'RC', title: 'SEO Specialist' }
+        ]
+      },
+      {
+        id: 5, name: 'Lisa Nguyen', initials: 'LN', title: 'Design Lead',
+        department: 'Design', email: 'lisa.nguyen@contoso.com', phone: '+1 (425) 555-0567',
+        office: 'Building 18, Room 3010', manager: 'Robert Kim',
+        presence: 'away',
+        reports: [
+          { name: 'James Wilson', initials: 'JW', title: 'UX Designer' },
+          { name: 'Aisha Khan', initials: 'AK', title: 'UI Designer' }
+        ]
+      },
+      {
+        id: 6, name: 'Ryan Cooper', initials: 'RC', title: 'Marketing Analyst',
+        department: 'Marketing', email: 'ryan.cooper@contoso.com', phone: '+1 (425) 555-0890',
+        office: 'Building 12, Room 1035', manager: 'David Park',
+        presence: 'busy',
+        reports: []
+      },
+      {
+        id: 7, name: 'Aisha Khan', initials: 'AK', title: 'Frontend Engineer',
+        department: 'Engineering', email: 'aisha.khan@contoso.com', phone: '+1 (425) 555-0345',
+        office: 'Building 25, Room 2018', manager: 'Maria Garcia',
+        presence: 'offline',
+        reports: []
+      },
+      {
+        id: 8, name: 'Tom Baker', initials: 'TB', title: 'Product Designer',
+        department: 'Design', email: 'tom.baker@contoso.com', phone: '+1 (425) 555-0678',
+        office: 'Building 18, Room 2090', manager: 'Lisa Nguyen',
+        presence: 'offline',
+        reports: []
+      }
+    ];
+
+    const presenceLabels = {
+      available: 'Available',
+      away: 'Away',
+      busy: 'Busy',
+      offline: 'Offline'
+    };
+
+    // Render employee cards
+    function renderCards(filtered) {
+      const grid = document.getElementById('employeeGrid');
+      grid.innerHTML = '';
+      filtered.forEach(emp => {
+        const card = document.createElement('div');
+        card.className = 'employee-card';
+        card.setAttribute('data-employee-id', emp.id);
+        card.innerHTML = `
+          <div class="flm-persona flm-persona--size72">
+            <div class="flm-persona-coin flm-persona-presence flm-persona-presence--${emp.presence}">${emp.initials}</div>
+            <div class="flm-persona-details">
+              <span class="flm-persona-name">${emp.name}</span>
+              <span class="flm-persona-secondary">${emp.title}</span>
+              <span class="flm-persona-tertiary">${emp.department}</span>
+            </div>
+          </div>
+          <hr class="flm-separator" style="margin: var(--spacingS1) 0;">
+          <div class="flm-stack" style="gap: var(--spacingS2);">
+            <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingS2); align-items: center;">
+              <i class="flm-icon flm-icon--small" data-icon="Mail"></i>
+              <span class="flm-text flm-text--small">${emp.email}</span>
+            </div>
+            <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingS2); align-items: center;">
+              <span class="presence-dot presence-dot--${emp.presence}"></span>
+              <span class="flm-text flm-text--small flm-text--secondary">${presenceLabels[emp.presence]}</span>
+            </div>
+          </div>
+        `;
+        card.addEventListener('click', () => openPanel(emp));
+        grid.appendChild(card);
+      });
+      document.getElementById('employeeCount').textContent = `Showing ${filtered.length} of 142 employees`;
+      // Re-init icons for new cards
+      if (window.FluentLM) FluentLM.init();
+    }
+
+    // Open detail panel
+    function openPanel(emp) {
+      document.getElementById('panelTitle').textContent = emp.name;
+
+      // Build facepile members
+      let facepileHtml = '';
+      if (emp.reports.length > 0) {
+        facepileHtml = `
+          <div class="flm-facepile" data-max="5" style="margin-bottom: var(--spacingS1);">
+            ${emp.reports.map(r => `<span class="flm-facepile-member"><span class="flm-persona-coin">${r.initials}</span></span>`).join('')}
+          </div>
+        `;
+      }
+
+      // Build reports list
+      let reportsHtml = '';
+      if (emp.reports.length > 0) {
+        reportsHtml = emp.reports.map(r => `
+          <div class="flm-persona flm-persona--size40" style="margin-bottom: var(--spacingS1);">
+            <div class="flm-persona-coin">${r.initials}</div>
+            <div class="flm-persona-details">
+              <span class="flm-persona-name">${r.name}</span>
+              <span class="flm-persona-secondary">${r.title}</span>
+            </div>
+          </div>
+        `).join('');
+      } else {
+        reportsHtml = '<span class="flm-text flm-text--secondary">No direct reports</span>';
+      }
+
+      document.getElementById('panelContent').innerHTML = `
+        <div class="flm-stack" style="gap: var(--spacingM);">
+          <!-- Large persona -->
+          <div style="text-align: center;">
+            <div class="flm-persona flm-persona--size100" style="justify-content: center;">
+              <div class="flm-persona-coin flm-persona-presence flm-persona-presence--${emp.presence}">${emp.initials}</div>
+            </div>
+            <span class="flm-text flm-text--xLarge flm-text--block" style="margin-top: var(--spacingS1);">${emp.name}</span>
+            <span class="flm-text flm-text--secondary flm-text--block">${emp.title}</span>
+            <div style="margin-top: var(--spacingS2);">
+              <span class="presence-dot presence-dot--${emp.presence}"></span>
+              <span class="flm-text flm-text--small">${presenceLabels[emp.presence]}</span>
+            </div>
+          </div>
+
+          <hr class="flm-separator">
+
+          <!-- Pivot tabs -->
+          <div class="flm-pivot">
+            <div class="flm-pivot-tabs" role="tablist">
+              <button class="flm-pivot-tab flm-pivot-tab--active" data-panel="about-${emp.id}" role="tab">About</button>
+              <button class="flm-pivot-tab" data-panel="team-${emp.id}" role="tab">Team</button>
+            </div>
+            <div class="flm-pivot-panel flm-pivot-panel--active" id="about-${emp.id}" role="tabpanel">
+              <div class="profile-info-grid" style="margin-top: var(--spacingM);">
+                <div>
+                  <dt>Email</dt>
+                  <dd><a class="flm-link" href="mailto:${emp.email}">${emp.email}</a></dd>
+                </div>
+                <div>
+                  <dt>Phone</dt>
+                  <dd>${emp.phone}</dd>
+                </div>
+                <div>
+                  <dt>Office</dt>
+                  <dd>${emp.office}</dd>
+                </div>
+                <div>
+                  <dt>Manager</dt>
+                  <dd>${emp.manager}</dd>
+                </div>
+              </div>
+            </div>
+            <div class="flm-pivot-panel" id="team-${emp.id}" role="tabpanel">
+              <div style="margin-top: var(--spacingM);">
+                <span class="flm-text flm-text--mediumPlus flm-text--semibold flm-text--block" style="margin-bottom: var(--spacingS1);">Direct Reports (${emp.reports.length})</span>
+                ${facepileHtml}
+                <hr class="flm-separator" style="margin: var(--spacingS1) 0;">
+                ${reportsHtml}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Open the panel
+      const panel = document.getElementById('employeePanel');
+      const overlay = document.getElementById('panelOverlay');
+      panel.classList.add('flm-panel--open');
+      overlay.classList.add('flm-panel-overlay--open');
+
+      // Re-init for icons and pivot tabs
+      if (window.FluentLM) FluentLM.init();
+    }
+
+    // Filter logic
+    function filterEmployees() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const deptDropdown = document.getElementById('deptFilter');
+      const dept = deptDropdown.getAttribute('data-value') || 'All';
+
+      const filtered = employees.filter(emp => {
+        const matchesSearch = !query ||
+          emp.name.toLowerCase().includes(query) ||
+          emp.title.toLowerCase().includes(query) ||
+          emp.department.toLowerCase().includes(query);
+        const matchesDept = dept === 'All' || emp.department === dept;
+        return matchesSearch && matchesDept;
+      });
+      renderCards(filtered);
+    }
+
+    // Search input listener
+    document.getElementById('searchInput').addEventListener('input', filterEmployees);
+
+    // Watch dropdown for changes
+    const deptFilter = document.getElementById('deptFilter');
+    const observer = new MutationObserver(mutations => {
+      mutations.forEach(m => {
+        if (m.attributeName === 'data-value') filterEmployees();
+      });
+    });
+    observer.observe(deptFilter, { attributes: true });
+
+    // Theme toggle
+    document.getElementById('themeToggle').addEventListener('change', function() {
+      FluentLM.setTheme(this.checked ? 'dark' : 'light');
+    });
+
+    // Close panel on overlay click
+    document.getElementById('panelOverlay').addEventListener('click', function() {
+      document.getElementById('employeePanel').classList.remove('flm-panel--open');
+      this.classList.remove('flm-panel-overlay--open');
+    });
+
+    // Initial render
+    renderCards(employees);
+  </script>
+</body>
+</html>

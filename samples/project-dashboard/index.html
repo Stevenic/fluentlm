@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en" class="fluentlm">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Dashboard — FluentLM Sample</title>
+  <link rel="stylesheet" href="../../dist/theme-light.css">
+  <link rel="stylesheet" href="../../dist/theme-dark.css">
+  <link rel="stylesheet" href="../../dist/fluentlm.min.css">
+  <style>
+    /* Demo layout */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: var(--fontFamily);
+      background: var(--bodyStandoutBackground);
+      color: var(--bodyText);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .demo-sidebar {
+      width: 240px;
+      min-width: 240px;
+      background: var(--bodyBackground);
+      border-right: 1px solid var(--bodyFrameDivider);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .demo-sidebar-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--bodyFrameDivider);
+    }
+
+    .demo-sidebar-header h2 {
+      margin: 0 0 4px 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .demo-sidebar-header p {
+      margin: 0;
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    /* Main area */
+    .demo-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .demo-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 20px;
+      background: var(--bodyBackground);
+      border-bottom: 1px solid var(--bodyFrameDivider);
+    }
+
+    .demo-topbar-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .demo-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    /* Board columns */
+    .board-columns {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .board-column {
+      flex: 1;
+      min-width: 240px;
+      background: var(--defaultStateBackground);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .board-column-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--bodyFrameDivider);
+    }
+
+    .board-column-header h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .board-column-count {
+      font-size: 12px;
+      background: var(--bodyBackground);
+      border-radius: 10px;
+      padding: 2px 8px;
+      font-weight: 600;
+    }
+
+    .board-column .flm-documentcard {
+      margin-bottom: 8px;
+      cursor: pointer;
+    }
+
+    .board-column .flm-documentcard:hover {
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+
+    /* Card internals */
+    .task-card-body {
+      padding: 12px;
+    }
+
+    .task-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      line-height: 1.4;
+    }
+
+    .task-card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+
+    .task-card-due {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    /* Priority tags */
+    .priority-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .priority-tag--high {
+      background: var(--errorBackground);
+      color: var(--redDark);
+    }
+
+    .priority-tag--medium {
+      background: var(--warningBackground);
+      color: var(--yellowDark);
+    }
+
+    .priority-tag--low {
+      background: var(--successBackground);
+      color: var(--green);
+    }
+
+    /* Persona coin styling */
+    .flm-persona-coin {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #fff;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .flm-persona-coin[data-initials="JD"] { background: #0078d4; }
+    .flm-persona-coin[data-initials="AB"] { background: #8764b8; }
+    .flm-persona-coin[data-initials="MK"] { background: #c4314b; }
+    .flm-persona-coin[data-initials="TW"] { background: #107c10; }
+    .flm-persona-coin[data-initials="SR"] { background: #ca5010; }
+
+    .flm-persona-presence::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      right: -1px;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--bodyBackground);
+    }
+
+    .flm-persona-presence--available::after { background: #107c10; }
+    .flm-persona-presence--busy::after { background: #c4314b; }
+    .flm-persona-presence--away::after { background: #ca5010; }
+    .flm-persona-presence--offline::after { background: #8a8886; }
+
+    .flm-persona {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .flm-persona-name {
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    /* Tab content */
+
+    /* List view table */
+    .flm-detailslist {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .flm-detailslist th,
+    .flm-detailslist td {
+      text-align: left;
+      padding: 10px 14px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--bodyFrameDivider);
+    }
+
+    .flm-detailslist th {
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--bodySubtext);
+      background: var(--defaultStateBackground);
+      position: sticky;
+      top: 0;
+    }
+
+    .flm-detailslist tbody tr:hover {
+      background: var(--listItemBackgroundHovered);
+      cursor: pointer;
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 12px;
+    }
+
+    .status-badge--todo {
+      background: var(--defaultStateBackground);
+      color: var(--bodySubtext);
+    }
+
+    .status-badge--inprogress {
+      background: var(--themeLighter);
+      color: var(--themeDark);
+    }
+
+    .status-badge--done {
+      background: var(--successBackground);
+      color: var(--green);
+    }
+
+    /* Commandbar */
+    .flm-commandbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 0;
+      margin-bottom: 12px;
+    }
+
+    .flm-commandbar-left,
+    .flm-commandbar-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* MessageBar */
+    .flm-messagebar {
+      padding: 10px 16px;
+      border-radius: 4px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .flm-messagebar--info {
+      background: var(--themeLighter);
+      color: var(--themeDark);
+      border-left: 4px solid var(--themePrimary);
+    }
+
+    .flm-messagebar-icon::before {
+      content: '\2139';
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .flm-messagebar-dismiss {
+      margin-left: auto;
+      background: none;
+      border: none;
+      cursor: pointer;
+      opacity: 0.6;
+      font-size: 16px;
+      color: inherit;
+    }
+
+    .flm-pivot {
+      margin-bottom: 16px;
+    }
+
+    /* Nav */
+    .flm-nav {
+      list-style: none;
+      margin: 0;
+      padding: 8px 0;
+    }
+
+
+    /* Buttons */
+    .flm-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border: 1px solid var(--bodyFrameDivider);
+      border-radius: 4px;
+      background: var(--bodyBackground);
+      color: var(--bodyText);
+      cursor: pointer;
+      transition: background 0.1s;
+      font-family: inherit;
+    }
+
+    .flm-button:hover {
+      background: var(--listItemBackgroundHovered);
+    }
+
+    .flm-button--primary {
+      background: var(--themePrimary);
+      color: #fff;
+      border-color: var(--themePrimary);
+    }
+
+    .flm-button--primary:hover {
+      background: var(--themeDarkAlt);
+    }
+
+    .flm-button--danger {
+      color: var(--redDark);
+      border-color: var(--redDark);
+    }
+
+    .flm-button--subtle {
+      border-color: transparent;
+      background: transparent;
+    }
+
+    .flm-button--subtle:hover {
+      background: var(--listItemBackgroundHovered);
+    }
+
+    .flm-button--icon-only {
+      padding: 6px 8px;
+    }
+
+    /* Progress bar */
+    .flm-progress { margin-bottom: 16px; }
+    .flm-progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-bottom: 4px;
+      color: var(--bodySubtext);
+    }
+    .flm-progress-track {
+      height: 4px;
+      background: var(--defaultStateBackground);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .flm-progress-bar {
+      height: 100%;
+      background: var(--themePrimary);
+      border-radius: 2px;
+      transition: width 0.3s;
+    }
+
+    /* Panel overlay */
+    .flm-panel-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 1000;
+      justify-content: flex-end;
+    }
+
+    .flm-panel-overlay.open {
+      display: flex;
+    }
+
+    .flm-panel {
+      width: 400px;
+      max-width: 90vw;
+      background: var(--bodyBackground);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      box-shadow: -4px 0 16px rgba(0,0,0,0.15);
+      animation: slideInRight 0.25s ease;
+    }
+
+    @keyframes slideInRight {
+      from { transform: translateX(100%); }
+      to { transform: translateX(0); }
+    }
+
+    .flm-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--bodyFrameDivider);
+    }
+
+    .flm-panel-header h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .flm-panel-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .flm-panel-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--bodyFrameDivider);
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    /* Form fields */
+    .flm-textfield { margin-bottom: 16px; }
+    .flm-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .flm-textfield-input,
+    .flm-dropdown-select,
+    .flm-datepicker-input {
+      width: 100%;
+      padding: 7px 10px;
+      font-size: 14px;
+      border: 1px solid var(--bodyFrameDivider);
+      border-radius: 4px;
+      background: var(--bodyBackground);
+      color: var(--bodyText);
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .flm-textfield-input:focus,
+    .flm-dropdown-select:focus,
+    .flm-datepicker-input:focus {
+      border-color: var(--themePrimary);
+    }
+
+    .flm-textfield-input--multiline {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .flm-dropdown { margin-bottom: 16px; }
+    .flm-dropdown-select {
+      appearance: none;
+      cursor: pointer;
+      padding-right: 32px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 4.5l3.5 3.5 3.5-3.5' fill='none' stroke='%23616161' stroke-width='1.5'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    .flm-datepicker { margin-bottom: 16px; }
+    .flm-datepicker-wrapper {
+      display: flex;
+      align-items: center;
+    }
+    .flm-datepicker-input {
+      border-radius: 4px 0 0 4px;
+      flex: 1;
+    }
+    .flm-datepicker-icon {
+      padding: 7px 10px;
+      border: 1px solid var(--bodyFrameDivider);
+      border-left: none;
+      border-radius: 0 4px 4px 0;
+      background: var(--defaultStateBackground);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--bodySubtext);
+    }
+
+    /* Dialog */
+    .flm-dialog-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .flm-dialog-overlay.open {
+      display: flex;
+    }
+
+    .flm-dialog {
+      background: var(--bodyBackground);
+      border-radius: 8px;
+      padding: 24px;
+      max-width: 480px;
+      width: 90vw;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      animation: fadeInUp 0.2s ease;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .flm-dialog h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .flm-dialog p {
+      margin: 0 0 20px;
+      font-size: 14px;
+      color: var(--bodySubtext);
+    }
+
+    .flm-dialog-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .flm-toggle {
+      position: relative;
+      width: 40px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .flm-toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+
+    .flm-toggle-track {
+      position: absolute;
+      inset: 0;
+      background: var(--defaultStateBackground);
+      border-radius: 10px;
+      border: 1px solid var(--bodyFrameDivider);
+      transition: background 0.2s;
+    }
+
+    .flm-toggle-thumb {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: var(--bodySubtext);
+      border-radius: 50%;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .flm-toggle input:checked ~ .flm-toggle-track {
+      background: var(--themePrimary);
+      border-color: var(--themePrimary);
+    }
+
+    .flm-toggle input:checked ~ .flm-toggle-thumb {
+      transform: translateX(20px);
+      background: #fff;
+    }
+
+    /* Timeline placeholder */
+    .timeline-placeholder {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--bodySubtext);
+    }
+
+    .timeline-placeholder-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    /* Sprint progress area */
+    .sprint-stats {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 8px;
+    }
+
+    .sprint-stat {
+      text-align: center;
+    }
+
+    .sprint-stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--themePrimary);
+    }
+
+    .sprint-stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--bodySubtext);
+    }
+
+    /* Document card base */
+    .flm-documentcard {
+      background: var(--bodyBackground);
+      border: 1px solid var(--bodyFrameDivider);
+      border-radius: 6px;
+      transition: box-shadow 0.15s;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Navigation -->
+  <aside class="demo-sidebar">
+    <div class="demo-sidebar-header">
+      <h2>Contoso App</h2>
+      <p>Sprint 14 &middot; Feb 10 &ndash; Feb 24</p>
+    </div>
+    <nav class="flm-nav">
+      <a class="flm-nav-link" href="#" data-icon="ViewAll">Overview</a>
+      <a class="flm-nav-link flm-nav-link--active" href="#" data-icon="CheckboxComposite">Tasks</a>
+      <a class="flm-nav-link" href="#" data-icon="FabricFolder">Files</a>
+      <a class="flm-nav-link" href="#" data-icon="Dictionary">Wiki</a>
+    </nav>
+
+    <div style="padding: 20px; margin-top: auto; border-top: 1px solid var(--bodyFrameDivider);">
+      <div class="flm-progress-label">
+        <span>Sprint Progress</span>
+        <span>68%</span>
+      </div>
+      <div class="flm-progress">
+        <div class="flm-progress-track">
+          <div class="flm-progress-bar" style="width: 68%"></div>
+        </div>
+      </div>
+      <div class="sprint-stats">
+        <div class="sprint-stat">
+          <div class="sprint-stat-value">17</div>
+          <div class="sprint-stat-label">Total</div>
+        </div>
+        <div class="sprint-stat">
+          <div class="sprint-stat-value">4</div>
+          <div class="sprint-stat-label">Active</div>
+        </div>
+        <div class="sprint-stat">
+          <div class="sprint-stat-value">11</div>
+          <div class="sprint-stat-label">Done</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="demo-main">
+
+    <!-- Top Bar -->
+    <header class="demo-topbar">
+      <span class="demo-topbar-title">Tasks</span>
+      <div class="theme-toggle">
+        <span>Light</span>
+        <label class="flm-toggle">
+          <input type="checkbox" id="themeToggle">
+          <span class="flm-toggle-track"></span>
+          <span class="flm-toggle-thumb"></span>
+        </label>
+        <span>Dark</span>
+      </div>
+    </header>
+
+    <!-- Scrollable Content -->
+    <div class="demo-content">
+
+      <!-- Message Bar -->
+      <div class="flm-messagebar flm-messagebar--info">
+        <span class="flm-messagebar-icon"></span>
+        <span>Sprint 14 ends in 3 days &mdash; 4 tasks remaining</span>
+        <button class="flm-messagebar-dismiss" title="Dismiss">&times;</button>
+      </div>
+
+      <!-- Command Bar -->
+      <div class="flm-commandbar">
+        <div class="flm-commandbar-left">
+          <button class="flm-button flm-button--primary" data-icon="Add" data-panel-open="taskPanel">+ New Task</button>
+          <button class="flm-button" data-icon="Edit" data-panel-open="taskPanel">Edit</button>
+          <button class="flm-button flm-button--danger" data-icon="Delete" data-dialog-open="deleteDialog">Delete</button>
+        </div>
+        <div class="flm-commandbar-right">
+          <button class="flm-button flm-button--subtle" data-icon="Filter">Filter</button>
+          <button class="flm-button flm-button--subtle" data-icon="Settings">Settings</button>
+        </div>
+      </div>
+
+      <!-- Pivot Tabs -->
+      <div class="flm-pivot">
+        <div class="flm-pivot-tabs" role="tablist">
+          <button class="flm-pivot-tab flm-pivot-tab--active" role="tab" data-panel="boardView">Board View</button>
+          <button class="flm-pivot-tab" role="tab" data-panel="listView">List View</button>
+          <button class="flm-pivot-tab" role="tab" data-panel="timeline">Timeline</button>
+        </div>
+
+      <!-- Board View -->
+      <div class="flm-pivot-panel flm-pivot-panel--active" id="boardView">
+        <div class="board-columns">
+
+          <!-- To Do Column -->
+          <div class="board-column">
+            <div class="board-column-header">
+              <h3>To Do</h3>
+              <span class="board-column-count">3</span>
+            </div>
+
+            <div class="flm-documentcard" data-panel-open="taskPanel">
+              <div class="task-card-body">
+                <div class="task-card-title">Update API documentation</div>
+                <span class="priority-tag priority-tag--medium">Medium</span>
+                <div class="task-card-meta">
+                  <div class="flm-persona flm-persona--size32">
+                    <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available" data-initials="JD">JD</div>
+                    <div class="flm-persona-details"><span class="flm-persona-name">Jane Doe</span></div>
+                  </div>
+                  <span class="task-card-due">Feb 22</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flm-documentcard" data-panel-open="taskPanel">
+              <div class="task-card-body">
+                <div class="task-card-title">Add unit tests for auth module</div>
+                <span class="priority-tag priority-tag--high">High</span>
+                <div class="task-card-meta">
+                  <div class="flm-persona flm-persona--size32">
+                    <div class="flm-persona-coin flm-persona-presence flm-persona-presence--busy" data-initials="MK">MK</div>
+                    <div class="flm-persona-details"><span class="flm-persona-name">Mike Kim</span></div>
+                  </div>
+                  <span class="task-card-due">Feb 21</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flm-documentcard" data-panel-open="taskPanel">
+              <div class="task-card-body">
+                <div class="task-card-title">Design onboarding flow mockups</div>
+                <span class="priority-tag priority-tag--low">Low</span>
+                <div class="task-card-meta">
+                  <div class="flm-persona flm-persona--size32">
+                    <div class="flm-persona-coin flm-persona-presence flm-persona-presence--away" data-initials="SR">SR</div>
+                    <div class="flm-persona-details"><span class="flm-persona-name">Sara Reyes</span></div>
+                  </div>
+                  <span class="task-card-due">Feb 24</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- In Progress Column -->
+          <div class="board-column">
+            <div class="board-column-header">
+              <h3>In Progress</h3>
+              <span class="board-column-count">2</span>
+            </div>
+
+            <div class="flm-documentcard" data-panel-open="taskPanel">
+              <div class="task-card-body">
+                <div class="task-card-title">Fix login redirect bug</div>
+                <span class="priority-tag priority-tag--high">High</span>
+                <div class="task-card-meta">
+                  <div class="flm-persona flm-persona--size32">
+                    <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available" data-initials="AB">AB</div>
+                    <div class="flm-persona-details"><span class="flm-persona-name">Alex Brown</span></div>
+                  </div>
+                  <span class="task-card-due">Feb 20</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flm-documentcard" data-panel-open="taskPanel">
+              <div class="task-card-body">
+                <div class="task-card-title">Migrate database to v3 schema</div>
+                <span class="priority-tag priority-tag--high">High</span>
+                <div class="task-card-meta">
+                  <div class="flm-persona flm-persona--size32">
+                    <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available" data-initials="TW">TW</div>
+                    <div class="flm-persona-details"><span class="flm-persona-name">Tom Walsh</span></div>
+                  </div>
+                  <span class="task-card-due">Feb 21</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Done Column -->
+          <div class="board-column">
+            <div class="board-column-header">
+              <h3>Done</h3>
+              <span class="board-column-count">2</span>
+            </div>
+
+            <div class="flm-documentcard" style="opacity: 0.7;">
+              <div class="task-card-body">
+                <div class="task-card-title">Set up CI/CD pipeline</div>
+                <span class="priority-tag priority-tag--medium">Medium</span>
+                <div class="task-card-meta">
+                  <div class="flm-persona flm-persona--size32">
+                    <div class="flm-persona-coin flm-persona-presence flm-persona-presence--offline" data-initials="TW">TW</div>
+                    <div class="flm-persona-details"><span class="flm-persona-name">Tom Walsh</span></div>
+                  </div>
+                  <span class="task-card-due">Feb 15</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flm-documentcard" style="opacity: 0.7;">
+              <div class="task-card-body">
+                <div class="task-card-title">Implement search autocomplete</div>
+                <span class="priority-tag priority-tag--medium">Medium</span>
+                <div class="task-card-meta">
+                  <div class="flm-persona flm-persona--size32">
+                    <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available" data-initials="JD">JD</div>
+                    <div class="flm-persona-details"><span class="flm-persona-name">Jane Doe</span></div>
+                  </div>
+                  <span class="task-card-due">Feb 17</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- List View -->
+      <div class="flm-pivot-panel" id="listView">
+        <table class="flm-detailslist">
+          <thead>
+            <tr>
+              <th>Task Name</th>
+              <th>Assignee</th>
+              <th>Priority</th>
+              <th>Status</th>
+              <th>Due Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr data-panel-open="taskPanel">
+              <td><strong>Fix login redirect bug</strong></td>
+              <td>
+                <div class="flm-persona flm-persona--size32">
+                  <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available" data-initials="AB">AB</div>
+                  <div class="flm-persona-details"><span class="flm-persona-name">Alex Brown</span></div>
+                </div>
+              </td>
+              <td><span class="priority-tag priority-tag--high">High</span></td>
+              <td><span class="status-badge status-badge--inprogress">In Progress</span></td>
+              <td>Feb 20, 2026</td>
+            </tr>
+            <tr data-panel-open="taskPanel">
+              <td><strong>Migrate database to v3 schema</strong></td>
+              <td>
+                <div class="flm-persona flm-persona--size32">
+                  <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available" data-initials="TW">TW</div>
+                  <div class="flm-persona-details"><span class="flm-persona-name">Tom Walsh</span></div>
+                </div>
+              </td>
+              <td><span class="priority-tag priority-tag--high">High</span></td>
+              <td><span class="status-badge status-badge--inprogress">In Progress</span></td>
+              <td>Feb 21, 2026</td>
+            </tr>
+            <tr data-panel-open="taskPanel">
+              <td><strong>Add unit tests for auth module</strong></td>
+              <td>
+                <div class="flm-persona flm-persona--size32">
+                  <div class="flm-persona-coin flm-persona-presence flm-persona-presence--busy" data-initials="MK">MK</div>
+                  <div class="flm-persona-details"><span class="flm-persona-name">Mike Kim</span></div>
+                </div>
+              </td>
+              <td><span class="priority-tag priority-tag--high">High</span></td>
+              <td><span class="status-badge status-badge--todo">To Do</span></td>
+              <td>Feb 21, 2026</td>
+            </tr>
+            <tr data-panel-open="taskPanel">
+              <td><strong>Update API documentation</strong></td>
+              <td>
+                <div class="flm-persona flm-persona--size32">
+                  <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available" data-initials="JD">JD</div>
+                  <div class="flm-persona-details"><span class="flm-persona-name">Jane Doe</span></div>
+                </div>
+              </td>
+              <td><span class="priority-tag priority-tag--medium">Medium</span></td>
+              <td><span class="status-badge status-badge--todo">To Do</span></td>
+              <td>Feb 22, 2026</td>
+            </tr>
+            <tr data-panel-open="taskPanel">
+              <td><strong>Design onboarding flow mockups</strong></td>
+              <td>
+                <div class="flm-persona flm-persona--size32">
+                  <div class="flm-persona-coin flm-persona-presence flm-persona-presence--away" data-initials="SR">SR</div>
+                  <div class="flm-persona-details"><span class="flm-persona-name">Sara Reyes</span></div>
+                </div>
+              </td>
+              <td><span class="priority-tag priority-tag--low">Low</span></td>
+              <td><span class="status-badge status-badge--todo">To Do</span></td>
+              <td>Feb 24, 2026</td>
+            </tr>
+            <tr>
+              <td><strong>Implement search autocomplete</strong></td>
+              <td>
+                <div class="flm-persona flm-persona--size32">
+                  <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available" data-initials="JD">JD</div>
+                  <div class="flm-persona-details"><span class="flm-persona-name">Jane Doe</span></div>
+                </div>
+              </td>
+              <td><span class="priority-tag priority-tag--medium">Medium</span></td>
+              <td><span class="status-badge status-badge--done">Done</span></td>
+              <td>Feb 17, 2026</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Timeline View -->
+      <div class="flm-pivot-panel" id="timeline">
+        <div class="timeline-placeholder">
+          <div class="timeline-placeholder-icon">&#128197;</div>
+          <span class="flm-text flm-text--xLarge">Timeline View</span>
+          <p style="margin-top: 8px;">Gantt chart visualization coming soon. Switch to Board or List view to manage tasks.</p>
+        </div>
+      </div>
+
+      </div><!-- /.flm-pivot -->
+
+    </div>
+  </main>
+
+  <!-- Task Edit Panel -->
+  <div class="flm-panel-overlay" id="taskPanel">
+    <div class="flm-panel">
+      <div class="flm-panel-header">
+        <h2>Edit Task</h2>
+        <button class="flm-button flm-button--subtle flm-button--icon-only" data-panel-close="taskPanel">&times;</button>
+      </div>
+      <div class="flm-panel-body">
+
+        <div class="flm-textfield">
+          <label class="flm-label">Task Name</label>
+          <input class="flm-textfield-input" value="Fix login redirect bug">
+        </div>
+
+        <div class="flm-textfield">
+          <label class="flm-label">Description</label>
+          <textarea class="flm-textfield-input flm-textfield-input--multiline">Users are redirected to a 404 page after logging in from the /settings route. Need to preserve the original URL and redirect back after authentication completes.</textarea>
+        </div>
+
+        <div class="flm-dropdown">
+          <label class="flm-label">Assignee</label>
+          <select class="flm-dropdown-select">
+            <option>Alex Brown</option>
+            <option>Jane Doe</option>
+            <option>Mike Kim</option>
+            <option>Tom Walsh</option>
+            <option>Sara Reyes</option>
+          </select>
+        </div>
+
+        <div class="flm-dropdown">
+          <label class="flm-label">Priority</label>
+          <select class="flm-dropdown-select">
+            <option selected>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+          </select>
+        </div>
+
+        <div class="flm-dropdown">
+          <label class="flm-label">Status</label>
+          <select class="flm-dropdown-select">
+            <option>To Do</option>
+            <option selected>In Progress</option>
+            <option>Done</option>
+          </select>
+        </div>
+
+        <div class="flm-datepicker">
+          <label class="flm-label">Due Date</label>
+          <div class="flm-datepicker-wrapper">
+            <input class="flm-datepicker-input" placeholder="MM/DD/YYYY" value="02/20/2026">
+            <button class="flm-datepicker-icon" data-icon="Calendar" aria-label="Open calendar">&#128197;</button>
+          </div>
+        </div>
+
+        <div class="flm-dropdown">
+          <label class="flm-label">Sprint</label>
+          <select class="flm-dropdown-select">
+            <option>Sprint 13</option>
+            <option selected>Sprint 14</option>
+            <option>Sprint 15</option>
+          </select>
+        </div>
+
+      </div>
+      <div class="flm-panel-footer">
+        <button class="flm-button" data-panel-close="taskPanel">Cancel</button>
+        <button class="flm-button flm-button--primary" data-panel-close="taskPanel">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Dialog -->
+  <div class="flm-dialog-overlay" id="deleteDialog">
+    <div class="flm-dialog">
+      <h2>Delete Task</h2>
+      <p>Are you sure you want to delete "Fix login redirect bug"? This action cannot be undone.</p>
+      <div class="flm-dialog-actions">
+        <button class="flm-button" data-dialog-close="deleteDialog">Cancel</button>
+        <button class="flm-button flm-button--danger" data-dialog-close="deleteDialog">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../dist/fluentlm.min.js"></script>
+  <script>
+    // Theme toggle
+    var themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('change', function () {
+      document.documentElement.classList.toggle('fluent-dark', this.checked);
+    });
+
+    // Dismiss message bar
+    document.querySelectorAll('.flm-messagebar-dismiss').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        this.parentElement.style.display = 'none';
+      });
+    });
+
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en" class="fluentlm">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Standup - Team Standup Tracker</title>
+  <link rel="stylesheet" href="../../dist/theme-light.css">
+  <link rel="stylesheet" href="../../dist/theme-dark.css">
+  <link rel="stylesheet" href="../../dist/fluentlm.min.css">
+  <style>
+    /* Demo layout styles */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--fontFamily);
+      background: var(--bodyStandoutBackground);
+      color: var(--bodyText);
+      min-height: 100vh;
+    }
+
+    .app-shell {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 24px 48px;
+    }
+
+    /* Header */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      background: var(--bodyBackground);
+      border-radius: var(--roundedCorner6);
+      box-shadow: var(--elevation8);
+      margin-bottom: 20px;
+    }
+
+    .app-header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .app-header-title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .app-header-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--roundedCorner4);
+      background: var(--themePrimary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .app-header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .app-date {
+      color: var(--bodySubtext);
+      font-size: var(--fontSizeMedium);
+    }
+
+    /* Summary strip */
+    .summary-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 16px 24px;
+      background: var(--bodyBackground);
+      border-radius: var(--roundedCorner6);
+      box-shadow: var(--elevation4);
+      margin-bottom: 20px;
+    }
+
+    .summary-left {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .summary-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Content card */
+    .content-card {
+      background: var(--bodyBackground);
+      border-radius: var(--roundedCorner6);
+      box-shadow: var(--elevation8);
+      overflow: hidden;
+    }
+
+    .content-card-body {
+      padding: 20px 24px 24px;
+    }
+
+    /* Standup categories */
+    .standup-category {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeMedium);
+      line-height: 1.5;
+    }
+
+    .standup-category-label {
+      font-weight: 600;
+      white-space: nowrap;
+      min-width: 56px;
+    }
+
+    .standup-category--done .standup-category-label {
+      color: var(--green);
+    }
+
+    .standup-category--doing .standup-category-label {
+      color: var(--themePrimary);
+    }
+
+    .standup-category--blocked .standup-category-label {
+      color: var(--redDark);
+    }
+
+    .standup-category-text {
+      color: var(--bodyText);
+    }
+
+    .standup-items-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    /* Person group header */
+    .person-group-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px 12px;
+    }
+
+    .person-group-header .flm-persona {
+      pointer-events: none;
+    }
+
+    .person-timestamp {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+      white-space: nowrap;
+    }
+
+    /* No-update placeholder */
+    .no-update-placeholder {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--bodySubtext);
+      font-size: var(--fontSizeMedium);
+      font-style: italic;
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+      background: none;
+      border: 1px solid var(--bodyFrameDivider);
+      border-radius: var(--roundedCorner4);
+      padding: 6px 10px;
+      cursor: pointer;
+      color: var(--bodyText);
+      font-size: var(--fontSizeSmall);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .theme-toggle:hover {
+      background: var(--listItemBackgroundHovered);
+    }
+
+    /* Pivot overrides */
+    .content-card > .flm-pivot > .flm-pivot-tabs {
+      padding: 0 24px;
+      border-bottom: 1px solid var(--bodyFrameDivider);
+    }
+
+    /* Empty state for other tabs */
+    .tab-empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px;
+      text-align: center;
+      gap: 8px;
+    }
+
+    .tab-empty-state .flm-icon {
+      font-size: 32px;
+      color: var(--bodySubtext);
+      margin-bottom: 8px;
+    }
+
+    /* Progress inline layout */
+    .progress-inline {
+      min-width: 200px;
+    }
+
+    /* Add-update callout form */
+    .callout-form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 280px;
+    }
+
+    .callout-form label {
+      font-size: var(--fontSizeMedium);
+      font-weight: 600;
+      color: var(--bodyText);
+    }
+
+    .callout-form select,
+    .callout-form textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--bodyFrameDivider);
+      border-radius: var(--roundedCorner4);
+      font-family: inherit;
+      font-size: var(--fontSizeMedium);
+      background: var(--bodyBackground);
+      color: var(--bodyText);
+      resize: vertical;
+    }
+
+    .callout-form select:focus,
+    .callout-form textarea:focus {
+      outline: 2px solid var(--themePrimary);
+      outline-offset: -1px;
+      border-color: transparent;
+    }
+
+    .callout-form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    /* Teaching bubble positioning */
+    .add-update-wrapper {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .add-update-wrapper > .flm-teachingbubble {
+      position: absolute;
+      top: calc(100% + 12px);
+      right: 0;
+      z-index: 100;
+      width: 300px;
+    }
+
+    /* Callout positioning */
+    .add-update-wrapper > .flm-callout {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      z-index: 99;
+      width: 320px;
+    }
+
+    /* Blocked message bar within list */
+    .blocked-bar {
+      margin: 4px 0 4px 12px;
+    }
+
+    /* Week summary table */
+    .week-summary {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--fontSizeMedium);
+    }
+
+    .week-summary th,
+    .week-summary td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--bodyFrameDivider);
+    }
+
+    .week-summary th {
+      font-weight: 600;
+      color: var(--bodySubtext);
+      font-size: var(--fontSizeSmall);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: var(--fontSizeSmall);
+      font-weight: 600;
+    }
+
+    .stat-pill--done {
+      background: var(--successBackground);
+      color: var(--green);
+    }
+
+    .stat-pill--doing {
+      background: var(--themeLighter);
+      color: var(--themePrimary);
+    }
+
+    .stat-pill--blocked {
+      background: var(--errorBackground);
+      color: var(--redDark);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="app-header-left">
+        <div class="app-header-icon">
+          <i class="flm-icon" data-icon="ClipboardList"></i>
+        </div>
+        <div class="app-header-title-block">
+          <span class="flm-text flm-text--xLarge" style="font-weight:600;">Daily Standup</span>
+          <span class="app-date">Thursday, February 20, 2026</span>
+        </div>
+      </div>
+      <div class="app-header-right">
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+          <i class="flm-icon" data-icon="Brightness"></i>
+          <span>Theme</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Summary strip -->
+    <div class="summary-strip">
+      <div class="summary-left">
+        <!-- Facepile -->
+        <div class="flm-facepile" data-max="3">
+          <span class="flm-facepile-member" title="Jane Doe">
+            <span class="flm-persona-coin">JD</span>
+          </span>
+          <span class="flm-facepile-member" title="Alex Brown">
+            <span class="flm-persona-coin">AB</span>
+          </span>
+          <span class="flm-facepile-member" title="Maya Kim">
+            <span class="flm-persona-coin">MK</span>
+          </span>
+          <span class="flm-facepile-member" title="Tom Wilson">
+            <span class="flm-persona-coin">TW</span>
+          </span>
+        </div>
+
+        <!-- Progress -->
+        <div class="flm-progress progress-inline">
+          <span class="flm-progress-label">Team progress</span>
+          <div class="flm-progress-track">
+            <div class="flm-progress-bar" style="width:75%"></div>
+          </div>
+          <span class="flm-progress-description">3 of 4 team members reported</span>
+        </div>
+      </div>
+      <div class="summary-right">
+        <!-- Add Update button + teaching bubble + callout -->
+        <div class="add-update-wrapper">
+          <button class="flm-button flm-button--primary" data-icon="Add" id="addUpdateBtn" data-callout-toggle="addCallout">Add Update</button>
+
+          <!-- Teaching Bubble (shown on first visit) -->
+          <div class="flm-teachingbubble" id="teachingBubble1">
+            <div class="flm-teachingbubble-beak"></div>
+            <div class="flm-teachingbubble-header">
+              <h3 class="flm-teachingbubble-headline">Add your standup update</h3>
+              <button class="flm-teachingbubble-close" data-icon="Cancel" aria-label="Close" id="dismissTeaching"></button>
+            </div>
+            <div class="flm-teachingbubble-body">
+              Click this button each morning to share what you've done, what you're working on, and anything that's blocking your progress. Your team will see your update in the shared board.
+            </div>
+            <div class="flm-teachingbubble-footer">
+              <button class="flm-button flm-button--primary" id="gotItBtn">Got it!</button>
+            </div>
+          </div>
+
+          <!-- Add Update Callout -->
+          <div class="flm-callout" id="addCallout" style="display:none;">
+            <div class="flm-callout-beak"></div>
+            <div class="flm-callout-body">
+              <div class="callout-form">
+                <div>
+                  <label for="categorySelect">Category</label>
+                  <select id="categorySelect">
+                    <option value="done">Done</option>
+                    <option value="doing" selected>Doing</option>
+                    <option value="blocked">Blocked</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="updateText">Update</label>
+                  <textarea id="updateText" rows="3" placeholder="What are you working on?"></textarea>
+                </div>
+                <div class="callout-form-actions">
+                  <button class="flm-button" id="cancelCallout">Cancel</button>
+                  <button class="flm-button flm-button--primary" data-icon="Send">Submit</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main content card with Pivot -->
+    <div class="content-card">
+      <div class="flm-pivot">
+        <div class="flm-pivot-tabs" role="tablist">
+          <button class="flm-pivot-tab flm-pivot-tab--active" data-panel="panelToday" role="tab" aria-selected="true">Today</button>
+          <button class="flm-pivot-tab" data-panel="panelYesterday" role="tab" aria-selected="false">Yesterday</button>
+          <button class="flm-pivot-tab" data-panel="panelWeek" role="tab" aria-selected="false">This Week</button>
+        </div>
+
+        <!-- Today Panel -->
+        <div class="flm-pivot-panel flm-pivot-panel--active" id="panelToday" role="tabpanel">
+          <div class="content-card-body">
+            <div class="flm-stack" style="gap:4px;">
+
+              <!-- Tom Wilson warning -->
+              <div class="flm-messagebar flm-messagebar--warning">
+                Tom hasn't submitted today's standup
+              </div>
+
+              <!-- Alex Brown blocked item -->
+              <div class="flm-messagebar flm-messagebar--error">
+                <strong>Blocked:</strong>&nbsp;Alex Brown &mdash; Waiting on design specs for modal
+              </div>
+
+            </div>
+
+            <hr class="flm-separator" style="margin:16px 0;">
+
+            <!-- Grouped List -->
+            <div class="flm-groupedlist">
+
+              <!-- Jane Doe -->
+              <div class="flm-groupedlist-group">
+                <button class="flm-groupedlist-header">
+                  <i class="flm-groupedlist-chevron flm-groupedlist-chevron--expanded" data-icon="ChevronRight"></i>
+                  <div class="person-group-header">
+                    <div class="flm-persona flm-persona--size40">
+                      <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available">JD</div>
+                      <div class="flm-persona-details">
+                        <span class="flm-persona-name">Jane Doe</span>
+                        <span class="flm-persona-secondary">Frontend Engineer</span>
+                      </div>
+                    </div>
+                    <span class="person-timestamp">9:03 AM</span>
+                  </div>
+                </button>
+                <div class="flm-groupedlist-items">
+                  <div class="flm-groupedlist-item">
+                    <div class="standup-items-list">
+                      <div class="standup-category standup-category--done">
+                        <span class="standup-category-label"><i class="flm-icon" data-icon="CheckMark"></i> Done</span>
+                        <span class="standup-category-text">Completed API integration tests</span>
+                      </div>
+                      <div class="standup-category standup-category--doing">
+                        <span class="standup-category-label"><i class="flm-icon" data-icon="ArrowRight"></i> Doing</span>
+                        <span class="standup-category-text">Working on user settings page</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Alex Brown -->
+              <div class="flm-groupedlist-group">
+                <button class="flm-groupedlist-header">
+                  <i class="flm-groupedlist-chevron flm-groupedlist-chevron--expanded" data-icon="ChevronRight"></i>
+                  <div class="person-group-header">
+                    <div class="flm-persona flm-persona--size40">
+                      <div class="flm-persona-coin flm-persona-presence flm-persona-presence--busy">AB</div>
+                      <div class="flm-persona-details">
+                        <span class="flm-persona-name">Alex Brown</span>
+                        <span class="flm-persona-secondary">Backend Engineer</span>
+                      </div>
+                    </div>
+                    <span class="person-timestamp">9:15 AM</span>
+                  </div>
+                </button>
+                <div class="flm-groupedlist-items">
+                  <div class="flm-groupedlist-item">
+                    <div class="standup-items-list">
+                      <div class="standup-category standup-category--done">
+                        <span class="standup-category-label"><i class="flm-icon" data-icon="CheckMark"></i> Done</span>
+                        <span class="standup-category-text">Fixed pagination bug</span>
+                      </div>
+                      <div class="standup-category standup-category--doing">
+                        <span class="standup-category-label"><i class="flm-icon" data-icon="ArrowRight"></i> Doing</span>
+                        <span class="standup-category-text">Code review for PR #247</span>
+                      </div>
+                      <div class="standup-category standup-category--blocked">
+                        <span class="standup-category-label"><i class="flm-icon" data-icon="Blocked2"></i> Blocked</span>
+                        <span class="standup-category-text">Waiting on design specs for modal</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Maya Kim -->
+              <div class="flm-groupedlist-group">
+                <button class="flm-groupedlist-header">
+                  <i class="flm-groupedlist-chevron flm-groupedlist-chevron--expanded" data-icon="ChevronRight"></i>
+                  <div class="person-group-header">
+                    <div class="flm-persona flm-persona--size40">
+                      <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available">MK</div>
+                      <div class="flm-persona-details">
+                        <span class="flm-persona-name">Maya Kim</span>
+                        <span class="flm-persona-secondary">DevOps Engineer</span>
+                      </div>
+                    </div>
+                    <span class="person-timestamp">8:47 AM</span>
+                  </div>
+                </button>
+                <div class="flm-groupedlist-items">
+                  <div class="flm-groupedlist-item">
+                    <div class="standup-items-list">
+                      <div class="standup-category standup-category--done">
+                        <span class="standup-category-label"><i class="flm-icon" data-icon="CheckMark"></i> Done</span>
+                        <span class="standup-category-text">Updated CI/CD pipeline config</span>
+                      </div>
+                      <div class="standup-category standup-category--done">
+                        <span class="standup-category-label"><i class="flm-icon" data-icon="CheckMark"></i> Done</span>
+                        <span class="standup-category-text">Merged dark mode PR</span>
+                      </div>
+                      <div class="standup-category standup-category--doing">
+                        <span class="standup-category-label"><i class="flm-icon" data-icon="ArrowRight"></i> Doing</span>
+                        <span class="standup-category-text">Performance optimization for list view</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tom Wilson (no update) -->
+              <div class="flm-groupedlist-group">
+                <button class="flm-groupedlist-header">
+                  <i class="flm-groupedlist-chevron flm-groupedlist-chevron--expanded" data-icon="ChevronRight"></i>
+                  <div class="person-group-header">
+                    <div class="flm-persona flm-persona--size40">
+                      <div class="flm-persona-coin flm-persona-presence flm-persona-presence--away">TW</div>
+                      <div class="flm-persona-details">
+                        <span class="flm-persona-name">Tom Wilson</span>
+                        <span class="flm-persona-secondary">QA Engineer</span>
+                      </div>
+                    </div>
+                    <span class="person-timestamp">--</span>
+                  </div>
+                </button>
+                <div class="flm-groupedlist-items">
+                  <div class="flm-groupedlist-item">
+                    <div class="no-update-placeholder">
+                      <i class="flm-icon" data-icon="Clock"></i>
+                      No update submitted yet
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Yesterday Panel -->
+        <div class="flm-pivot-panel" id="panelYesterday" role="tabpanel">
+          <div class="content-card-body">
+            <div class="tab-empty-state">
+              <i class="flm-icon" data-icon="History"></i>
+              <span class="flm-text flm-text--large" style="font-weight:600;">Yesterday's Standup</span>
+              <span class="flm-text" style="color:var(--bodySubtext);">
+                Wednesday, February 19, 2026 &mdash; All 4 members reported
+              </span>
+              <span class="flm-text flm-text--small" style="color:var(--bodySubtext);margin-top:8px;">
+                Yesterday's standup data is archived. View the full history in the This Week tab.
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- This Week Panel -->
+        <div class="flm-pivot-panel" id="panelWeek" role="tabpanel">
+          <div class="content-card-body">
+            <span class="flm-text flm-text--large" style="font-weight:600;display:block;margin-bottom:16px;">
+              Week of February 16 &ndash; 20, 2026
+            </span>
+            <table class="week-summary">
+              <thead>
+                <tr>
+                  <th>Team Member</th>
+                  <th>Mon</th>
+                  <th>Tue</th>
+                  <th>Wed</th>
+                  <th>Thu</th>
+                  <th>Fri</th>
+                  <th>Items</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <div class="flm-persona flm-persona--size24">
+                      <div class="flm-persona-coin">JD</div>
+                      <div class="flm-persona-details">
+                        <span class="flm-persona-name">Jane Doe</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><span style="color:var(--bodySubtext)">&mdash;</span></td>
+                  <td><span class="stat-pill stat-pill--done">8 done</span> <span class="stat-pill stat-pill--doing">2 doing</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="flm-persona flm-persona--size24">
+                      <div class="flm-persona-coin">AB</div>
+                      <div class="flm-persona-details">
+                        <span class="flm-persona-name">Alex Brown</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><span style="color:var(--bodySubtext)">&mdash;</span></td>
+                  <td><span class="stat-pill stat-pill--done">6 done</span> <span class="stat-pill stat-pill--doing">3 doing</span> <span class="stat-pill stat-pill--blocked">1 blocked</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="flm-persona flm-persona--size24">
+                      <div class="flm-persona-coin">MK</div>
+                      <div class="flm-persona-details">
+                        <span class="flm-persona-name">Maya Kim</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><span style="color:var(--bodySubtext)">&mdash;</span></td>
+                  <td><span class="stat-pill stat-pill--done">10 done</span> <span class="stat-pill stat-pill--doing">1 doing</span></td>
+                </tr>
+                <tr>
+                  <td>
+                    <div class="flm-persona flm-persona--size24">
+                      <div class="flm-persona-coin">TW</div>
+                      <div class="flm-persona-details">
+                        <span class="flm-persona-name">Tom Wilson</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><i class="flm-icon" data-icon="CheckMark" style="color:var(--green)"></i></td>
+                  <td><i class="flm-icon" data-icon="Warning" style="color:var(--yellowDark)"></i></td>
+                  <td><span style="color:var(--bodySubtext)">&mdash;</span></td>
+                  <td><span class="stat-pill stat-pill--done">5 done</span> <span class="stat-pill stat-pill--doing">3 doing</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="../../dist/fluentlm.min.js"></script>
+  <script>
+    (function () {
+      // Theme toggle
+      var themeToggle = document.getElementById('themeToggle');
+      themeToggle.addEventListener('click', function () {
+        document.documentElement.classList.toggle('fluent-dark');
+      });
+
+      // Teaching bubble - show on first visit
+      var teachingBubble = document.getElementById('teachingBubble1');
+      var dismissBtn = document.getElementById('dismissTeaching');
+      var gotItBtn = document.getElementById('gotItBtn');
+
+      function hideTeachingBubble() {
+        teachingBubble.style.display = 'none';
+        try { localStorage.setItem('standup-teaching-dismissed', '1'); } catch (e) {}
+      }
+
+      try {
+        if (localStorage.getItem('standup-teaching-dismissed') === '1') {
+          teachingBubble.style.display = 'none';
+        }
+      } catch (e) {}
+
+      if (dismissBtn) dismissBtn.addEventListener('click', hideTeachingBubble);
+      if (gotItBtn) gotItBtn.addEventListener('click', hideTeachingBubble);
+
+      // Hide teaching bubble when the Add Update callout opens
+      var addBtn = document.getElementById('addUpdateBtn');
+      addBtn.addEventListener('click', function () {
+        if (teachingBubble.style.display !== 'none') {
+          hideTeachingBubble();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

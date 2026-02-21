@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html class="fluentlm" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Support Tickets</title>
+  <link rel="stylesheet" href="../../dist/theme-light.css">
+  <link rel="stylesheet" href="../../dist/theme-dark.css">
+  <link rel="stylesheet" href="../../dist/fluentlm.min.css">
+  <style>
+    body {
+      margin: 0;
+      padding: var(--spacingM);
+      background: var(--bodyBackground);
+      color: var(--bodyText);
+      font-family: var(--fontFamily);
+    }
+
+    .summary-cards {
+      display: flex;
+      gap: var(--spacingM);
+      flex-wrap: wrap;
+    }
+
+    .summary-card {
+      flex: 1;
+      min-width: 160px;
+      background: var(--bodyStandoutBackground);
+      border-radius: var(--roundedCorner4);
+      padding: var(--spacingM);
+      box-shadow: var(--elevation4);
+      border-left: 4px solid transparent;
+    }
+
+    .summary-card--blue { border-left-color: var(--blue); }
+    .summary-card--yellow { border-left-color: var(--yellow); }
+    .summary-card--orange { border-left-color: var(--orange); }
+    .summary-card--green { border-left-color: var(--green); }
+
+    .summary-card-count {
+      font-size: var(--fontSizeXXLarge);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+    }
+
+    .summary-card-label {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+    }
+
+    .priority-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: var(--fontSizeSmall);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--white);
+    }
+
+    .priority-badge--critical { background: var(--red); }
+    .priority-badge--high { background: var(--orange); }
+    .priority-badge--medium { background: var(--yellow); color: #323130; }
+    .priority-badge--low { background: var(--neutralTertiary); }
+
+    .status-pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: var(--fontSizeSmall);
+      font-weight: var(--fontWeightSemibold);
+    }
+
+    .status-pill--open { background: var(--themeLighter); color: var(--themeDarker); }
+    .status-pill--in-progress { background: #fff4ce; color: #797300; }
+    .status-pill--awaiting { background: #fed9cc; color: #8a3707; }
+    .status-pill--resolved { background: #dff6dd; color: #0e6a0e; }
+
+    .flm-detailslist-row { cursor: pointer; }
+    .flm-detailslist-row:hover { background: var(--defaultStateBackground); }
+
+    .flm-detailslist-cell {
+      display: flex;
+      align-items: center;
+    }
+
+    .comment-block {
+      padding: var(--spacingS1) 0;
+    }
+
+    .comment-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+      margin-bottom: var(--spacingS2);
+    }
+
+    .comment-time {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+    }
+
+    .comment-text {
+      margin-left: 40px;
+      font-size: var(--fontSizeMedium);
+      color: var(--bodyText);
+    }
+
+    .header-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: var(--spacingM);
+    }
+
+    .ticket-detail-field {
+      margin-bottom: var(--spacingM);
+    }
+
+    .ticket-detail-field .flm-label {
+      margin-bottom: var(--spacingS2);
+    }
+
+    #newTicketDlg .flm-dialog-body {
+      overflow: visible;
+    }
+
+    #newTicketDlg .flm-dialog {
+      overflow: visible;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header-bar">
+    <span class="flm-text flm-text--xLarge">IT Support Tickets</span>
+    <label class="flm-toggle flm-toggle--inline">
+      <span class="flm-toggle-label">Dark Mode</span>
+      <input type="checkbox" class="flm-toggle-input" id="themeToggle">
+      <span class="flm-toggle-track"><span class="flm-toggle-thumb"></span></span>
+      <span class="flm-toggle-state" data-on="On" data-off="Off"></span>
+    </label>
+  </div>
+
+  <!-- Command Bar -->
+  <div class="flm-commandbar">
+    <div class="flm-commandbar-items">
+      <button class="flm-commandbar-item flm-button--primary" data-icon="Add" data-dialog-open="newTicketDlg">New Ticket</button>
+      <button class="flm-commandbar-item" data-icon="Contact">Assign to Me</button>
+    </div>
+    <div class="flm-commandbar-far">
+      <div class="flm-searchbox">
+        <input class="flm-searchbox-input" type="text" placeholder="Search tickets…">
+      </div>
+    </div>
+  </div>
+
+  <!-- Warning Message Bar -->
+  <div style="margin: var(--spacingM) 0;">
+    <div class="flm-messagebar flm-messagebar--warning">5 tickets are past SLA.</div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-cards" style="margin-bottom: var(--spacingM);">
+    <div class="summary-card summary-card--blue">
+      <div class="summary-card-count">23</div>
+      <div class="summary-card-label">Open</div>
+    </div>
+    <div class="summary-card summary-card--yellow">
+      <div class="summary-card-count">12</div>
+      <div class="summary-card-label">In Progress</div>
+    </div>
+    <div class="summary-card summary-card--orange">
+      <div class="summary-card-count">8</div>
+      <div class="summary-card-label">Awaiting Response</div>
+    </div>
+    <div class="summary-card summary-card--green">
+      <div class="summary-card-count">31</div>
+      <div class="summary-card-label">Resolved This Week</div>
+    </div>
+  </div>
+
+  <!-- Pivot Tabs -->
+  <div class="flm-pivot">
+    <div class="flm-pivot-tabs" role="tablist">
+      <button class="flm-pivot-tab flm-pivot-tab--active" data-panel="panelAll" role="tab">All Tickets</button>
+      <button class="flm-pivot-tab" data-panel="panelMy" role="tab">My Tickets</button>
+      <button class="flm-pivot-tab" data-panel="panelUnassigned" role="tab">Unassigned</button>
+    </div>
+
+    <!-- All Tickets Panel -->
+    <div class="flm-pivot-panel flm-pivot-panel--active" id="panelAll" role="tabpanel">
+      <div class="flm-detailslist" style="margin-top: var(--spacingS1);">
+        <div class="flm-detailslist-header">
+          <div class="flm-detailslist-header-cell" style="width: 90px;">ID</div>
+          <div class="flm-detailslist-header-cell" style="width: 220px;">Subject</div>
+          <div class="flm-detailslist-header-cell" style="width: 150px;">Requester</div>
+          <div class="flm-detailslist-header-cell" style="width: 90px;">Priority</div>
+          <div class="flm-detailslist-header-cell" style="width: 140px;">Status</div>
+          <div class="flm-detailslist-header-cell" style="width: 150px;">Assigned To</div>
+          <div class="flm-detailslist-header-cell" style="flex: 1;">Created</div>
+        </div>
+
+        <!-- Ticket 1 -->
+        <div class="flm-detailslist-row" data-panel-open="ticketPanel" onclick="showTicket(0)">
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="flm-text flm-text--semibold">TKT-1042</span></div>
+          <div class="flm-detailslist-cell" style="width: 220px;">Password reset not working</div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">SM</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">Sarah Miller</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="priority-badge priority-badge--critical">Critical</span></div>
+          <div class="flm-detailslist-cell" style="width: 140px;"><span class="status-pill status-pill--open">Open</span></div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">JW</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">James Wilson</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="flex: 1;">Feb 19, 2026</div>
+        </div>
+
+        <!-- Ticket 2 -->
+        <div class="flm-detailslist-row" data-panel-open="ticketPanel" onclick="showTicket(1)">
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="flm-text flm-text--semibold">TKT-1041</span></div>
+          <div class="flm-detailslist-cell" style="width: 220px;">VPN connection drops intermittently</div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">RJ</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">Robert Johnson</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="priority-badge priority-badge--high">High</span></div>
+          <div class="flm-detailslist-cell" style="width: 140px;"><span class="status-pill status-pill--in-progress">In Progress</span></div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">AL</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">Amy Lee</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="flex: 1;">Feb 18, 2026</div>
+        </div>
+
+        <!-- Ticket 3 -->
+        <div class="flm-detailslist-row" data-panel-open="ticketPanel" onclick="showTicket(2)">
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="flm-text flm-text--semibold">TKT-1040</span></div>
+          <div class="flm-detailslist-cell" style="width: 220px;">Request for Adobe Creative Suite license</div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">EC</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">Emily Chen</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="priority-badge priority-badge--medium">Medium</span></div>
+          <div class="flm-detailslist-cell" style="width: 140px;"><span class="status-pill status-pill--awaiting">Awaiting Response</span></div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">JW</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">James Wilson</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="flex: 1;">Feb 17, 2026</div>
+        </div>
+
+        <!-- Ticket 4 -->
+        <div class="flm-detailslist-row" data-panel-open="ticketPanel" onclick="showTicket(3)">
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="flm-text flm-text--semibold">TKT-1039</span></div>
+          <div class="flm-detailslist-cell" style="width: 220px;">Laptop screen flickering</div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">DT</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">David Thompson</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="priority-badge priority-badge--high">High</span></div>
+          <div class="flm-detailslist-cell" style="width: 140px;"><span class="status-pill status-pill--in-progress">In Progress</span></div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">MR</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">Mike Reyes</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="flex: 1;">Feb 16, 2026</div>
+        </div>
+
+        <!-- Ticket 5 -->
+        <div class="flm-detailslist-row" data-panel-open="ticketPanel" onclick="showTicket(4)">
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="flm-text flm-text--semibold">TKT-1038</span></div>
+          <div class="flm-detailslist-cell" style="width: 220px;">Cannot access shared drive</div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">LP</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">Lisa Park</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="priority-badge priority-badge--medium">Medium</span></div>
+          <div class="flm-detailslist-cell" style="width: 140px;"><span class="status-pill status-pill--open">Open</span></div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">AL</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">Amy Lee</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="flex: 1;">Feb 15, 2026</div>
+        </div>
+
+        <!-- Ticket 6 -->
+        <div class="flm-detailslist-row" data-panel-open="ticketPanel" onclick="showTicket(5)">
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="flm-text flm-text--semibold">TKT-1037</span></div>
+          <div class="flm-detailslist-cell" style="width: 220px;">Outlook keeps crashing on startup</div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">KN</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">Kevin Nguyen</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="priority-badge priority-badge--high">High</span></div>
+          <div class="flm-detailslist-cell" style="width: 140px;"><span class="status-pill status-pill--resolved">Resolved</span></div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">JW</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">James Wilson</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="flex: 1;">Feb 14, 2026</div>
+        </div>
+
+        <!-- Ticket 7 -->
+        <div class="flm-detailslist-row" data-panel-open="ticketPanel" onclick="showTicket(6)">
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="flm-text flm-text--semibold">TKT-1036</span></div>
+          <div class="flm-detailslist-cell" style="width: 220px;">New monitor setup request</div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">AW</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">Anna White</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="priority-badge priority-badge--low">Low</span></div>
+          <div class="flm-detailslist-cell" style="width: 140px;"><span class="status-pill status-pill--awaiting">Awaiting Response</span></div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">MR</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">Mike Reyes</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="flex: 1;">Feb 13, 2026</div>
+        </div>
+
+        <!-- Ticket 8 -->
+        <div class="flm-detailslist-row" data-panel-open="ticketPanel" onclick="showTicket(7)">
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="flm-text flm-text--semibold">TKT-1035</span></div>
+          <div class="flm-detailslist-cell" style="width: 220px;">MFA token not syncing</div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">BH</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">Brian Harris</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width: 90px;"><span class="priority-badge priority-badge--critical">Critical</span></div>
+          <div class="flm-detailslist-cell" style="width: 140px;"><span class="status-pill status-pill--in-progress">In Progress</span></div>
+          <div class="flm-detailslist-cell" style="width: 150px;">
+            <div class="flm-persona flm-persona--size24">
+              <div class="flm-persona-coin">AL</div>
+              <div class="flm-persona-details"><span class="flm-persona-name">Amy Lee</span></div>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="flex: 1;">Feb 12, 2026</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- My Tickets Panel -->
+    <div class="flm-pivot-panel" id="panelMy" role="tabpanel">
+      <div style="padding: var(--spacingL1); text-align: center;">
+        <span class="flm-text flm-text--secondary">Select "Assign to Me" on a ticket to see it here.</span>
+      </div>
+    </div>
+
+    <!-- Unassigned Panel -->
+    <div class="flm-pivot-panel" id="panelUnassigned" role="tabpanel">
+      <div style="padding: var(--spacingL1); text-align: center;">
+        <span class="flm-text flm-text--secondary">No unassigned tickets at this time.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ticket Detail Panel -->
+  <div class="flm-panel-overlay"></div>
+  <div class="flm-panel flm-panel--medium" id="ticketPanel">
+    <div class="flm-panel-header">
+      <h2 class="flm-panel-title" id="panelTitle">Ticket Detail</h2>
+      <button class="flm-panel-close" data-icon="Cancel" aria-label="Close"></button>
+    </div>
+    <div class="flm-panel-body">
+      <div class="ticket-detail-field">
+        <span class="flm-text flm-text--xLarge" id="panelSubject"></span>
+      </div>
+
+      <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingM); margin-bottom: var(--spacingM);">
+        <div style="flex: 1;">
+          <div class="flm-dropdown" id="panelStatusDropdown">
+            <label class="flm-label">Status</label>
+            <button class="flm-dropdown-trigger">
+              <span class="flm-dropdown-title" id="panelStatusTitle">Open</span>
+              <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+            </button>
+            <div class="flm-dropdown-listbox">
+              <div class="flm-dropdown-option" data-value="open">Open</div>
+              <div class="flm-dropdown-option" data-value="in-progress">In Progress</div>
+              <div class="flm-dropdown-option" data-value="awaiting">Awaiting Response</div>
+              <div class="flm-dropdown-option" data-value="resolved">Resolved</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex: 1;">
+          <div class="flm-dropdown" id="panelPriorityDropdown">
+            <label class="flm-label">Priority</label>
+            <button class="flm-dropdown-trigger">
+              <span class="flm-dropdown-title" id="panelPriorityTitle">Medium</span>
+              <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+            </button>
+            <div class="flm-dropdown-listbox">
+              <div class="flm-dropdown-option" data-value="critical">Critical</div>
+              <div class="flm-dropdown-option" data-value="high">High</div>
+              <div class="flm-dropdown-option" data-value="medium">Medium</div>
+              <div class="flm-dropdown-option" data-value="low">Low</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ticket-detail-field">
+        <label class="flm-label">Assigned To</label>
+        <div id="panelAssignee" style="margin-top: var(--spacingS2);"></div>
+      </div>
+
+      <hr class="flm-separator">
+
+      <div class="ticket-detail-field">
+        <label class="flm-label">Description</label>
+        <p class="flm-text flm-text--block" id="panelDescription" style="margin-top: var(--spacingS2);"></p>
+      </div>
+
+      <hr class="flm-separator">
+
+      <div class="ticket-detail-field">
+        <span class="flm-text flm-text--large flm-text--semibold">Comments</span>
+        <div id="panelComments" style="margin-top: var(--spacingS1);"></div>
+      </div>
+    </div>
+    <div class="flm-panel-footer">
+      <button class="flm-button flm-button--primary" data-panel-close>Close</button>
+    </div>
+  </div>
+
+  <!-- New Ticket Dialog -->
+  <div class="flm-dialog-overlay" id="newTicketDlg" data-light-dismiss>
+    <div class="flm-dialog" style="width: 520px;">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title">New Ticket</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close"></button>
+      </div>
+      <div class="flm-dialog-body">
+        <div class="flm-stack" style="gap: var(--spacingM);">
+          <div class="flm-textfield">
+            <label class="flm-label flm-label--required" for="newSubject">Subject</label>
+            <input class="flm-textfield-input" id="newSubject" placeholder="Brief description of the issue">
+          </div>
+
+          <div class="flm-textfield">
+            <label class="flm-label flm-label--required" for="newDescription">Description</label>
+            <textarea class="flm-textfield-input" id="newDescription" rows="4" placeholder="Provide details about your issue…"></textarea>
+          </div>
+
+          <div class="flm-stack flm-stack--horizontal" style="gap: var(--spacingM);">
+            <div style="flex: 1;">
+              <div class="flm-dropdown">
+                <label class="flm-label">Priority</label>
+                <button class="flm-dropdown-trigger">
+                  <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select priority…</span>
+                  <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+                </button>
+                <div class="flm-dropdown-listbox">
+                  <div class="flm-dropdown-option" data-value="critical">Critical</div>
+                  <div class="flm-dropdown-option" data-value="high">High</div>
+                  <div class="flm-dropdown-option" data-value="medium">Medium</div>
+                  <div class="flm-dropdown-option" data-value="low">Low</div>
+                </div>
+              </div>
+            </div>
+            <div style="flex: 1;">
+              <div class="flm-dropdown">
+                <label class="flm-label">Category</label>
+                <button class="flm-dropdown-trigger">
+                  <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select category…</span>
+                  <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+                </button>
+                <div class="flm-dropdown-listbox">
+                  <div class="flm-dropdown-option" data-value="hardware">Hardware</div>
+                  <div class="flm-dropdown-option" data-value="software">Software</div>
+                  <div class="flm-dropdown-option" data-value="network">Network</div>
+                  <div class="flm-dropdown-option" data-value="access">Access</div>
+                  <div class="flm-dropdown-option" data-value="other">Other</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button" data-dialog-close>Cancel</button>
+        <button class="flm-button flm-button--primary" data-dialog-close>Create Ticket</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../dist/fluentlm.min.js"></script>
+  <script>
+    // Theme toggle — sync checkbox to current theme on load
+    var themeToggle = document.getElementById('themeToggle');
+    themeToggle.checked = document.documentElement.classList.contains('fluent-dark');
+    themeToggle.addEventListener('change', function () {
+      FluentLM.setTheme(this.checked ? 'dark' : 'light');
+    });
+
+    // Ticket data
+    var tickets = [
+      {
+        id: 'TKT-1042', subject: 'Password reset not working', status: 'Open', priority: 'Critical',
+        assignee: { name: 'James Wilson', initials: 'JW' },
+        description: 'Multiple users in the marketing department are unable to reset their passwords through the self-service portal. The reset link sends an email, but clicking it returns a 500 error. This is blocking access for at least 5 users who are currently locked out.',
+        comments: [
+          { persona: { name: 'James Wilson', initials: 'JW' }, time: 'Feb 19, 2026 at 2:15 PM', text: 'I\'ve confirmed the issue is related to the SSO certificate expiring yesterday. Working with the identity team to renew it.' },
+          { persona: { name: 'Sarah Miller', initials: 'SM' }, time: 'Feb 19, 2026 at 3:45 PM', text: 'Thanks for the update. Two more people on my team are affected now. Is there a workaround in the meantime?' }
+        ]
+      },
+      {
+        id: 'TKT-1041', subject: 'VPN connection drops intermittently', status: 'In Progress', priority: 'High',
+        assignee: { name: 'Amy Lee', initials: 'AL' },
+        description: 'VPN drops every 15-20 minutes when connected to the corporate network. This started after the latest GlobalProtect update was pushed last Tuesday. Affecting remote workers who need consistent connectivity for database access.',
+        comments: [
+          { persona: { name: 'Amy Lee', initials: 'AL' }, time: 'Feb 18, 2026 at 10:30 AM', text: 'Rolled back the GlobalProtect client to version 5.2.8 on a test machine. Connection has been stable for 2 hours so far. Will monitor before pushing the rollback to affected users.' },
+          { persona: { name: 'Robert Johnson', initials: 'RJ' }, time: 'Feb 18, 2026 at 11:00 AM', text: 'That matches what I suspected. The latest version seems to have an issue with our split-tunnel configuration.' }
+        ]
+      },
+      {
+        id: 'TKT-1040', subject: 'Request for Adobe Creative Suite license', status: 'Awaiting Response', priority: 'Medium',
+        assignee: { name: 'James Wilson', initials: 'JW' },
+        description: 'The design team needs 3 additional Adobe Creative Suite licenses for new hires starting March 1st. Need manager approval and budget confirmation before proceeding with procurement.',
+        comments: [
+          { persona: { name: 'James Wilson', initials: 'JW' }, time: 'Feb 17, 2026 at 9:00 AM', text: 'I\'ve sent the license request to the procurement portal. Waiting on manager approval from the design team lead.' },
+          { persona: { name: 'Emily Chen', initials: 'EC' }, time: 'Feb 17, 2026 at 1:30 PM', text: 'I\'ve pinged my manager to approve it. Should be done by end of day.' }
+        ]
+      },
+      {
+        id: 'TKT-1039', subject: 'Laptop screen flickering', status: 'In Progress', priority: 'High',
+        assignee: { name: 'Mike Reyes', initials: 'MR' },
+        description: 'Dell Latitude 5520 screen flickers randomly and sometimes goes completely black for a few seconds. Started 3 days ago. Display driver is up to date. External monitor works fine. Suspect a hardware issue with the display cable.',
+        comments: [
+          { persona: { name: 'Mike Reyes', initials: 'MR' }, time: 'Feb 16, 2026 at 3:00 PM', text: 'Ran diagnostics — display cable connector is loose. Ordered a replacement unit from Dell. ETA is 2-3 business days. Providing a loaner laptop in the meantime.' },
+          { persona: { name: 'David Thompson', initials: 'DT' }, time: 'Feb 16, 2026 at 4:20 PM', text: 'Thanks Mike, the loaner is working great. I can manage until the replacement arrives.' }
+        ]
+      },
+      {
+        id: 'TKT-1038', subject: 'Cannot access shared drive', status: 'Open', priority: 'Medium',
+        assignee: { name: 'Amy Lee', initials: 'AL' },
+        description: 'Unable to access the \\\\fileserver\\marketing share. Getting "Access Denied" error. Permissions were working fine until last week. Other team members can still access it. Tried remapping the drive with no success.',
+        comments: [
+          { persona: { name: 'Amy Lee', initials: 'AL' }, time: 'Feb 15, 2026 at 11:15 AM', text: 'Checking your AD group memberships now. It looks like you may have been inadvertently removed from the Marketing-Files security group during last week\'s directory cleanup.' },
+          { persona: { name: 'Lisa Park', initials: 'LP' }, time: 'Feb 15, 2026 at 11:45 AM', text: 'That would make sense — it happened right after the IT maintenance window on Thursday night.' }
+        ]
+      },
+      {
+        id: 'TKT-1037', subject: 'Outlook keeps crashing on startup', status: 'Resolved', priority: 'High',
+        assignee: { name: 'James Wilson', initials: 'JW' },
+        description: 'Outlook 365 crashes immediately upon opening with an error referencing a corrupted OST file. User cannot send or receive email. Rebuilt the Outlook profile and the OST file — issue resolved.',
+        comments: [
+          { persona: { name: 'James Wilson', initials: 'JW' }, time: 'Feb 14, 2026 at 2:00 PM', text: 'Rebuilt the Outlook profile and deleted the corrupted OST file. Outlook is now syncing normally. Marking as resolved.' },
+          { persona: { name: 'Kevin Nguyen', initials: 'KN' }, time: 'Feb 14, 2026 at 2:30 PM', text: 'Confirmed — everything is working again. Thanks for the quick fix!' }
+        ]
+      },
+      {
+        id: 'TKT-1036', subject: 'New monitor setup request', status: 'Awaiting Response', priority: 'Low',
+        assignee: { name: 'Mike Reyes', initials: 'MR' },
+        description: 'Requesting a second monitor for the new desk in Building B, Room 204. Preference for a 27-inch display with USB-C connectivity. Need to confirm available inventory and desk compatibility.',
+        comments: [
+          { persona: { name: 'Mike Reyes', initials: 'MR' }, time: 'Feb 13, 2026 at 10:00 AM', text: 'We have Dell U2722D monitors in stock which support USB-C. I\'ll need to check if your docking station has an available video output. Can you confirm your dock model?' },
+          { persona: { name: 'Anna White', initials: 'AW' }, time: 'Feb 13, 2026 at 2:15 PM', text: 'I believe it\'s the Dell WD19S. There should be a sticker on the bottom. I\'ll double check tomorrow morning.' }
+        ]
+      },
+      {
+        id: 'TKT-1035', subject: 'MFA token not syncing', status: 'In Progress', priority: 'Critical',
+        assignee: { name: 'Amy Lee', initials: 'AL' },
+        description: 'Hardware MFA token is generating codes that are rejected by the authentication server. User has tried resyncing the token through the self-service portal but it fails each time. This is blocking access to all corporate applications that require MFA.',
+        comments: [
+          { persona: { name: 'Amy Lee', initials: 'AL' }, time: 'Feb 12, 2026 at 4:00 PM', text: 'The token\'s clock has drifted too far for an automatic resync. I\'ve initiated a manual seed reset on the auth server. Brian, please try your token in about 10 minutes.' },
+          { persona: { name: 'Brian Harris', initials: 'BH' }, time: 'Feb 12, 2026 at 4:30 PM', text: 'Still getting rejected. I tried 3 different codes. Could the token itself be defective?' }
+        ]
+      }
+    ];
+
+    function showTicket(index) {
+      var t = tickets[index];
+      document.getElementById('panelTitle').textContent = t.id;
+      document.getElementById('panelSubject').textContent = t.subject;
+      document.getElementById('panelStatusTitle').textContent = t.status;
+      document.getElementById('panelPriorityTitle').textContent = t.priority;
+      document.getElementById('panelDescription').textContent = t.description;
+
+      // Assignee
+      var assigneeEl = document.getElementById('panelAssignee');
+      assigneeEl.innerHTML = '<div class="flm-persona flm-persona--size40">' +
+        '<div class="flm-persona-coin flm-persona-presence flm-persona-presence--available">' + t.assignee.initials + '</div>' +
+        '<div class="flm-persona-details"><span class="flm-persona-name">' + t.assignee.name + '</span>' +
+        '<span class="flm-persona-secondary">IT Support</span></div></div>';
+
+      // Comments
+      var commentsEl = document.getElementById('panelComments');
+      var html = '';
+      t.comments.forEach(function (c) {
+        html += '<div class="comment-block">' +
+          '<div class="comment-meta">' +
+          '<div class="flm-persona flm-persona--size32">' +
+          '<div class="flm-persona-coin">' + c.persona.initials + '</div>' +
+          '<div class="flm-persona-details"><span class="flm-persona-name">' + c.persona.name + '</span></div>' +
+          '</div>' +
+          '<span class="comment-time">' + c.time + '</span>' +
+          '</div>' +
+          '<div class="comment-text">' + c.text + '</div>' +
+          '</div>';
+      });
+      commentsEl.innerHTML = html;
+    }
+  </script>
+</body>
+</html>

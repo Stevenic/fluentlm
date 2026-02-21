@@ -74,6 +74,7 @@ var FluentLMDatePickerComponent = (function () {
     }
 
     function open() {
+      document.dispatchEvent(new CustomEvent('flm-dismiss-pickers', { detail: { source: el } }));
       ensureCallout();
       var today = new Date();
       viewYear = selectedDate ? selectedDate.getFullYear() : today.getFullYear();
@@ -274,6 +275,11 @@ var FluentLMDatePickerComponent = (function () {
       if (e.key === 'Escape' || e.keyCode === 27) {
         close();
       }
+    });
+
+    // Close when another picker opens
+    document.addEventListener('flm-dismiss-pickers', function (e) {
+      if (e.detail.source !== el && isOpen()) close();
     });
 
     el.setAttribute('data-datepicker-wired', 'true');

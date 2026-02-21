@@ -2184,7 +2184,7 @@ a:hover {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: var(--neutralLight);
+  background-color: var(--defaultStateBackground);
   color: var(--bodyText);
   font-size: var(--fontSizeSmall);
   font-weight: var(--fontWeightSemibold);
@@ -4421,7 +4421,7 @@ a:hover {
 textarea.flm-textfield-input {
   height: auto;
   padding: 6px 8px;
-  resize: vertical;
+  resize: none;
 }
 
 .flm-textfield-input::placeholder {
@@ -4434,8 +4434,6 @@ textarea.flm-textfield-input {
 
 .flm-textfield-input:focus {
   border-color: var(--inputFocusBorderAlt);
-  border-bottom-width: 2px;
-  padding-bottom: 0;
 }
 
 /* Underlined variant */

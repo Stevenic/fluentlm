@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en" class="fluentlm">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time &amp; Expense Tracker - FluentLM Sample</title>
+  <link rel="stylesheet" href="../../dist/theme-light.css">
+  <link rel="stylesheet" href="../../dist/theme-dark.css">
+  <link rel="stylesheet" href="../../dist/fluentlm.min.css">
+  <style>
+    /* ---- Demo layout ---- */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--fontFamily, 'Segoe UI', -apple-system, sans-serif);
+      font-size: var(--fontSizeMedium);
+      color: var(--bodyText);
+      background: var(--bodyStandoutBackground);
+      min-height: 100vh;
+    }
+
+    .app-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--bodyBackground);
+      min-height: 100vh;
+      box-shadow: 0 0 2px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.08);
+    }
+
+    /* Header bar */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background: var(--themePrimary);
+      color: #fff;
+    }
+    .app-header-title {
+      font-size: var(--fontSizeXLarge);
+      font-weight: var(--fontWeightSemibold);
+    }
+    .app-header-meta {
+      font-size: var(--fontSizeSmall);
+      opacity: .85;
+    }
+
+    /* Content area */
+    .app-content { padding: 0 24px 32px; }
+
+    /* Summary cards row */
+    .summary-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .summary-card {
+      background: var(--bodyBackground);
+      border: 1px solid var(--bodyFrameDivider);
+      border-radius: var(--roundedCorner4);
+      padding: 16px;
+    }
+    .summary-card-label {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 4px;
+    }
+    .summary-card-value {
+      font-size: var(--fontSizeXXLarge);
+      font-weight: var(--fontWeightSemibold);
+    }
+    .summary-card-sub {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+      margin-top: 4px;
+    }
+
+    /* Status badges */
+    .status-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: var(--fontSizeSmall);
+      font-weight: var(--fontWeightSemibold);
+    }
+    .status-badge--approved { background: #dff6dd; color: #107c10; }
+    .status-badge--pending  { background: #fff4ce; color: #835c00; }
+    .status-badge--draft    { background: #ebebeb; color: #616161; }
+
+    /* Project color dot */
+    .project-color {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    /* Expense cards */
+    .expense-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .expense-card {
+      border: 1px solid var(--bodyFrameDivider);
+      border-radius: var(--roundedCorner4);
+      overflow: hidden;
+      background: var(--bodyBackground);
+    }
+    .expense-card-preview {
+      height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: var(--bodySubtext);
+    }
+    .expense-card-preview--travel   { background: #e3f2fd; color: #1565c0; }
+    .expense-card-preview--meals    { background: #fff3e0; color: #e65100; }
+    .expense-card-preview--software { background: #f3e5f5; color: #7b1fa2; }
+    .expense-card-preview--equipment{ background: #e8f5e9; color: #2e7d32; }
+    .expense-card-body { padding: 12px 16px; }
+    .expense-card-amount {
+      font-size: var(--fontSizeXLarge);
+      font-weight: var(--fontWeightSemibold);
+    }
+    .expense-card-meta {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+      margin-top: 4px;
+    }
+    .expense-card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 16px;
+      border-top: 1px solid var(--bodyFrameDivider);
+    }
+
+    /* Summary tab */
+    .breakdown-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .breakdown-label {
+      width: 160px;
+      font-size: var(--fontSizeMedium);
+      white-space: nowrap;
+    }
+    .breakdown-bar { flex: 1; }
+    .breakdown-hours {
+      width: 60px;
+      text-align: right;
+      font-weight: var(--fontWeightSemibold);
+      font-size: var(--fontSizeMedium);
+    }
+
+    /* Tab panels */
+
+    /* Modal form layout */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .form-row--full { grid-template-columns: 1fr; }
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--bodyFrameDivider);
+    }
+
+    /* Spinner button inline in table */
+    .flm-spinbutton--compact { max-width: 80px; }
+    .flm-spinbutton--compact .flm-spinbutton-input { padding: 2px 4px; text-align: center; }
+
+    /* Theme toggle fixed button */
+    .theme-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 100;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 640px) {
+      .form-row { grid-template-columns: 1fr; }
+      .app-content { padding: 0 12px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===== App Shell ===== -->
+<div class="app-shell">
+
+  <!-- Header -->
+  <div class="app-header">
+    <div>
+      <div class="app-header-title">Time &amp; Expense Tracker</div>
+      <div class="app-header-meta">Contoso Engineering &middot; Week of Feb 16 &ndash; 20, 2026</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span class="app-header-meta">Alex Wilber</span>
+      <div class="flm-persona flm-persona--size-32">
+        <div class="flm-persona-coin" style="background:#7c4dff;color:#fff;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;">AW</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Command Bar -->
+  <div class="flm-commandbar" style="border-bottom:1px solid var(--bodyFrameDivider)">
+    <div class="flm-commandbar-items">
+      <button class="flm-commandbar-item flm-commandbar-item--primary" data-icon="Add" data-modal-open="newEntryModal">New Entry</button>
+      <button class="flm-commandbar-item" data-icon="Send">Submit Week</button>
+      <button class="flm-commandbar-item" data-icon="Download">Export</button>
+    </div>
+    <div class="flm-commandbar-far">
+      <button class="flm-commandbar-item" data-icon="Filter">Filter</button>
+      <span class="flm-commandbar-item" style="cursor:default;opacity:.85;font-size:13px;" data-icon="Calendar">Feb 16 &ndash; Feb 20, 2026</span>
+    </div>
+  </div>
+
+  <div class="app-content">
+
+    <!-- Message Bar -->
+    <div class="flm-messagebar flm-messagebar--warning" style="margin:16px 0" role="alert">
+      <span class="flm-messagebar-icon" data-icon="Warning"></span>
+      <span class="flm-messagebar-text">You have <strong>2 hours</strong> unaccounted for on Wednesday, Feb 18.</span>
+      <button class="flm-messagebar-dismiss" data-icon="Dismiss" aria-label="Dismiss"></button>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="summary-card-label">Hours This Week</div>
+        <div class="summary-card-value">32<span style="font-size:14px;font-weight:400;color:var(--bodySubtext);"> / 40</span></div>
+        <div class="summary-card-sub">80% complete</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-card-label">Pending Approval</div>
+        <div class="summary-card-value">3</div>
+        <div class="summary-card-sub">entries awaiting review</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-card-label">Expenses This Week</div>
+        <div class="summary-card-value">$347.50</div>
+        <div class="summary-card-sub">4 receipts</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-card-label">Projects Active</div>
+        <div class="summary-card-value">3</div>
+        <div class="summary-card-sub">Contoso Portal, Internal Tools, Meetings</div>
+      </div>
+    </div>
+
+    <!-- Pivot / Tabs -->
+    <div class="flm-pivot">
+      <div class="flm-pivot-tabs" role="tablist">
+        <button class="flm-pivot-tab flm-pivot-tab--active" role="tab" data-panel="tab-timesheet">Timesheet</button>
+        <button class="flm-pivot-tab" role="tab" data-panel="tab-expenses">Expenses</button>
+        <button class="flm-pivot-tab" role="tab" data-panel="tab-summary">Summary</button>
+      </div>
+
+    <!-- ========== TIMESHEET TAB ========== -->
+    <div class="flm-pivot-panel flm-pivot-panel--active" id="tab-timesheet">
+
+      <!-- Project Color Legend -->
+      <div style="display:flex;align-items:center;gap:16px;margin:16px 0 12px;flex-wrap:wrap;">
+        <span style="font-size:13px;color:var(--bodySubtext);">Project Colors:</span>
+        <div class="flm-swatchcolorpicker" style="display:inline-flex;">
+          <button class="flm-swatchcolorpicker-cell flm-swatchcolorpicker-cell--selected" style="background-color:#5b5fc7" data-color="#5b5fc7" title="Contoso Portal"></button>
+          <button class="flm-swatchcolorpicker-cell" style="background-color:#0078d4" data-color="#0078d4" title="Internal Tools"></button>
+          <button class="flm-swatchcolorpicker-cell" style="background-color:#498205" data-color="#498205" title="Team Meetings"></button>
+          <button class="flm-swatchcolorpicker-cell" style="background-color:#da3b01" data-color="#da3b01" title="Code Reviews"></button>
+          <button class="flm-swatchcolorpicker-cell" style="background-color:#8764b8" data-color="#8764b8" title="Documentation"></button>
+          <button class="flm-swatchcolorpicker-cell" style="background-color:#008272" data-color="#008272" title="Onboarding"></button>
+        </div>
+        <span style="font-size:12px;color:var(--bodySubtext);margin-left:auto;">Click a swatch to filter by project</span>
+      </div>
+
+      <!-- Details List -->
+      <div class="flm-detailslist">
+        <div class="flm-detailslist-header">
+          <div class="flm-detailslist-header-cell" style="width:110px">Date</div>
+          <div class="flm-detailslist-header-cell" style="width:180px">Project</div>
+          <div class="flm-detailslist-header-cell" style="width:200px">Task</div>
+          <div class="flm-detailslist-header-cell" style="width:120px">Hours</div>
+          <div class="flm-detailslist-header-cell" style="width:110px">Status</div>
+        </div>
+
+        <!-- Row 1 -->
+        <div class="flm-detailslist-row">
+          <div class="flm-detailslist-cell" style="width:110px">Mon 02/16</div>
+          <div class="flm-detailslist-cell" style="width:180px"><span class="project-color" style="background:#5b5fc7"></span>Contoso Portal</div>
+          <div class="flm-detailslist-cell" style="width:200px">API integration - auth module</div>
+          <div class="flm-detailslist-cell" style="width:120px">
+            <div class="flm-spinbutton flm-spinbutton--compact">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--decrement" data-icon="ChevronDown" aria-label="Decrease"></button>
+              <input class="flm-spinbutton-input" type="number" value="6" min="0" max="24" step="0.5">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--increment" data-icon="ChevronUp" aria-label="Increase"></button>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width:110px"><span class="status-badge status-badge--approved">Approved</span></div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="flm-detailslist-row">
+          <div class="flm-detailslist-cell" style="width:110px">Mon 02/16</div>
+          <div class="flm-detailslist-cell" style="width:180px"><span class="project-color" style="background:#498205"></span>Team Meetings</div>
+          <div class="flm-detailslist-cell" style="width:200px">Sprint planning &amp; standup</div>
+          <div class="flm-detailslist-cell" style="width:120px">
+            <div class="flm-spinbutton flm-spinbutton--compact">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--decrement" data-icon="ChevronDown" aria-label="Decrease"></button>
+              <input class="flm-spinbutton-input" type="number" value="2" min="0" max="24" step="0.5">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--increment" data-icon="ChevronUp" aria-label="Increase"></button>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width:110px"><span class="status-badge status-badge--approved">Approved</span></div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="flm-detailslist-row">
+          <div class="flm-detailslist-cell" style="width:110px">Tue 02/17</div>
+          <div class="flm-detailslist-cell" style="width:180px"><span class="project-color" style="background:#5b5fc7"></span>Contoso Portal</div>
+          <div class="flm-detailslist-cell" style="width:200px">Dashboard UI components</div>
+          <div class="flm-detailslist-cell" style="width:120px">
+            <div class="flm-spinbutton flm-spinbutton--compact">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--decrement" data-icon="ChevronDown" aria-label="Decrease"></button>
+              <input class="flm-spinbutton-input" type="number" value="5" min="0" max="24" step="0.5">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--increment" data-icon="ChevronUp" aria-label="Increase"></button>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width:110px"><span class="status-badge status-badge--approved">Approved</span></div>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="flm-detailslist-row">
+          <div class="flm-detailslist-cell" style="width:110px">Tue 02/17</div>
+          <div class="flm-detailslist-cell" style="width:180px"><span class="project-color" style="background:#0078d4"></span>Internal Tools</div>
+          <div class="flm-detailslist-cell" style="width:200px">Build pipeline optimization</div>
+          <div class="flm-detailslist-cell" style="width:120px">
+            <div class="flm-spinbutton flm-spinbutton--compact">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--decrement" data-icon="ChevronDown" aria-label="Decrease"></button>
+              <input class="flm-spinbutton-input" type="number" value="3" min="0" max="24" step="0.5">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--increment" data-icon="ChevronUp" aria-label="Increase"></button>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width:110px"><span class="status-badge status-badge--pending">Pending</span></div>
+        </div>
+
+        <!-- Row 5 -->
+        <div class="flm-detailslist-row">
+          <div class="flm-detailslist-cell" style="width:110px">Wed 02/18</div>
+          <div class="flm-detailslist-cell" style="width:180px"><span class="project-color" style="background:#5b5fc7"></span>Contoso Portal</div>
+          <div class="flm-detailslist-cell" style="width:200px">User settings page refactor</div>
+          <div class="flm-detailslist-cell" style="width:120px">
+            <div class="flm-spinbutton flm-spinbutton--compact">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--decrement" data-icon="ChevronDown" aria-label="Decrease"></button>
+              <input class="flm-spinbutton-input" type="number" value="4" min="0" max="24" step="0.5">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--increment" data-icon="ChevronUp" aria-label="Increase"></button>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width:110px"><span class="status-badge status-badge--pending">Pending</span></div>
+        </div>
+
+        <!-- Row 6 -->
+        <div class="flm-detailslist-row">
+          <div class="flm-detailslist-cell" style="width:110px">Thu 02/19</div>
+          <div class="flm-detailslist-cell" style="width:180px"><span class="project-color" style="background:#0078d4"></span>Internal Tools</div>
+          <div class="flm-detailslist-cell" style="width:200px">Monitoring dashboard setup</div>
+          <div class="flm-detailslist-cell" style="width:120px">
+            <div class="flm-spinbutton flm-spinbutton--compact">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--decrement" data-icon="ChevronDown" aria-label="Decrease"></button>
+              <input class="flm-spinbutton-input" type="number" value="5.5" min="0" max="24" step="0.5">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--increment" data-icon="ChevronUp" aria-label="Increase"></button>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width:110px"><span class="status-badge status-badge--pending">Pending</span></div>
+        </div>
+
+        <!-- Row 7 -->
+        <div class="flm-detailslist-row">
+          <div class="flm-detailslist-cell" style="width:110px">Thu 02/19</div>
+          <div class="flm-detailslist-cell" style="width:180px"><span class="project-color" style="background:#498205"></span>Team Meetings</div>
+          <div class="flm-detailslist-cell" style="width:200px">Design review &amp; retrospective</div>
+          <div class="flm-detailslist-cell" style="width:120px">
+            <div class="flm-spinbutton flm-spinbutton--compact">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--decrement" data-icon="ChevronDown" aria-label="Decrease"></button>
+              <input class="flm-spinbutton-input" type="number" value="2.5" min="0" max="24" step="0.5">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--increment" data-icon="ChevronUp" aria-label="Increase"></button>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width:110px"><span class="status-badge status-badge--draft">Draft</span></div>
+        </div>
+
+        <!-- Row 8 -->
+        <div class="flm-detailslist-row">
+          <div class="flm-detailslist-cell" style="width:110px">Fri 02/20</div>
+          <div class="flm-detailslist-cell" style="width:180px"><span class="project-color" style="background:#5b5fc7"></span>Contoso Portal</div>
+          <div class="flm-detailslist-cell" style="width:200px">Bug fixes &amp; code reviews</div>
+          <div class="flm-detailslist-cell" style="width:120px">
+            <div class="flm-spinbutton flm-spinbutton--compact">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--decrement" data-icon="ChevronDown" aria-label="Decrease"></button>
+              <input class="flm-spinbutton-input" type="number" value="4" min="0" max="24" step="0.5">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--increment" data-icon="ChevronUp" aria-label="Increase"></button>
+            </div>
+          </div>
+          <div class="flm-detailslist-cell" style="width:110px"><span class="status-badge status-badge--draft">Draft</span></div>
+        </div>
+
+        <!-- Shimmer loading rows -->
+        <div class="flm-detailslist-row">
+          <div class="flm-detailslist-cell" style="width:110px"><div class="flm-shimmer flm-shimmer--row"><div class="flm-shimmer-line" style="width:70%"></div></div></div>
+          <div class="flm-detailslist-cell" style="width:180px"><div class="flm-shimmer flm-shimmer--row"><div class="flm-shimmer-line" style="width:85%"></div></div></div>
+          <div class="flm-detailslist-cell" style="width:200px"><div class="flm-shimmer flm-shimmer--row"><div class="flm-shimmer-line" style="width:90%"></div></div></div>
+          <div class="flm-detailslist-cell" style="width:120px"><div class="flm-shimmer flm-shimmer--row"><div class="flm-shimmer-line" style="width:50%"></div></div></div>
+          <div class="flm-detailslist-cell" style="width:110px"><div class="flm-shimmer flm-shimmer--row"><div class="flm-shimmer-line" style="width:60%"></div></div></div>
+        </div>
+        <div class="flm-detailslist-row">
+          <div class="flm-detailslist-cell" style="width:110px"><div class="flm-shimmer flm-shimmer--row"><div class="flm-shimmer-line" style="width:65%"></div></div></div>
+          <div class="flm-detailslist-cell" style="width:180px"><div class="flm-shimmer flm-shimmer--row"><div class="flm-shimmer-line" style="width:75%"></div></div></div>
+          <div class="flm-detailslist-cell" style="width:200px"><div class="flm-shimmer flm-shimmer--row"><div class="flm-shimmer-line" style="width:80%"></div></div></div>
+          <div class="flm-detailslist-cell" style="width:120px"><div class="flm-shimmer flm-shimmer--row"><div class="flm-shimmer-line" style="width:45%"></div></div></div>
+          <div class="flm-detailslist-cell" style="width:110px"><div class="flm-shimmer flm-shimmer--row"><div class="flm-shimmer-line" style="width:55%"></div></div></div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:12px;color:var(--bodySubtext);font-size:12px;">
+        Loading additional entries&hellip;
+      </div>
+    </div>
+
+    <!-- ========== EXPENSES TAB ========== -->
+    <div class="flm-pivot-panel" id="tab-expenses">
+
+      <div class="flm-stack flm-stack--horizontal" style="align-items:center;gap:12px;margin:16px 0;">
+        <button class="flm-button flm-button--primary" data-icon="Add" data-modal-open="addExpenseModal">Add Expense</button>
+        <div class="flm-dropdown" style="min-width:180px;">
+          <button class="flm-dropdown-trigger">
+            <span class="flm-dropdown-title">All Categories</span>
+            <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+          </button>
+          <div class="flm-dropdown-listbox">
+            <button class="flm-dropdown-option flm-dropdown-option--selected">All Categories</button>
+            <button class="flm-dropdown-option">Travel</button>
+            <button class="flm-dropdown-option">Meals</button>
+            <button class="flm-dropdown-option">Software</button>
+            <button class="flm-dropdown-option">Equipment</button>
+          </div>
+        </div>
+        <span style="margin-left:auto;font-size:13px;color:var(--bodySubtext);">4 expenses &middot; $347.50 total</span>
+      </div>
+
+      <div class="expense-grid">
+        <!-- Expense 1 -->
+        <div class="expense-card">
+          <div class="expense-card-preview expense-card-preview--travel">&#9992;</div>
+          <div class="expense-card-body">
+            <div class="expense-card-amount">$185.00</div>
+            <div class="flm-text flm-text--body1" style="margin-top:4px;">Uber rides to client site (round trip)</div>
+            <div class="expense-card-meta">Feb 17, 2026 &middot; Travel</div>
+          </div>
+          <div class="expense-card-footer">
+            <span class="status-badge status-badge--pending">Pending</span>
+            <button class="flm-button flm-button--subtle flm-button--small" data-icon="MoreHorizontal" aria-label="More options"></button>
+          </div>
+        </div>
+
+        <!-- Expense 2 -->
+        <div class="expense-card">
+          <div class="expense-card-preview expense-card-preview--meals">&#127869;</div>
+          <div class="expense-card-body">
+            <div class="expense-card-amount">$62.50</div>
+            <div class="flm-text flm-text--body1" style="margin-top:4px;">Team lunch at Olive Garden (4 people)</div>
+            <div class="expense-card-meta">Feb 18, 2026 &middot; Meals</div>
+          </div>
+          <div class="expense-card-footer">
+            <span class="status-badge status-badge--approved">Approved</span>
+            <button class="flm-button flm-button--subtle flm-button--small" data-icon="MoreHorizontal" aria-label="More options"></button>
+          </div>
+        </div>
+
+        <!-- Expense 3 -->
+        <div class="expense-card">
+          <div class="expense-card-preview expense-card-preview--software">&#128187;</div>
+          <div class="expense-card-body">
+            <div class="expense-card-amount">$49.00</div>
+            <div class="flm-text flm-text--body1" style="margin-top:4px;">Figma Pro subscription (monthly)</div>
+            <div class="expense-card-meta">Feb 16, 2026 &middot; Software</div>
+          </div>
+          <div class="expense-card-footer">
+            <span class="status-badge status-badge--approved">Approved</span>
+            <button class="flm-button flm-button--subtle flm-button--small" data-icon="MoreHorizontal" aria-label="More options"></button>
+          </div>
+        </div>
+
+        <!-- Expense 4 -->
+        <div class="expense-card">
+          <div class="expense-card-preview expense-card-preview--equipment">&#128268;</div>
+          <div class="expense-card-body">
+            <div class="expense-card-amount">$51.00</div>
+            <div class="flm-text flm-text--body1" style="margin-top:4px;">USB-C hub &amp; display adapter</div>
+            <div class="expense-card-meta">Feb 19, 2026 &middot; Equipment</div>
+          </div>
+          <div class="expense-card-footer">
+            <span class="status-badge status-badge--draft">Draft</span>
+            <button class="flm-button flm-button--subtle flm-button--small" data-icon="MoreHorizontal" aria-label="More options"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== SUMMARY TAB ========== -->
+    <div class="flm-pivot-panel" id="tab-summary">
+
+      <div class="flm-separator" style="margin:20px 0 16px;">
+        <span class="flm-text flm-text--subtitle2">Weekly Hours</span>
+      </div>
+
+      <div style="margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <span class="flm-text flm-text--body1">32 of 40 hours logged</span>
+          <span class="flm-text flm-text--body1" style="font-weight:600;">80%</span>
+        </div>
+        <div class="flm-progress" role="progressbar" aria-valuenow="80" aria-valuemin="0" aria-valuemax="100">
+          <div class="flm-progress-bar" style="width:80%"></div>
+        </div>
+        <div style="font-size:12px;color:var(--bodySubtext);margin-top:6px;">8 hours remaining to reach full-time target</div>
+      </div>
+
+      <div class="flm-separator" style="margin:20px 0 16px;">
+        <span class="flm-text flm-text--subtitle2">Hours by Project</span>
+      </div>
+
+      <div style="margin-bottom:24px;">
+        <!-- Contoso Portal -->
+        <div class="breakdown-row">
+          <div class="breakdown-label"><span class="project-color" style="background:#5b5fc7"></span>Contoso Portal</div>
+          <div class="breakdown-bar">
+            <div class="flm-progress" role="progressbar" aria-valuenow="59" aria-valuemin="0" aria-valuemax="100">
+              <div class="flm-progress-bar" style="width:59%;background:var(--themePrimary)"></div>
+            </div>
+          </div>
+          <div class="breakdown-hours">19 hrs</div>
+        </div>
+        <!-- Internal Tools -->
+        <div class="breakdown-row">
+          <div class="breakdown-label"><span class="project-color" style="background:#0078d4"></span>Internal Tools</div>
+          <div class="breakdown-bar">
+            <div class="flm-progress" role="progressbar" aria-valuenow="27" aria-valuemin="0" aria-valuemax="100">
+              <div class="flm-progress-bar" style="width:27%;background:#0078d4"></div>
+            </div>
+          </div>
+          <div class="breakdown-hours">8.5 hrs</div>
+        </div>
+        <!-- Team Meetings -->
+        <div class="breakdown-row">
+          <div class="breakdown-label"><span class="project-color" style="background:#498205"></span>Team Meetings</div>
+          <div class="breakdown-bar">
+            <div class="flm-progress" role="progressbar" aria-valuenow="14" aria-valuemin="0" aria-valuemax="100">
+              <div class="flm-progress-bar" style="width:14%;background:#498205"></div>
+            </div>
+          </div>
+          <div class="breakdown-hours">4.5 hrs</div>
+        </div>
+      </div>
+
+      <div class="flm-separator" style="margin:20px 0 16px;">
+        <span class="flm-text flm-text--subtitle2">Hours by Day</span>
+      </div>
+
+      <div style="margin-bottom:24px;">
+        <div class="breakdown-row">
+          <div class="breakdown-label">Monday, Feb 16</div>
+          <div class="breakdown-bar">
+            <div class="flm-progress" role="progressbar"><div class="flm-progress-bar" style="width:100%"></div></div>
+          </div>
+          <div class="breakdown-hours">8 hrs</div>
+        </div>
+        <div class="breakdown-row">
+          <div class="breakdown-label">Tuesday, Feb 17</div>
+          <div class="breakdown-bar">
+            <div class="flm-progress" role="progressbar"><div class="flm-progress-bar" style="width:100%"></div></div>
+          </div>
+          <div class="breakdown-hours">8 hrs</div>
+        </div>
+        <div class="breakdown-row">
+          <div class="breakdown-label">Wednesday, Feb 18</div>
+          <div class="breakdown-bar">
+            <div class="flm-progress" role="progressbar"><div class="flm-progress-bar" style="width:50%;background:var(--warningBackground)"></div></div>
+          </div>
+          <div class="breakdown-hours" style="color:#835c00;">4 hrs</div>
+        </div>
+        <div class="breakdown-row">
+          <div class="breakdown-label">Thursday, Feb 19</div>
+          <div class="breakdown-bar">
+            <div class="flm-progress" role="progressbar"><div class="flm-progress-bar" style="width:100%"></div></div>
+          </div>
+          <div class="breakdown-hours">8 hrs</div>
+        </div>
+        <div class="breakdown-row">
+          <div class="breakdown-label">Friday, Feb 20</div>
+          <div class="breakdown-bar">
+            <div class="flm-progress" role="progressbar"><div class="flm-progress-bar" style="width:50%"></div></div>
+          </div>
+          <div class="breakdown-hours">4 hrs</div>
+        </div>
+      </div>
+
+      <div class="flm-separator" style="margin:20px 0 16px;">
+        <span class="flm-text flm-text--subtitle2">Expenses Summary</span>
+      </div>
+
+      <div class="summary-cards" style="margin-bottom:0;">
+        <div class="summary-card">
+          <div class="summary-card-label">Total Expenses</div>
+          <div class="summary-card-value">$347.50</div>
+          <div class="summary-card-sub">4 receipts submitted</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-label">Approved</div>
+          <div class="summary-card-value" style="color:#107c10;">$111.50</div>
+          <div class="summary-card-sub">2 receipts</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-label">Pending</div>
+          <div class="summary-card-value" style="color:#835c00;">$185.00</div>
+          <div class="summary-card-sub">1 receipt</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-card-label">Draft</div>
+          <div class="summary-card-value" style="color:#616161;">$51.00</div>
+          <div class="summary-card-sub">1 receipt</div>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- /.flm-pivot -->
+
+  </div><!-- /app-content -->
+</div><!-- /app-shell -->
+
+<!-- ========== NEW ENTRY MODAL ========== -->
+<div class="flm-modal-overlay" id="newEntryModal" aria-hidden="true">
+  <div class="flm-modal" style="width:560px;padding:var(--spacingL1,24px)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <span class="flm-text flm-text--subtitle1">New Time Entry</span>
+      <button class="flm-button flm-button--subtle" data-icon="Dismiss" data-modal-close aria-label="Close"></button>
+    </div>
+
+    <div class="form-row">
+      <!-- DatePicker -->
+      <div class="flm-datepicker">
+        <label class="flm-label">Date</label>
+        <div class="flm-datepicker-wrapper">
+          <input class="flm-datepicker-input" placeholder="MM/DD/YYYY" value="02/20/2026">
+          <button class="flm-datepicker-icon" data-icon="Calendar" aria-label="Open calendar"></button>
+        </div>
+      </div>
+      <!-- Project Dropdown -->
+      <div class="flm-dropdown">
+        <label class="flm-label">Project</label>
+        <button class="flm-dropdown-trigger">
+          <span class="flm-dropdown-title">Select a project</span>
+          <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+        </button>
+        <div class="flm-dropdown-listbox">
+          <button class="flm-dropdown-option">Contoso Portal</button>
+          <button class="flm-dropdown-option">Internal Tools</button>
+          <button class="flm-dropdown-option">Team Meetings</button>
+          <button class="flm-dropdown-option">Code Reviews</button>
+          <button class="flm-dropdown-option">Documentation</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <!-- TimePicker Start -->
+      <div class="flm-timepicker" data-increment="30" data-use-12h>
+        <label class="flm-label">Start Time</label>
+        <div class="flm-timepicker-wrapper">
+          <input class="flm-timepicker-input" placeholder="Select a time..." value="9:00 AM">
+          <button class="flm-timepicker-icon" data-icon="Clock" aria-label="Open time picker"></button>
+        </div>
+      </div>
+      <!-- TimePicker End -->
+      <div class="flm-timepicker" data-increment="30" data-use-12h>
+        <label class="flm-label">End Time</label>
+        <div class="flm-timepicker-wrapper">
+          <input class="flm-timepicker-input" placeholder="Select a time..." value="5:00 PM">
+          <button class="flm-timepicker-icon" data-icon="Clock" aria-label="Open time picker"></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <!-- SpinButton for Hours -->
+      <div class="flm-spinbutton-wrapper">
+        <label class="flm-label">Hours</label>
+        <div class="flm-spinbutton">
+          <button class="flm-spinbutton-btn flm-spinbutton-btn--decrement" data-icon="ChevronDown" aria-label="Decrease"></button>
+          <input class="flm-spinbutton-input" type="number" value="8" min="0" max="24" step="0.5">
+          <button class="flm-spinbutton-btn flm-spinbutton-btn--increment" data-icon="ChevronUp" aria-label="Increase"></button>
+        </div>
+      </div>
+      <!-- Task Dropdown -->
+      <div class="flm-dropdown">
+        <label class="flm-label">Task Category</label>
+        <button class="flm-dropdown-trigger">
+          <span class="flm-dropdown-title">Select a task</span>
+          <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+        </button>
+        <div class="flm-dropdown-listbox">
+          <button class="flm-dropdown-option">Development</button>
+          <button class="flm-dropdown-option">Design</button>
+          <button class="flm-dropdown-option">Meetings</button>
+          <button class="flm-dropdown-option">Code Review</button>
+          <button class="flm-dropdown-option">Testing</button>
+          <button class="flm-dropdown-option">Documentation</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row form-row--full">
+      <div class="flm-textfield">
+        <label class="flm-label">Notes</label>
+        <textarea class="flm-textfield-input" rows="3" placeholder="Describe what you worked on..."></textarea>
+      </div>
+    </div>
+
+    <div style="margin-bottom:8px;">
+      <label class="flm-label" style="margin-bottom:8px;display:block;">Project Color</label>
+      <div class="flm-swatchcolorpicker">
+        <button class="flm-swatchcolorpicker-cell flm-swatchcolorpicker-cell--selected" style="background-color:#5b5fc7" data-color="#5b5fc7"></button>
+        <button class="flm-swatchcolorpicker-cell" style="background-color:#0078d4" data-color="#0078d4"></button>
+        <button class="flm-swatchcolorpicker-cell" style="background-color:#498205" data-color="#498205"></button>
+        <button class="flm-swatchcolorpicker-cell" style="background-color:#da3b01" data-color="#da3b01"></button>
+        <button class="flm-swatchcolorpicker-cell" style="background-color:#8764b8" data-color="#8764b8"></button>
+        <button class="flm-swatchcolorpicker-cell" style="background-color:#008272" data-color="#008272"></button>
+        <button class="flm-swatchcolorpicker-cell" style="background-color:#ff8c00" data-color="#ff8c00"></button>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="flm-button" data-modal-close>Cancel</button>
+      <button class="flm-button flm-button--primary" data-icon="Save">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== ADD EXPENSE MODAL ========== -->
+<div class="flm-modal-overlay" id="addExpenseModal" aria-hidden="true">
+  <div class="flm-modal" style="width:520px;padding:var(--spacingL1,24px)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <span class="flm-text flm-text--subtitle1">Add Expense</span>
+      <button class="flm-button flm-button--subtle" data-icon="Dismiss" data-modal-close aria-label="Close"></button>
+    </div>
+
+    <div class="form-row">
+      <div class="flm-datepicker">
+        <label class="flm-label">Date</label>
+        <div class="flm-datepicker-wrapper">
+          <input class="flm-datepicker-input" placeholder="MM/DD/YYYY" value="02/20/2026">
+          <button class="flm-datepicker-icon" data-icon="Calendar" aria-label="Open calendar"></button>
+        </div>
+      </div>
+      <div class="flm-dropdown">
+        <label class="flm-label">Category</label>
+        <button class="flm-dropdown-trigger">
+          <span class="flm-dropdown-title">Select category</span>
+          <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+        </button>
+        <div class="flm-dropdown-listbox">
+          <button class="flm-dropdown-option">Travel</button>
+          <button class="flm-dropdown-option">Meals</button>
+          <button class="flm-dropdown-option">Software</button>
+          <button class="flm-dropdown-option">Equipment</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="flm-spinbutton-wrapper">
+        <label class="flm-label">Amount ($)</label>
+        <div class="flm-spinbutton">
+          <button class="flm-spinbutton-btn flm-spinbutton-btn--decrement" data-icon="ChevronDown" aria-label="Decrease"></button>
+          <input class="flm-spinbutton-input" type="number" value="0.00" min="0" max="10000" step="0.50">
+          <button class="flm-spinbutton-btn flm-spinbutton-btn--increment" data-icon="ChevronUp" aria-label="Increase"></button>
+        </div>
+      </div>
+      <div class="flm-dropdown">
+        <label class="flm-label">Project</label>
+        <button class="flm-dropdown-trigger">
+          <span class="flm-dropdown-title">Select a project</span>
+          <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+        </button>
+        <div class="flm-dropdown-listbox">
+          <button class="flm-dropdown-option">Contoso Portal</button>
+          <button class="flm-dropdown-option">Internal Tools</button>
+          <button class="flm-dropdown-option">Team Meetings</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row form-row--full">
+      <div class="flm-textfield">
+        <label class="flm-label">Description</label>
+        <textarea class="flm-textfield-input" rows="2" placeholder="Brief description of the expense..."></textarea>
+      </div>
+    </div>
+
+    <div class="form-row form-row--full">
+      <div>
+        <label class="flm-label" style="margin-bottom:8px;display:block;">Upload Receipt</label>
+        <div style="border:2px dashed var(--bodyFrameDivider);border-radius:var(--roundedCorner4);padding:24px;text-align:center;color:var(--bodySubtext);">
+          <div style="font-size:24px;margin-bottom:8px;">&#128206;</div>
+          <div>Drag &amp; drop a receipt or <a href="#" style="color:var(--themePrimary);">browse files</a></div>
+          <div style="font-size:12px;margin-top:4px;">PNG, JPG, or PDF up to 5MB</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="flm-button" data-modal-close>Cancel</button>
+      <button class="flm-button flm-button--primary" data-icon="Save">Submit Expense</button>
+    </div>
+  </div>
+</div>
+
+<!-- Theme toggle -->
+<div class="theme-toggle">
+  <button class="flm-button flm-button--primary" id="themeToggleBtn" data-icon="Brightness" title="Toggle dark/light theme" aria-label="Toggle theme">
+    Toggle Theme
+  </button>
+</div>
+
+<!-- Scripts -->
+<script src="../../dist/fluentlm.min.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Theme toggle ---------- */
+  var themeBtn = document.getElementById('themeToggleBtn');
+
+  if (themeBtn) {
+    themeBtn.addEventListener('click', function () {
+      document.documentElement.classList.toggle('fluent-dark');
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

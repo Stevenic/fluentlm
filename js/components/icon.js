@@ -21,8 +21,8 @@ var FluentLMIconComponent = (function () {
     var svg = FluentIcons.getSvg(name);
     if (!svg) return;
 
-    // For .flm-icon elements, replace contents
-    if (el.classList.contains('flm-icon')) {
+    // For .flm-icon elements or inline icon elements (i, span with data-icon only), replace contents
+    if (el.classList.contains('flm-icon') || ((el.tagName === 'I' || el.tagName === 'SPAN') && el.childNodes.length === 0)) {
       el.innerHTML = '';
       el.appendChild(svg);
     }

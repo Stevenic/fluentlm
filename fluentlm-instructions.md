@@ -22,6 +22,18 @@ Apply to any element.
 
 ---
 
+## Global Implementation Notes
+
+**Auto-wired JS handlers** — The Nav, Pivot, Dialog, Panel, Modal, Callout, Dropdown, ComboBox, SpinButton, SwatchColorPicker, GroupedList, MessageBar, Toggle, Rating, SearchBox, TagPicker, DatePicker, TimePicker, Coachmark, and TeachingBubble components implement their own click/interaction handlers via `fluentlm.js`. Do not duplicate them in page scripts.
+
+**Theme switching** — Use `FluentLM.setTheme('dark')` / `FluentLM.setTheme('light')`, or toggle the `fluent-dark` class on `<html>`. Do not use `data-theme` attributes.
+
+**CSS variables** — Use only the FluentLM semantic tokens documented in the CSS Custom Properties section below (e.g. `--bodyText`, `--bodyBackground`). Do not use Fluent UI v2 variable names (e.g. `--colorNeutralForeground1`). **Important:** For any custom styles (hover states, backgrounds, borders, text colors), always use the **Semantic Colors** variables (e.g. `--bodyBackground`, `--defaultStateBackground`, `--bodySubtext`) instead of the **Palette Colors** variables (e.g. `--neutralLighter`, `--neutralLight`). Palette colors are fixed values that do not change between light and dark themes, so using them will produce incorrect colors in one theme or the other.
+
+**Icons** — Any element with a `data-icon="Name"` attribute gets an inline SVG injected by JS. Works on `.flm-icon` elements, empty `<i>` / `<span>` tags, buttons, and links.
+
+---
+
 ## Button
 
 ```html
@@ -392,6 +404,8 @@ Inline `style="gap: var(--spacingS1)"` sets spacing per instance.
 | `flm-dialog-body` | Content area |
 | `flm-dialog-footer` | Action buttons row |
 
+**Implementation note:** When embedding a Dropdown, ComboBox, or other popup-based component inside a Dialog, Modal, or Panel, add `overflow: visible` to both the dialog/modal container (`.flm-dialog`, `.flm-modal`) and the body (`.flm-dialog-body`, `.flm-panel-body`) so the dropdown listbox is not clipped.
+
 ---
 
 ## Panel
@@ -517,12 +531,15 @@ Inline `style="gap: var(--spacingS1)"` sets spacing per instance.
 | `data-icon="Name"` | Icon before label |
 | `disabled` | Disabled state |
 
+**Implementation note:** When embedding a Dropdown or other popup-based component inside a CommandBar, add `overflow: visible` to `.flm-commandbar` and `.flm-commandbar-items` so the dropdown listbox is not clipped.
+
 ---
 
 ## Nav
 
 ```html
 <nav class="flm-nav">
+  <!-- Expanded group -->
   <div class="flm-nav-group">
     <button class="flm-nav-group-header">
       <i class="flm-nav-chevron flm-nav-chevron--expanded" data-icon="ChevronRight"></i>
@@ -534,6 +551,16 @@ Inline `style="gap: var(--spacingS1)"` sets spacing per instance.
       <a class="flm-nav-link flm-nav-link--disabled">Disabled</a>
     </div>
   </div>
+  <!-- Collapsed group: put --collapsed on flm-nav-group-items, omit --expanded on chevron -->
+  <div class="flm-nav-group">
+    <button class="flm-nav-group-header">
+      <i class="flm-nav-chevron" data-icon="ChevronRight"></i>
+      Collapsed Section
+    </button>
+    <div class="flm-nav-group-items flm-nav-group-items--collapsed">
+      <a class="flm-nav-link" href="#">Hidden Link</a>
+    </div>
+  </div>
 </nav>
 ```
 
@@ -543,7 +570,7 @@ Inline `style="gap: var(--spacingS1)"` sets spacing per instance.
 | `flm-nav-group` | Section group |
 | `flm-nav-group-header` | Collapsible group title |
 | `flm-nav-group-items` | Links container |
-| `flm-nav-group-items--collapsed` | Hidden (toggled by JS) |
+| `flm-nav-group-items--collapsed` | Hidden (toggled by JS). Apply to `.flm-nav-group-items`, NOT the parent group |
 | `flm-nav-link` | Navigation link |
 | `flm-nav-link--active` | Active/selected link |
 | `flm-nav-link--disabled` | Disabled link |
@@ -645,7 +672,7 @@ Set column widths via inline `style="width: 200px"` or `style="flex: 1"`.
 
 ```html
 <div class="flm-searchbox">
-  <input class="flm-searchbox-input" type="search" placeholder="Search…">
+  <input class="flm-searchbox-input" type="text" placeholder="Search…">
 </div>
 ```
 
@@ -657,7 +684,7 @@ Set column widths via inline `style="width: 200px"` or `style="flex: 1"`.
 
 | Child class | Element |
 |-------------|---------|
-| `flm-searchbox-input` | `<input type="search">` |
+| `flm-searchbox-input` | `<input type="text">` |
 | `flm-searchbox-icon` | Search icon (auto-injected) |
 | `flm-searchbox-clear` | Clear button (auto-injected) |
 
@@ -1439,3 +1466,128 @@ JS: ResizeObserver measures available width, hides items that don't fit, builds 
 | `flm-timepicker-error` | Error message |
 
 JS generates time-slot options at the configured increment. Input text filters the list. Arrow keys navigate, Enter selects, Escape closes. Auto-scrolls to selected or nearest-to-current-time option on open.
+
+---
+
+## CSS Custom Properties
+
+Use these variables in inline `style` attributes or demo-specific `<style>` blocks. They automatically adapt to light/dark theme. **Do not use Fluent UI v2 variable names** (e.g. `--colorNeutralForeground1`) — they are not defined in this library.
+
+### Semantic Colors (theme-aware)
+
+Use these for page layout, custom containers, and demo styling:
+
+| Variable | Purpose |
+|----------|---------|
+| `--bodyBackground` | Page / container background |
+| `--bodyStandoutBackground` | Slightly offset background (sidebars, cards) |
+| `--bodyFrameBackground` | Frame / shell background |
+| `--bodyFrameDivider` | Border between frame sections |
+| `--bodyDivider` | General divider lines |
+| `--bodyText` | Primary text color |
+| `--bodyTextChecked` | Text on checked/selected background |
+| `--bodySubtext` | Secondary / caption text |
+| `--disabledText` | Disabled text |
+| `--errorText` | Error text |
+| `--successText` | Success text |
+| `--link` | Link color |
+| `--linkHovered` | Link hover color |
+| `--overlayBackground` | Semi-transparent backdrop |
+| `--defaultStateBackground` | Default surface background |
+| `--focusBorder` | Focus outline color |
+
+### Palette Colors
+
+Raw color values — **not** theme-aware (same in light and dark):
+
+| Variable | Value |
+|----------|-------|
+| `--themePrimary` | `#0078d4` (brand blue) |
+| `--themeDark` | `#005a9e` |
+| `--themeDarkAlt` | `#106ebe` |
+| `--themeDarker` | `#004578` |
+| `--themeSecondary` | `#2b88d8` |
+| `--themeTertiary` | `#71afe5` |
+| `--themeLight` | `#c7e0f4` |
+| `--themeLighter` | `#deecf9` |
+| `--themeLighterAlt` | `#eff6fc` |
+| `--black` | `#000000` |
+| `--white` | `#ffffff` |
+| `--neutralPrimary` | `#323130` |
+| `--neutralSecondary` | `#605e5c` |
+| `--neutralTertiary` | `#a19f9d` |
+| `--neutralLight` | `#edebe9` |
+| `--neutralLighter` | `#f3f2f1` |
+| `--neutralLighterAlt` | `#faf9f8` |
+| `--red` | `#e81123` |
+| `--redDark` | `#a4262c` |
+| `--orange` | `#d83b01` |
+| `--yellow` | `#ffb900` |
+| `--green` | `#107c10` |
+| `--teal` | `#008272` |
+| `--blue` | `#0078d4` |
+| `--purple` | `#5c2d91` |
+
+### Status Backgrounds (theme-aware)
+
+| Variable | Purpose |
+|----------|---------|
+| `--infoBackground` | Info message bar / banner |
+| `--errorBackground` | Error state |
+| `--warningBackground` | Warning state |
+| `--severeWarningBackground` | Severe warning state |
+| `--successBackground` | Success state |
+| `--blockingBackground` | Blocking state |
+
+### Typography
+
+| Variable | Value |
+|----------|-------|
+| `--fontFamily` | Segoe UI system stack |
+| `--fontFamilyMonospace` | Cascadia Code / Consolas |
+| `--fontSizeTiny` | `10px` |
+| `--fontSizeSmall` | `12px` |
+| `--fontSizeMedium` | `14px` |
+| `--fontSizeMediumPlus` | `16px` |
+| `--fontSizeLarge` | `18px` |
+| `--fontSizeXLarge` | `20px` |
+| `--fontSizeXXLarge` | `28px` |
+| `--fontSizeSuperLarge` | `42px` |
+| `--fontSizeMega` | `68px` |
+| `--fontWeightRegular` | `400` |
+| `--fontWeightSemibold` | `600` |
+| `--fontWeightBold` | `700` |
+
+### Spacing
+
+| Variable | Value |
+|----------|-------|
+| `--spacingS2` | `4px` |
+| `--spacingS1` | `8px` |
+| `--spacingM` | `16px` |
+| `--spacingL1` | `20px` |
+| `--spacingL2` | `32px` |
+
+### Effects
+
+| Variable | Purpose |
+|----------|---------|
+| `--elevation4` | Subtle shadow (cards) |
+| `--elevation8` | Medium shadow (dropdowns, callouts) |
+| `--elevation16` | Prominent shadow (dialogs, panels) |
+| `--elevation64` | Dramatic shadow |
+| `--roundedCorner2` | `2px` border radius |
+| `--roundedCorner4` | `4px` border radius |
+| `--roundedCorner6` | `6px` border radius |
+
+### Motion
+
+| Variable | Value |
+|----------|-------|
+| `--duration1` | `100ms` |
+| `--duration2` | `200ms` |
+| `--duration3` | `300ms` |
+| `--duration4` | `400ms` |
+| `--easeAccelerate` | `cubic-bezier(0.9, 0.1, 1, 0.2)` |
+| `--easeDecelerate` | `cubic-bezier(0.1, 0.9, 0.2, 1)` |
+| `--easeStandard` | `cubic-bezier(0.8, 0, 0.2, 1)` |

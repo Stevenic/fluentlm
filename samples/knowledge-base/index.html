@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en" class="fluentlm">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Knowledge Base - FluentLM Sample</title>
+  <link rel="stylesheet" href="../../dist/theme-light.css">
+  <link rel="stylesheet" href="../../dist/theme-dark.css">
+  <link rel="stylesheet" href="../../dist/fluentlm.min.css">
+  <style>
+    /* Demo layout styles */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bodyStandoutBackground);
+      color: var(--bodyText);
+      line-height: 1.5;
+    }
+
+    /* Top bar */
+    .demo-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 24px;
+      background: var(--themePrimary);
+      color: #fff;
+      height: 48px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .demo-topbar-title {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .demo-topbar-title svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+    .demo-topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Search area */
+    .demo-search-area {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Layout */
+    .demo-layout {
+      display: flex;
+      min-height: calc(100vh - 48px);
+    }
+
+    /* Sidebar */
+    .demo-sidebar {
+      width: 280px;
+      min-width: 280px;
+      background: var(--bodyBackground);
+      border-right: 1px solid var(--bodyFrameDivider);
+      padding: 16px 0;
+      overflow-y: auto;
+    }
+    .demo-sidebar-heading {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--bodySubtext);
+      padding: 8px 20px;
+      margin: 0;
+    }
+
+    /* Main content */
+    .demo-main {
+      flex: 1;
+      padding: 24px 40px 60px;
+      max-width: 900px;
+      overflow-y: auto;
+    }
+
+    /* Article styles */
+    .article-header {
+      margin-bottom: 24px;
+    }
+    .article-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 12px;
+      color: var(--bodyText);
+    }
+    .article-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+    .article-meta-date {
+      font-size: 13px;
+      color: var(--bodySubtext);
+    }
+
+    /* Article body */
+    .article-body h2 {
+      font-size: 22px;
+      font-weight: 600;
+      margin: 32px 0 12px;
+      color: var(--bodyText);
+    }
+    .article-body h3 {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 24px 0 8px;
+      color: var(--bodyText);
+    }
+    .article-body p {
+      margin: 0 0 16px;
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--bodyText);
+    }
+    .article-body ul, .article-body ol {
+      margin: 0 0 16px;
+      padding-left: 24px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+    .article-body li {
+      margin-bottom: 4px;
+    }
+    .article-body code {
+      background: var(--defaultStateBackground);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 13px;
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+    }
+
+    /* Tooltip terms */
+    .term-highlight {
+      border-bottom: 1px dashed var(--themePrimary);
+      color: var(--themePrimary);
+      cursor: help;
+    }
+
+    /* Image placeholder */
+    .demo-image-placeholder {
+      width: 100%;
+      height: 240px;
+      border-radius: 8px;
+      background: var(--defaultStateBackground);
+      border: 1px solid var(--bodyFrameDivider);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bodySubtext);
+      font-size: 14px;
+      margin: 16px 0;
+    }
+    .demo-image-placeholder svg {
+      width: 48px;
+      height: 48px;
+      fill: var(--bodySubtext);
+      margin-right: 12px;
+    }
+
+    /* Helpful section */
+    .helpful-section {
+      margin-top: 40px;
+      padding: 24px;
+      background: var(--bodyBackground);
+      border-radius: 8px;
+      border: 1px solid var(--bodyFrameDivider);
+      text-align: center;
+    }
+    .helpful-section h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    /* Theme toggle button */
+    .theme-toggle {
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+      border-radius: 4px;
+      padding: 4px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    .theme-toggle:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="demo-topbar">
+    <div class="demo-topbar-title">
+      <svg viewBox="0 0 20 20"><path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414a2 2 0 00-.586-1.414l-3.414-3.414A2 2 0 0010.586 2H6zm0 1h4v3.5A1.5 1.5 0 0011.5 8H15v8a1 1 0 01-1 1H6a1 1 0 01-1-1V4a1 1 0 011-1zm5 .707L14.293 7H11.5a.5.5 0 01-.5-.5V3.707z"/></svg>
+      Knowledge Base
+    </div>
+    <div class="demo-topbar-actions">
+      <div class="demo-search-area">
+        <div class="flm-searchbox" style="width: 320px;">
+          <input class="flm-searchbox-input" type="text" placeholder="Search articles..." id="searchBox">
+        </div>
+        <!-- Coachmark on search box -->
+        <div class="flm-coachmark" data-teachingbubble-toggle="tbSearch" id="searchCoachmark">
+          <div class="flm-coachmark-dot"></div>
+          <div class="flm-coachmark-ring"></div>
+        </div>
+        <div class="flm-teachingbubble" id="tbSearch" style="top: 100%; left: 0; margin-top: 12px;">
+          <div class="flm-teachingbubble-header">
+            <span class="flm-teachingbubble-title">Search Knowledge Base</span>
+            <button class="flm-teachingbubble-close" aria-label="Close">&times;</button>
+          </div>
+          <div class="flm-teachingbubble-body">
+            Use search to quickly find articles across all categories. Try keywords like "setup", "deploy", or "architecture".
+          </div>
+          <div class="flm-teachingbubble-footer">
+            <button class="flm-button flm-button--primary flm-button--small" onclick="document.getElementById('tbSearch').classList.remove('flm-teachingbubble--visible'); document.getElementById('searchCoachmark').style.display='none';">Got it</button>
+          </div>
+        </div>
+      </div>
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme">Light</button>
+    </div>
+  </div>
+
+  <!-- Main Layout -->
+  <div class="demo-layout">
+
+    <!-- Sidebar Nav -->
+    <aside class="demo-sidebar">
+      <p class="demo-sidebar-heading">Categories</p>
+      <nav class="flm-nav">
+
+        <!-- Getting Started (expanded) -->
+        <div class="flm-nav-group">
+          <button class="flm-nav-group-header">
+            <i class="flm-nav-chevron flm-nav-chevron--expanded" data-icon="ChevronRight"></i>
+            Getting Started
+          </button>
+          <div class="flm-nav-group-items">
+            <a class="flm-nav-link" href="#">Welcome</a>
+            <a class="flm-nav-link" href="#">Setup Guide</a>
+            <a class="flm-nav-link" href="#">FAQ</a>
+          </div>
+        </div>
+
+        <!-- Engineering (expanded, Onboarding Guide active) -->
+        <div class="flm-nav-group">
+          <button class="flm-nav-group-header">
+            <i class="flm-nav-chevron flm-nav-chevron--expanded" data-icon="ChevronRight"></i>
+            Engineering
+          </button>
+          <div class="flm-nav-group-items">
+            <a class="flm-nav-link flm-nav-link--active" href="#">Onboarding Guide</a>
+            <a class="flm-nav-link" href="#">Code Standards</a>
+            <a class="flm-nav-link" href="#">CI/CD Pipeline</a>
+            <a class="flm-nav-link" href="#">Architecture Overview</a>
+          </div>
+        </div>
+
+        <!-- Design (collapsed) -->
+        <div class="flm-nav-group">
+          <button class="flm-nav-group-header">
+            <i class="flm-nav-chevron" data-icon="ChevronRight"></i>
+            Design
+          </button>
+          <div class="flm-nav-group-items flm-nav-group-items--collapsed">
+            <a class="flm-nav-link" href="#">Design System</a>
+            <a class="flm-nav-link" href="#">Brand Guidelines</a>
+            <a class="flm-nav-link" href="#">Accessibility</a>
+          </div>
+        </div>
+
+        <!-- Product (collapsed) -->
+        <div class="flm-nav-group">
+          <button class="flm-nav-group-header">
+            <i class="flm-nav-chevron" data-icon="ChevronRight"></i>
+            Product
+          </button>
+          <div class="flm-nav-group-items flm-nav-group-items--collapsed">
+            <a class="flm-nav-link" href="#">Roadmap</a>
+            <a class="flm-nav-link" href="#">Release Notes</a>
+            <a class="flm-nav-link" href="#">Feature Requests</a>
+          </div>
+        </div>
+
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="demo-main">
+
+      <!-- Breadcrumb -->
+      <ol class="flm-breadcrumb">
+        <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#">Home</a></li>
+        <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#">Engineering</a></li>
+        <li class="flm-breadcrumb-item"><span class="flm-breadcrumb-current">Onboarding Guide</span></li>
+      </ol>
+
+      <!-- Article Header -->
+      <div class="article-header">
+        <h1 class="article-title">Engineering Onboarding Guide</h1>
+        <div class="article-meta">
+          <!-- Author Persona with HoverCard -->
+          <span data-hovercard-id="hcAuthor" style="cursor: pointer;">
+            <div class="flm-persona flm-persona--size40">
+              <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available">MR</div>
+              <div class="flm-persona-details">
+                <span class="flm-persona-name">Maya Rodriguez</span>
+                <span class="flm-persona-secondary">Senior Engineer</span>
+              </div>
+            </div>
+          </span>
+          <div class="flm-hovercard" id="hcAuthor">
+            <div class="flm-hovercard-compact">
+              <div class="flm-persona flm-persona--size72">
+                <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available">MR</div>
+                <div class="flm-persona-details">
+                  <div class="flm-hovercard-title">Maya Rodriguez</div>
+                  <div class="flm-hovercard-subtitle">Senior Software Engineer</div>
+                </div>
+              </div>
+            </div>
+            <div class="flm-hovercard-expanded">
+              <div class="flm-hovercard-body">
+                <p style="margin:0 0 8px;font-size:13px;">Platform Engineering Team &bull; Seattle, WA</p>
+                <p style="margin:0 0 8px;font-size:13px;">maya.rodriguez@contoso.com</p>
+                <p style="margin:0;font-size:13px;">Author of 14 knowledge base articles. Primary contributor to Engineering and Architecture documentation.</p>
+              </div>
+            </div>
+          </div>
+          <span class="article-meta-date">Last updated: February 3, 2026</span>
+        </div>
+      </div>
+
+      <!-- Message Bar -->
+      <div class="flm-messagebar flm-messagebar--info">
+        <div class="flm-messagebar-icon">&#9432;</div>
+        <div class="flm-messagebar-text">This guide was last reviewed on Jan 15, 2026. If you notice outdated information, please contact the Engineering Docs team.</div>
+      </div>
+
+      <!-- Article Body -->
+      <div class="article-body">
+
+        <h2>Welcome to the Engineering Team</h2>
+        <p>
+          Welcome to the Engineering organization at Contoso. This onboarding guide is designed to help you get
+          up and running quickly. Whether you are joining as a junior developer or a seasoned architect, this
+          document covers everything you need to know during your first two weeks, from setting up your
+          development environment to understanding our deployment workflows.
+        </p>
+        <p>
+          Our engineering culture values <strong>collaboration</strong>, <strong>quality</strong>, and
+          <strong>continuous improvement</strong>. We believe in writing clean, well-tested code and
+          sharing knowledge openly across the team. This wiki is one of the main ways we preserve and
+          distribute institutional knowledge.
+        </p>
+
+        <div class="flm-separator"></div>
+
+        <h2>Required Tools</h2>
+        <p>
+          Before you begin, make sure you have the following tools installed on your development machine.
+          IT will provision your laptop with administrative access on your first day. Reach out in the
+          <code>#eng-onboarding</code> channel if you run into any issues.
+        </p>
+
+        <!-- Details List -->
+        <div class="flm-detailslist">
+          <div class="flm-detailslist-header">
+            <div class="flm-detailslist-header-cell" style="width:180px">Tool</div>
+            <div class="flm-detailslist-header-cell" style="width:120px">Version</div>
+            <div class="flm-detailslist-header-cell" style="width:160px">Category</div>
+            <div class="flm-detailslist-header-cell" style="flex:1">Notes</div>
+          </div>
+          <div class="flm-detailslist-row">
+            <div class="flm-detailslist-cell" style="width:180px">VS Code</div>
+            <div class="flm-detailslist-cell" style="width:120px">1.96+</div>
+            <div class="flm-detailslist-cell" style="width:160px">Editor</div>
+            <div class="flm-detailslist-cell" style="flex:1">Install recommended extensions from <code>.vscode/extensions.json</code></div>
+          </div>
+          <div class="flm-detailslist-row">
+            <div class="flm-detailslist-cell" style="width:180px">Git</div>
+            <div class="flm-detailslist-cell" style="width:120px">2.43+</div>
+            <div class="flm-detailslist-cell" style="width:160px">Version Control</div>
+            <div class="flm-detailslist-cell" style="flex:1">Configure SSH keys for Azure DevOps access</div>
+          </div>
+          <div class="flm-detailslist-row">
+            <div class="flm-detailslist-cell" style="width:180px">Node.js</div>
+            <div class="flm-detailslist-cell" style="width:120px">20 LTS</div>
+            <div class="flm-detailslist-cell" style="width:160px">Runtime</div>
+            <div class="flm-detailslist-cell" style="flex:1">Use <code>nvm</code> to manage versions across projects</div>
+          </div>
+          <div class="flm-detailslist-row">
+            <div class="flm-detailslist-cell" style="width:180px">Docker</div>
+            <div class="flm-detailslist-cell" style="width:120px">25.0+</div>
+            <div class="flm-detailslist-cell" style="width:160px">Containerization</div>
+            <div class="flm-detailslist-cell" style="flex:1">Required for running local integration tests</div>
+          </div>
+        </div>
+
+        <div class="flm-separator"></div>
+
+        <h2>Development Environment Setup</h2>
+        <p>
+          Once you have the required tools installed, follow these steps to set up the main application
+          repository. Our monorepo uses <span class="term-highlight" data-tooltip="A high-performance build system for JavaScript and TypeScript codebases that enables fast incremental builds.">Turborepo</span>
+          for build orchestration and <span class="term-highlight" data-tooltip="A fast, disk-space efficient package manager that uses a content-addressable store to share dependencies across projects.">pnpm</span>
+          as the package manager.
+        </p>
+        <ol>
+          <li>Clone the main repository from Azure DevOps using the SSH URL provided in your onboarding email.</li>
+          <li>Run <code>pnpm install</code> at the root of the repository to install all dependencies.</li>
+          <li>Copy <code>.env.example</code> to <code>.env.local</code> and fill in the values from the team's shared vault.</li>
+          <li>Run <code>pnpm dev</code> to start the development server on <code>localhost:3000</code>.</li>
+          <li>Verify everything works by running <code>pnpm test</code> to execute the unit test suite.</li>
+        </ol>
+
+        <h3>Architecture Diagram</h3>
+        <p>
+          The following diagram shows the high-level architecture of the platform, including the API gateway,
+          microservices layer, and data stores.
+        </p>
+
+        <!-- Image placeholder -->
+        <div class="demo-image-placeholder">
+          <img class="flm-image flm-image--border" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='760' height='220' fill='none'%3E%3Crect width='760' height='220' rx='8' fill='%23f0f0f0'/%3E%3Ctext x='380' y='110' text-anchor='middle' dominant-baseline='central' font-family='Segoe UI' font-size='16' fill='%23999'%3EArchitecture Diagram Placeholder%3C/text%3E%3C/svg%3E" alt="Platform architecture diagram showing API gateway, microservices, and data stores" style="width:100%;height:auto;border-radius:8px;">
+        </div>
+
+        <div class="flm-separator"></div>
+
+        <h2>Key Concepts &amp; Terminology</h2>
+        <p>
+          As you ramp up, you will encounter several terms specific to our engineering practices.
+          Hover over the highlighted terms below to see their definitions.
+        </p>
+        <p>
+          Our applications follow a <span class="term-highlight" data-tooltip="An architectural style that structures an application as a collection of loosely coupled, independently deployable services.">microservices</span>
+          architecture pattern. Each service communicates through our internal
+          <span class="term-highlight" data-tooltip="Application Programming Interface: a set of protocols and definitions that allow different software components to communicate with each other.">API</span>
+          gateway. We deploy to <span class="term-highlight" data-tooltip="Azure Kubernetes Service: a managed container orchestration platform provided by Microsoft Azure.">AKS</span>
+          clusters using a <span class="term-highlight" data-tooltip="A deployment strategy that gradually shifts traffic from the current version to a new version, allowing you to monitor for issues before full rollout.">canary deployment</span>
+          strategy. Feature flags are managed through our
+          <span class="term-highlight" data-tooltip="A system that allows teams to toggle features on and off in production without code deployments, enabling safe experimentation and gradual rollouts.">feature management platform</span>,
+          which enables safe experimentation and gradual rollouts to production users.
+        </p>
+
+        <h3>Code Review Process</h3>
+        <p>
+          All changes go through a pull request workflow in Azure DevOps. Every PR requires at least two
+          approvals from team members, one of whom must be a designated code owner for the modified paths.
+          Automated checks include linting, unit tests, integration tests, and a build verification step.
+          We aim for a review turnaround of less than 24 hours for standard PRs.
+        </p>
+
+        <h3>On-Call Rotation</h3>
+        <p>
+          After your first month, you will be added to the on-call rotation. On-call engineers are
+          responsible for triaging incoming alerts, coordinating incident response, and writing
+          post-incident reviews. Detailed runbooks for common scenarios are available in the
+          <strong>Operations</strong> section of this knowledge base.
+        </p>
+
+        <div class="flm-separator"></div>
+
+        <h2>Helpful Resources</h2>
+        <ul>
+          <li><strong>Engineering Handbook</strong> &mdash; Comprehensive guide to our coding practices and team norms.</li>
+          <li><strong>Architecture Decision Records</strong> &mdash; History of significant technical decisions and their rationale.</li>
+          <li><strong>Runbook Library</strong> &mdash; Step-by-step guides for operational procedures and incident response.</li>
+          <li><strong>#eng-onboarding Slack channel</strong> &mdash; Ask questions and connect with your onboarding buddy.</li>
+        </ul>
+
+      </div>
+
+      <!-- Was this helpful? -->
+      <div class="helpful-section">
+        <h3>Was this article helpful?</h3>
+        <p style="font-size:13px;color:var(--bodySubtext);margin:0 0 12px;">Your feedback helps us improve our documentation.</p>
+        <div class="flm-rating" id="articleRating">
+          <input type="radio" id="star5" name="rating" value="5"><label for="star5" title="Excellent">&#9733;</label>
+          <input type="radio" id="star4" name="rating" value="4"><label for="star4" title="Good">&#9733;</label>
+          <input type="radio" id="star3" name="rating" value="3"><label for="star3" title="Average">&#9733;</label>
+          <input type="radio" id="star2" name="rating" value="2"><label for="star2" title="Below Average">&#9733;</label>
+          <input type="radio" id="star1" name="rating" value="1"><label for="star1" title="Poor">&#9733;</label>
+        </div>
+        <div id="ratingFeedback" style="margin-top:12px;display:none;">
+          <div class="flm-messagebar flm-messagebar--success">
+            <div class="flm-messagebar-icon">&#10003;</div>
+            <div class="flm-messagebar-text">Thank you for your feedback!</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="../../dist/fluentlm.min.js"></script>
+  <script>
+    (function () {
+      // Theme toggle
+      var themeToggle = document.getElementById('themeToggle');
+      var currentTheme = 'light';
+
+      themeToggle.addEventListener('click', function () {
+        if (currentTheme === 'light') {
+          document.documentElement.classList.add('fluent-dark');
+          themeToggle.textContent = 'Dark';
+          currentTheme = 'dark';
+        } else {
+          document.documentElement.classList.remove('fluent-dark');
+          themeToggle.textContent = 'Light';
+          currentTheme = 'light';
+        }
+      });
+
+      // Nav group collapse/expand
+      // Nav link active state (collapse/expand is handled by FluentLM nav JS)
+      var navLinks = document.querySelectorAll('.flm-nav-link');
+      navLinks.forEach(function (link) {
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          navLinks.forEach(function (l) { l.classList.remove('flm-nav-link--active'); });
+          link.classList.add('flm-nav-link--active');
+        });
+      });
+
+      // Rating feedback
+      var ratingInputs = document.querySelectorAll('#articleRating input');
+      ratingInputs.forEach(function (input) {
+        input.addEventListener('change', function () {
+          document.getElementById('ratingFeedback').style.display = 'block';
+        });
+      });
+
+      // Coachmark: show teaching bubble after a short delay
+      setTimeout(function () {
+        var tb = document.getElementById('tbSearch');
+        if (tb) tb.classList.add('flm-teachingbubble--visible');
+      }, 1500);
+
+      // Teaching bubble close
+      var tbClose = document.querySelector('#tbSearch .flm-teachingbubble-close');
+      if (tbClose) {
+        tbClose.addEventListener('click', function () {
+          document.getElementById('tbSearch').classList.remove('flm-teachingbubble--visible');
+          document.getElementById('searchCoachmark').style.display = 'none';
+        });
+      }
+
+      // HoverCard logic
+      var hoverTriggers = document.querySelectorAll('[data-hovercard-id]');
+      hoverTriggers.forEach(function (trigger) {
+        var cardId = trigger.getAttribute('data-hovercard-id');
+        var card = document.getElementById(cardId);
+        if (!card) return;
+
+        var showTimeout, hideTimeout;
+
+        trigger.addEventListener('mouseenter', function () {
+          clearTimeout(hideTimeout);
+          showTimeout = setTimeout(function () {
+            card.classList.add('flm-hovercard--visible');
+            // Position the card near the trigger
+            var rect = trigger.getBoundingClientRect();
+            card.style.position = 'absolute';
+            card.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+            card.style.left = rect.left + 'px';
+            card.style.zIndex = '200';
+          }, 400);
+        });
+
+        trigger.addEventListener('mouseleave', function () {
+          clearTimeout(showTimeout);
+          hideTimeout = setTimeout(function () {
+            card.classList.remove('flm-hovercard--visible');
+          }, 300);
+        });
+
+        card.addEventListener('mouseenter', function () {
+          clearTimeout(hideTimeout);
+        });
+
+        card.addEventListener('mouseleave', function () {
+          hideTimeout = setTimeout(function () {
+            card.classList.remove('flm-hovercard--visible');
+          }, 300);
+        });
+      });
+
+      // Simple tooltip implementation for data-tooltip attributes
+      var tooltipEl = document.createElement('div');
+      tooltipEl.className = 'flm-tooltip';
+      tooltipEl.style.cssText = 'position:absolute;z-index:300;background:var(--bodyBackground);color:var(--bodyText);border:1px solid var(--bodyFrameDivider);border-radius:4px;padding:8px 12px;font-size:13px;max-width:280px;box-shadow:0 2px 8px rgba(0,0,0,0.14);pointer-events:none;display:none;line-height:1.4;';
+      document.body.appendChild(tooltipEl);
+
+      document.addEventListener('mouseover', function (e) {
+        var target = e.target.closest('[data-tooltip]');
+        if (target) {
+          var text = target.getAttribute('data-tooltip');
+          tooltipEl.textContent = text;
+          tooltipEl.style.display = 'block';
+          var rect = target.getBoundingClientRect();
+          tooltipEl.style.top = (rect.bottom + window.scrollY + 6) + 'px';
+          tooltipEl.style.left = (rect.left + window.scrollX) + 'px';
+        }
+      });
+
+      document.addEventListener('mouseout', function (e) {
+        var target = e.target.closest('[data-tooltip]');
+        if (target) {
+          tooltipEl.style.display = 'none';
+        }
+      });
+    })();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en" class="fluentlm">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Dashboard</title>
+  <link rel="stylesheet" href="../../dist/theme-light.css">
+  <link rel="stylesheet" href="../../dist/theme-dark.css">
+  <link rel="stylesheet" href="../../dist/fluentlm.min.css">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: var(--bodyBackground);
+      color: var(--bodyText);
+      font-family: var(--fontFamily);
+    }
+
+    .dashboard-shell {
+      display: flex;
+      height: 100vh;
+    }
+
+    .dashboard-sidebar {
+      width: 220px;
+      min-width: 220px;
+      background: var(--bodyStandoutBackground);
+      border-right: 1px solid var(--bodyFrameDivider);
+      display: flex;
+      flex-direction: column;
+      padding: var(--spacingM) 0;
+    }
+
+    .sidebar-header {
+      padding: 0 var(--spacingM) var(--spacingM);
+    }
+
+    .dashboard-main {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--spacingL1);
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingM);
+    }
+
+    .kpi-card {
+      background: var(--bodyStandoutBackground);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      padding: var(--spacingM);
+      flex: 1;
+      min-width: 180px;
+      box-shadow: var(--elevation4);
+    }
+
+    .kpi-value {
+      font-size: var(--fontSizeXXLarge);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+    }
+
+    .kpi-trend--positive {
+      color: var(--green);
+      font-size: var(--fontSizeSmall);
+      font-weight: var(--fontWeightSemibold);
+    }
+
+    .kpi-trend--negative {
+      color: var(--red);
+      font-size: var(--fontSizeSmall);
+      font-weight: var(--fontWeightSemibold);
+    }
+
+    .chart-container {
+      background: var(--bodyStandoutBackground);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      padding: var(--spacingM);
+      box-shadow: var(--elevation4);
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .chart-container canvas {
+      width: 100% !important;
+      max-height: 280px;
+    }
+
+    .top-pages-container {
+      background: var(--bodyStandoutBackground);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      padding: var(--spacingM);
+      box-shadow: var(--elevation4);
+      flex: 1;
+      min-width: 300px;
+    }
+
+    .top-pages-row {
+      display: flex;
+      justify-content: space-between;
+      padding: var(--spacingS1) 0;
+      border-bottom: 1px solid var(--bodyDivider);
+      font-size: var(--fontSizeMedium);
+    }
+
+    .top-pages-row:last-child {
+      border-bottom: none;
+    }
+
+    .top-pages-header {
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodySubtext);
+      font-size: var(--fontSizeSmall);
+      text-transform: uppercase;
+    }
+
+    .flm-commandbar,
+    .flm-commandbar-items {
+      overflow: visible;
+    }
+
+    .dashboard-main > .flm-commandbar .flm-dropdown-listbox {
+      z-index: 10;
+    }
+
+    .theme-toggle-wrapper {
+      padding: var(--spacingM);
+      margin-top: auto;
+      border-top: 1px solid var(--bodyDivider);
+    }
+  </style>
+</head>
+<body>
+  <div class="dashboard-shell">
+    <!-- Sidebar Nav -->
+    <aside class="dashboard-sidebar">
+      <div class="sidebar-header">
+        <div class="flm-stack--horizontal" style="display:flex; align-items:center; gap: var(--spacingS1);">
+          <div class="flm-persona flm-persona--size32">
+            <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available">AD</div>
+          </div>
+          <span class="flm-text flm-text--large flm-text--semibold">Analytics</span>
+        </div>
+      </div>
+
+      <nav class="flm-nav">
+        <div class="flm-nav-group">
+          <button class="flm-nav-group-header">
+            <i class="flm-nav-chevron flm-nav-chevron--expanded" data-icon="ChevronRight"></i>
+            Overview
+          </button>
+          <div class="flm-nav-group-items">
+            <a class="flm-nav-link flm-nav-link--active" href="#" data-icon="ViewDashboard">Dashboard</a>
+            <a class="flm-nav-link" href="#" data-icon="ReportDocument">Reports</a>
+          </div>
+        </div>
+        <div class="flm-nav-group">
+          <button class="flm-nav-group-header">
+            <i class="flm-nav-chevron flm-nav-chevron--expanded" data-icon="ChevronRight"></i>
+            Acquisition
+          </button>
+          <div class="flm-nav-group-items">
+            <a class="flm-nav-link" href="#">Traffic Sources</a>
+            <a class="flm-nav-link" href="#">Campaigns</a>
+          </div>
+        </div>
+        <div class="flm-nav-group">
+          <button class="flm-nav-group-header">
+            <i class="flm-nav-chevron flm-nav-chevron--expanded" data-icon="ChevronRight"></i>
+            Engagement
+          </button>
+          <div class="flm-nav-group-items">
+            <a class="flm-nav-link" href="#">Sessions</a>
+            <a class="flm-nav-link" href="#">Page Views</a>
+          </div>
+        </div>
+        <div class="flm-nav-group">
+          <button class="flm-nav-group-header">
+            <i class="flm-nav-chevron flm-nav-chevron--expanded" data-icon="ChevronRight"></i>
+            Revenue
+          </button>
+          <div class="flm-nav-group-items">
+            <a class="flm-nav-link" href="#">Subscriptions</a>
+            <a class="flm-nav-link" href="#">Transactions</a>
+          </div>
+        </div>
+      </nav>
+
+      <div class="theme-toggle-wrapper">
+        <label class="flm-toggle flm-toggle--inline">
+          <span class="flm-toggle-label">Dark Mode</span>
+          <input type="checkbox" class="flm-toggle-input" id="themeToggle">
+          <span class="flm-toggle-track"><span class="flm-toggle-thumb"></span></span>
+          <span class="flm-toggle-state" data-on="On" data-off="Off"></span>
+        </label>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+      <!-- Command Bar -->
+      <div class="flm-commandbar">
+        <div class="flm-commandbar-items" style="display: flex; align-items: center; gap: var(--spacingS1);">
+          <div class="flm-dropdown" id="dateRangeDropdown" style="min-width: 160px;">
+            <button class="flm-dropdown-trigger">
+              <span class="flm-dropdown-title">Last 30 days</span>
+              <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+            </button>
+            <div class="flm-dropdown-listbox">
+              <div class="flm-dropdown-option" data-value="7">Last 7 days</div>
+              <div class="flm-dropdown-option flm-dropdown-option--selected" data-value="30">Last 30 days</div>
+              <div class="flm-dropdown-option" data-value="90">Last 90 days</div>
+            </div>
+          </div>
+        </div>
+        <div class="flm-commandbar-far">
+          <button class="flm-commandbar-item" data-icon="Download">Export</button>
+        </div>
+      </div>
+
+      <!-- Message Bar -->
+      <div class="flm-messagebar flm-messagebar--success">
+        <span class="flm-messagebar-text">Dashboard updated 2 minutes ago.</span>
+        <div class="flm-messagebar-actions">
+          <button class="flm-messagebar-dismiss" data-icon="Cancel" aria-label="Dismiss"></button>
+        </div>
+      </div>
+
+      <!-- KPI Summary Cards -->
+      <div class="flm-stack flm-stack--horizontal flm-stack--wrap" style="gap: var(--spacingM);">
+        <div class="kpi-card">
+          <span class="flm-text flm-text--small flm-text--secondary flm-text--block">Total Users</span>
+          <span class="kpi-value">12,847</span>
+          <span class="kpi-trend--positive"><i class="flm-icon flm-icon--small" data-icon="CaretSolidUp"></i> +8.3%</span>
+        </div>
+        <div class="kpi-card">
+          <span class="flm-text flm-text--small flm-text--secondary flm-text--block">Active Sessions</span>
+          <span class="kpi-value">3,421</span>
+          <span class="kpi-trend--positive"><i class="flm-icon flm-icon--small" data-icon="CaretSolidUp"></i> +12.1%</span>
+        </div>
+        <div class="kpi-card">
+          <span class="flm-text flm-text--small flm-text--secondary flm-text--block">Conversion Rate</span>
+          <span class="kpi-value">3.2%</span>
+          <span class="kpi-trend--negative"><i class="flm-icon flm-icon--small" data-icon="CaretSolidDown"></i> -0.4%</span>
+        </div>
+        <div class="kpi-card">
+          <span class="flm-text flm-text--small flm-text--secondary flm-text--block">Revenue</span>
+          <span class="kpi-value">$48,290</span>
+          <span class="kpi-trend--positive"><i class="flm-icon flm-icon--small" data-icon="CaretSolidUp"></i> +15.7%</span>
+        </div>
+      </div>
+
+      <hr class="flm-separator">
+
+      <!-- Pivot Tabs -->
+      <div class="flm-pivot">
+        <div class="flm-pivot-tabs" role="tablist">
+          <button class="flm-pivot-tab flm-pivot-tab--active" data-panel="panelOverview" role="tab">Overview</button>
+          <button class="flm-pivot-tab" data-panel="panelAcquisition" role="tab">Acquisition</button>
+          <button class="flm-pivot-tab" data-panel="panelRevenue" role="tab">Revenue</button>
+        </div>
+
+        <!-- Overview Panel -->
+        <div class="flm-pivot-panel flm-pivot-panel--active" id="panelOverview" role="tabpanel">
+          <div class="flm-stack" style="gap: var(--spacingM); margin-top: var(--spacingM);">
+            <!-- Row 1: Line Chart + Doughnut Chart -->
+            <div class="flm-stack flm-stack--horizontal flm-stack--wrap" style="gap: var(--spacingM);">
+              <div class="chart-container" style="flex: 2;">
+                <span class="flm-text flm-text--mediumPlus flm-text--semibold flm-text--block" style="margin-bottom: var(--spacingS1);">Daily Active Users</span>
+                <canvas id="dauChart"></canvas>
+              </div>
+              <div class="chart-container" style="flex: 1; min-width: 250px;">
+                <span class="flm-text flm-text--mediumPlus flm-text--semibold flm-text--block" style="margin-bottom: var(--spacingS1);">Traffic Sources</span>
+                <canvas id="trafficChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Row 2: Bar Chart + Top Pages -->
+            <div class="flm-stack flm-stack--horizontal flm-stack--wrap" style="gap: var(--spacingM);">
+              <div class="chart-container" style="flex: 1;">
+                <span class="flm-text flm-text--mediumPlus flm-text--semibold flm-text--block" style="margin-bottom: var(--spacingS1);">Signups by Week</span>
+                <canvas id="signupsChart"></canvas>
+              </div>
+              <div class="top-pages-container" style="flex: 1;">
+                <span class="flm-text flm-text--mediumPlus flm-text--semibold flm-text--block" style="margin-bottom: var(--spacingS1);">Top Pages</span>
+                <div class="top-pages-row top-pages-header">
+                  <span style="flex: 2;">Page</span>
+                  <span style="flex: 1; text-align: right;">Views</span>
+                  <span style="flex: 1; text-align: right;">Avg Time</span>
+                </div>
+                <div class="top-pages-row">
+                  <span style="flex: 2;">/home</span>
+                  <span style="flex: 1; text-align: right;">8,421</span>
+                  <span style="flex: 1; text-align: right;">2m 34s</span>
+                </div>
+                <div class="top-pages-row">
+                  <span style="flex: 2;">/pricing</span>
+                  <span style="flex: 1; text-align: right;">5,102</span>
+                  <span style="flex: 1; text-align: right;">3m 12s</span>
+                </div>
+                <div class="top-pages-row">
+                  <span style="flex: 2;">/features</span>
+                  <span style="flex: 1; text-align: right;">3,847</span>
+                  <span style="flex: 1; text-align: right;">1m 58s</span>
+                </div>
+                <div class="top-pages-row">
+                  <span style="flex: 2;">/docs/getting-started</span>
+                  <span style="flex: 1; text-align: right;">2,931</span>
+                  <span style="flex: 1; text-align: right;">4m 45s</span>
+                </div>
+                <div class="top-pages-row">
+                  <span style="flex: 2;">/blog</span>
+                  <span style="flex: 1; text-align: right;">2,214</span>
+                  <span style="flex: 1; text-align: right;">2m 10s</span>
+                </div>
+                <div class="top-pages-row">
+                  <span style="flex: 2;">/signup</span>
+                  <span style="flex: 1; text-align: right;">1,876</span>
+                  <span style="flex: 1; text-align: right;">1m 22s</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Acquisition Panel -->
+        <div class="flm-pivot-panel" id="panelAcquisition" role="tabpanel">
+          <div class="flm-stack" style="gap: var(--spacingM); margin-top: var(--spacingM);">
+            <div class="flm-stack flm-stack--horizontal flm-stack--wrap" style="gap: var(--spacingM);">
+              <div class="kpi-card">
+                <span class="flm-text flm-text--small flm-text--secondary flm-text--block">Organic Search</span>
+                <span class="kpi-value">4,218</span>
+                <div class="flm-progress" style="margin-top: var(--spacingS1);">
+                  <div class="flm-progress-track"><div class="flm-progress-bar" style="width: 28%; background: var(--themePrimary);"></div></div>
+                </div>
+              </div>
+              <div class="kpi-card">
+                <span class="flm-text flm-text--small flm-text--secondary flm-text--block">Direct</span>
+                <span class="kpi-value">5,274</span>
+                <div class="flm-progress" style="margin-top: var(--spacingS1);">
+                  <div class="flm-progress-track"><div class="flm-progress-bar" style="width: 35%; background: var(--themeDarkAlt);"></div></div>
+                </div>
+              </div>
+              <div class="kpi-card">
+                <span class="flm-text flm-text--small flm-text--secondary flm-text--block">Referral</span>
+                <span class="kpi-value">3,312</span>
+                <div class="flm-progress" style="margin-top: var(--spacingS1);">
+                  <div class="flm-progress-track"><div class="flm-progress-bar" style="width: 22%; background: var(--themeSecondary);"></div></div>
+                </div>
+              </div>
+              <div class="kpi-card">
+                <span class="flm-text flm-text--small flm-text--secondary flm-text--block">Social</span>
+                <span class="kpi-value">2,261</span>
+                <div class="flm-progress" style="margin-top: var(--spacingS1);">
+                  <div class="flm-progress-track"><div class="flm-progress-bar" style="width: 15%; background: var(--themeTertiary);"></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revenue Panel -->
+        <div class="flm-pivot-panel" id="panelRevenue" role="tabpanel">
+          <div class="flm-stack" style="gap: var(--spacingM); margin-top: var(--spacingM);">
+            <div class="flm-stack flm-stack--horizontal flm-stack--wrap" style="gap: var(--spacingM);">
+              <div class="kpi-card">
+                <span class="flm-text flm-text--small flm-text--secondary flm-text--block">MRR</span>
+                <span class="kpi-value">$48,290</span>
+                <span class="kpi-trend--positive"><i class="flm-icon flm-icon--small" data-icon="CaretSolidUp"></i> +15.7%</span>
+              </div>
+              <div class="kpi-card">
+                <span class="flm-text flm-text--small flm-text--secondary flm-text--block">ARPU</span>
+                <span class="kpi-value">$12.40</span>
+                <span class="kpi-trend--positive"><i class="flm-icon flm-icon--small" data-icon="CaretSolidUp"></i> +3.2%</span>
+              </div>
+              <div class="kpi-card">
+                <span class="flm-text flm-text--small flm-text--secondary flm-text--block">Churn Rate</span>
+                <span class="kpi-value">2.1%</span>
+                <span class="kpi-trend--negative"><i class="flm-icon flm-icon--small" data-icon="CaretSolidDown"></i> +0.3%</span>
+              </div>
+              <div class="kpi-card">
+                <span class="flm-text flm-text--small flm-text--secondary flm-text--block">LTV</span>
+                <span class="kpi-value">$590</span>
+                <span class="kpi-trend--positive"><i class="flm-icon flm-icon--small" data-icon="CaretSolidUp"></i> +8.1%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="../../dist/fluentlm.min.js"></script>
+  <script>
+    // Theme toggle
+    document.getElementById('themeToggle').addEventListener('change', function () {
+      FluentLM.setTheme(this.checked ? 'dark' : 'light');
+    });
+
+    // Read CSS variable values from computed styles
+    const cs = getComputedStyle(document.documentElement);
+    const themePrimary = cs.getPropertyValue('--themePrimary').trim() || '#0078d4';
+    const themeDarkAlt = cs.getPropertyValue('--themeDarkAlt').trim() || '#106ebe';
+    const themeSecondary = cs.getPropertyValue('--themeSecondary').trim() || '#2b88d8';
+    const themeTertiary = cs.getPropertyValue('--themeTertiary').trim() || '#71afe5';
+    const bodySubtext = cs.getPropertyValue('--bodySubtext').trim() || '#605e5c';
+
+    // Generate 30 days of DAU data
+    const dauLabels = [];
+    const dauData = [];
+    const today = new Date();
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      dauLabels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+      dauData.push(Math.floor(2800 + Math.random() * 1200 + (29 - i) * 15));
+    }
+
+    // Line Chart — Daily Active Users
+    new Chart(document.getElementById('dauChart'), {
+      type: 'line',
+      data: {
+        labels: dauLabels,
+        datasets: [{
+          label: 'Daily Active Users',
+          data: dauData,
+          borderColor: themePrimary,
+          backgroundColor: themePrimary + '20',
+          fill: true,
+          tension: 0.3,
+          pointRadius: 0,
+          pointHoverRadius: 4,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: {
+            ticks: { color: bodySubtext, maxTicksLimit: 8, font: { size: 11 } },
+            grid: { display: false }
+          },
+          y: {
+            ticks: { color: bodySubtext, font: { size: 11 } },
+            grid: { color: 'rgba(128,128,128,0.15)' }
+          }
+        }
+      }
+    });
+
+    // Doughnut Chart — Traffic Sources
+    new Chart(document.getElementById('trafficChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Direct (35%)', 'Organic (28%)', 'Referral (22%)', 'Social (15%)'],
+        datasets: [{
+          data: [35, 28, 22, 15],
+          backgroundColor: [themePrimary, themeDarkAlt, themeSecondary, themeTertiary],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: bodySubtext, padding: 12, font: { size: 12 } }
+          }
+        },
+        cutout: '60%'
+      }
+    });
+
+    // Bar Chart — Signups by Week
+    new Chart(document.getElementById('signupsChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+        datasets: [{
+          label: 'Signups',
+          data: [320, 410, 385, 502],
+          backgroundColor: [themePrimary, themeDarkAlt, themeSecondary, themeTertiary],
+          borderRadius: 4,
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: {
+            ticks: { color: bodySubtext, font: { size: 12 } },
+            grid: { display: false }
+          },
+          y: {
+            ticks: { color: bodySubtext, font: { size: 11 } },
+            grid: { color: 'rgba(128,128,128,0.15)' },
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

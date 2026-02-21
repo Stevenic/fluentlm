@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en" class="fluentlm">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OKR Tracker — Q1 2026 | FluentLM Sample</title>
+  <link rel="stylesheet" href="../../dist/theme-light.css">
+  <link rel="stylesheet" href="../../dist/theme-dark.css">
+  <link rel="stylesheet" href="../../dist/fluentlm.min.css">
+  <style>
+    /* ── Demo Shell Layout ─────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bodyStandoutBackground);
+      color: var(--bodyText);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Sidebar ───────────────────────────────────────────── */
+    .demo-sidebar {
+      width: 240px;
+      min-width: 240px;
+      background: var(--bodyBackground);
+      border-right: 1px solid var(--bodyFrameDivider);
+      display: flex;
+      flex-direction: column;
+      padding: 16px 0;
+    }
+    .demo-sidebar-brand {
+      padding: 0 20px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--themePrimary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .demo-sidebar-brand .brand-icon {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      background: var(--themePrimary);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+    }
+
+    /* ── Main Content ──────────────────────────────────────── */
+    .demo-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+
+    /* ── Header ────────────────────────────────────────────── */
+    .demo-header {
+      background: var(--bodyBackground);
+      border-bottom: 1px solid var(--bodyFrameDivider);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .demo-header-left { flex: 1; min-width: 280px; }
+    .demo-header h1 {
+      margin: 0 0 4px;
+      font-size: 22px;
+      font-weight: 600;
+    }
+    .demo-header-subtitle {
+      font-size: 13px;
+      color: var(--bodySubtext);
+    }
+    .demo-header-progress { width: 320px; }
+    .demo-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ── Content Area ──────────────────────────────────────── */
+    .demo-content {
+      padding: 24px 32px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ── Objective Card ────────────────────────────────────── */
+    .okr-card {
+      background: var(--bodyBackground);
+      border: 1px solid var(--bodyFrameDivider);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,.04), 0 0 2px rgba(0,0,0,.06);
+      padding: 24px;
+      transition: box-shadow .15s ease;
+    }
+    .okr-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,.08), 0 0 2px rgba(0,0,0,.06);
+    }
+    .okr-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .okr-card-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin: 0 0 8px;
+    }
+    .okr-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .okr-confidence-label {
+      font-size: 12px;
+      color: var(--bodySubtext);
+      margin-bottom: 2px;
+    }
+
+    /* ── Key Result Row ────────────────────────────────────── */
+    .kr-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 8px;
+      padding-top: 16px;
+      border-top: 1px solid var(--bodyFrameDivider);
+    }
+    .kr-row {
+      display: grid;
+      grid-template-columns: 1fr 160px 200px auto;
+      align-items: center;
+      gap: 16px;
+    }
+    .kr-title {
+      font-size: 14px;
+      font-weight: 400;
+    }
+    .kr-title strong {
+      font-weight: 600;
+      color: var(--bodySubtext);
+      margin-right: 6px;
+    }
+
+    /* ── Status Tags ───────────────────────────────────────── */
+    .status-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .status-tag--on-track {
+      background: #dff6dd;
+      color: #0e700e;
+    }
+    .status-tag--at-risk {
+      background: #fff1d6;
+      color: #8a6400;
+    }
+    .status-tag--behind {
+      background: #fde7e9;
+      color: #b10e1c;
+    }
+    .fluent-dark .status-tag--on-track {
+      background: rgba(14,112,14,.25);
+      color: #54b054;
+    }
+    .fluent-dark .status-tag--at-risk {
+      background: rgba(138,100,0,.25);
+      color: #e5c44b;
+    }
+    .fluent-dark .status-tag--behind {
+      background: rgba(177,14,28,.25);
+      color: #e87979;
+    }
+
+    /* ── Document Cards Grid ───────────────────────────────── */
+    .doc-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    /* ── Section Title ─────────────────────────────────────── */
+    .section-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 8px 0 4px;
+    }
+
+    /* ── Utilities ──────────────────────────────────────────── */
+    .gap-8 { gap: 8px; }
+    .gap-12 { gap: 12px; }
+    .mt-4 { margin-top: 4px; }
+    .mb-0 { margin-bottom: 0; }
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+
+    /* ── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .kr-row {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+      .demo-sidebar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════════════════
+       SIDEBAR
+       ════════════════════════════════════════════════════════ -->
+  <aside class="demo-sidebar">
+    <div class="demo-sidebar-brand">
+      <span class="brand-icon">OKR</span>
+      Goal Tracker
+    </div>
+
+    <nav class="flm-nav">
+      <!-- Quarters -->
+      <div class="flm-nav-group">
+        <button class="flm-nav-group-header">
+          <i class="flm-nav-chevron flm-nav-chevron--expanded" data-icon="ChevronRight"></i>
+          Quarters
+        </button>
+        <div class="flm-nav-group-items">
+          <a class="flm-nav-link flm-nav-link--active" href="#">Q1 2026</a>
+          <a class="flm-nav-link" href="#">Q2 2026</a>
+          <a class="flm-nav-link" href="#">Q3 2026</a>
+          <a class="flm-nav-link" href="#">Q4 2026</a>
+        </div>
+      </div>
+
+      <!-- Views -->
+      <div class="flm-nav-group">
+        <button class="flm-nav-group-header">
+          <i class="flm-nav-chevron flm-nav-chevron--expanded" data-icon="ChevronRight"></i>
+          Views
+        </button>
+        <div class="flm-nav-group-items">
+          <a class="flm-nav-link" href="#">All Objectives</a>
+          <a class="flm-nav-link" href="#">My OKRs</a>
+          <a class="flm-nav-link" href="#">Team Dashboard</a>
+        </div>
+      </div>
+
+      <!-- Teams -->
+      <div class="flm-nav-group">
+        <button class="flm-nav-group-header">
+          <i class="flm-nav-chevron flm-nav-chevron--expanded" data-icon="ChevronRight"></i>
+          Teams
+        </button>
+        <div class="flm-nav-group-items">
+          <a class="flm-nav-link" href="#">Engineering</a>
+          <a class="flm-nav-link" href="#">Product</a>
+          <a class="flm-nav-link" href="#">Design</a>
+        </div>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ════════════════════════════════════════════════════════
+       MAIN
+       ════════════════════════════════════════════════════════ -->
+  <div class="demo-main">
+
+    <!-- ── Header ──────────────────────────────────────────── -->
+    <header class="demo-header">
+      <div class="demo-header-left">
+        <h1>OKR Tracker &mdash; Q1 2026</h1>
+        <span class="demo-header-subtitle">3 Objectives &middot; 8 Key Results &middot; 65% Overall Progress</span>
+      </div>
+
+      <div class="demo-header-progress">
+        <div class="flm-progress">
+          <span class="flm-progress-label">Quarter Progress &mdash; 65%</span>
+          <div class="flm-progress-track">
+            <div class="flm-progress-bar" style="width:65%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-header-actions">
+        <button class="flm-button flm-button--primary" id="btnNewObjective" data-dialog-open="dlgNewObjective">
+          + New Objective
+        </button>
+        <button class="flm-button" id="btnThemeToggle" title="Toggle theme">
+          Toggle Theme
+        </button>
+      </div>
+    </header>
+
+    <!-- ── Content ─────────────────────────────────────────── -->
+    <div class="demo-content">
+
+      <!-- Warning Message Bar -->
+      <div class="flm-messagebar flm-messagebar--warning">
+        <span class="flm-messagebar-icon" data-icon="Warning"></span>
+        <span class="flm-messagebar-text">3 key results are at risk this quarter. Review the flagged items below and update owners.</span>
+        <button class="flm-messagebar-dismiss" data-icon="Cancel" aria-label="Dismiss"></button>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+           OBJECTIVE 1 — Platform Reliability
+           ═══════════════════════════════════════════════════ -->
+      <div class="okr-card">
+        <div class="okr-card-header">
+          <div>
+            <h2 class="okr-card-title">Objective 1: Improve Platform Reliability</h2>
+            <div class="okr-card-meta">
+              <div class="flm-persona flm-persona--size32">
+                <div class="flm-persona-coin flm-persona-presence flm-persona-presence--available">AR</div>
+                <div class="flm-persona-details">
+                  <span class="flm-persona-name">Anika Rao</span>
+                </div>
+              </div>
+              <div>
+                <div class="okr-confidence-label">Confidence</div>
+                <div class="flm-rating flm-rating--readonly">
+                  <label class="flm-rating-star flm-rating-star--filled"></label>
+                  <label class="flm-rating-star flm-rating-star--filled"></label>
+                  <label class="flm-rating-star flm-rating-star--filled"></label>
+                  <label class="flm-rating-star flm-rating-star--filled"></label>
+                  <label class="flm-rating-star flm-rating-star--empty"></label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flm-progress" style="width:140px;">
+            <span class="flm-progress-label">78%</span>
+            <div class="flm-progress-track">
+              <div class="flm-progress-bar" style="width:78%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kr-list">
+          <!-- KR 1.1 -->
+          <div class="kr-row">
+            <div class="kr-title"><strong>KR 1.1</strong> Achieve 99.95% uptime for core services</div>
+            <div class="flm-slider">
+              <div class="flm-slider-container">
+                <input class="flm-slider-input" type="range" min="0" max="100" value="92">
+                <span class="flm-slider-value">92</span>
+              </div>
+            </div>
+            <div class="flm-progress">
+              <div class="flm-progress-track">
+                <div class="flm-progress-bar" style="width:92%"></div>
+              </div>
+            </div>
+            <span class="status-tag status-tag--on-track">On Track</span>
+          </div>
+
+          <!-- KR 1.2 -->
+          <div class="kr-row">
+            <div class="kr-title"><strong>KR 1.2</strong> Reduce P1 incident count by 40%</div>
+            <div class="flm-slider">
+              <div class="flm-slider-container">
+                <input class="flm-slider-input" type="range" min="0" max="100" value="70">
+                <span class="flm-slider-value">70</span>
+              </div>
+            </div>
+            <div class="flm-progress">
+              <div class="flm-progress-track">
+                <div class="flm-progress-bar" style="width:70%"></div>
+              </div>
+            </div>
+            <span class="status-tag status-tag--on-track">On Track</span>
+          </div>
+
+          <!-- KR 1.3 -->
+          <div class="kr-row">
+            <div class="kr-title"><strong>KR 1.3</strong> Deploy automated failover in 3 regions</div>
+            <div class="flm-slider">
+              <div class="flm-slider-container">
+                <input class="flm-slider-input" type="range" min="0" max="100" value="67">
+                <span class="flm-slider-value">67</span>
+              </div>
+            </div>
+            <div class="flm-progress">
+              <div class="flm-progress-track">
+                <div class="flm-progress-bar" style="width:67%"></div>
+              </div>
+            </div>
+            <span class="status-tag status-tag--at-risk">At Risk</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+           OBJECTIVE 2 — User Growth
+           ═══════════════════════════════════════════════════ -->
+      <div class="okr-card">
+        <div class="okr-card-header">
+          <div>
+            <h2 class="okr-card-title">Objective 2: Accelerate User Growth</h2>
+            <div class="okr-card-meta">
+              <div class="flm-persona flm-persona--size32">
+                <div class="flm-persona-coin flm-persona-presence flm-persona-presence--busy">MT</div>
+                <div class="flm-persona-details">
+                  <span class="flm-persona-name">Marcus Torres</span>
+                </div>
+              </div>
+              <div>
+                <div class="okr-confidence-label">Confidence</div>
+                <div class="flm-rating flm-rating--readonly">
+                  <label class="flm-rating-star flm-rating-star--filled"></label>
+                  <label class="flm-rating-star flm-rating-star--filled"></label>
+                  <label class="flm-rating-star flm-rating-star--filled"></label>
+                  <label class="flm-rating-star flm-rating-star--empty"></label>
+                  <label class="flm-rating-star flm-rating-star--empty"></label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flm-progress" style="width:140px;">
+            <span class="flm-progress-label">52%</span>
+            <div class="flm-progress-track">
+              <div class="flm-progress-bar" style="width:52%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kr-list">
+          <!-- KR 2.1 -->
+          <div class="kr-row">
+            <div class="kr-title"><strong>KR 2.1</strong> Grow monthly active users to 500K</div>
+            <div class="flm-slider">
+              <div class="flm-slider-container">
+                <input class="flm-slider-input" type="range" min="0" max="100" value="60">
+                <span class="flm-slider-value">60</span>
+              </div>
+            </div>
+            <div class="flm-progress">
+              <div class="flm-progress-track">
+                <div class="flm-progress-bar" style="width:60%"></div>
+              </div>
+            </div>
+            <span class="status-tag status-tag--at-risk">At Risk</span>
+          </div>
+
+          <!-- KR 2.2 -->
+          <div class="kr-row">
+            <div class="kr-title"><strong>KR 2.2</strong> Improve onboarding completion to 80%</div>
+            <div class="flm-slider">
+              <div class="flm-slider-container">
+                <input class="flm-slider-input" type="range" min="0" max="100" value="45">
+                <span class="flm-slider-value">45</span>
+              </div>
+            </div>
+            <div class="flm-progress">
+              <div class="flm-progress-track">
+                <div class="flm-progress-bar" style="width:45%"></div>
+              </div>
+            </div>
+            <span class="status-tag status-tag--behind">Behind</span>
+          </div>
+
+          <!-- KR 2.3 -->
+          <div class="kr-row">
+            <div class="kr-title"><strong>KR 2.3</strong> Launch referral program with 10K sign-ups</div>
+            <div class="flm-slider">
+              <div class="flm-slider-container">
+                <input class="flm-slider-input" type="range" min="0" max="100" value="50">
+                <span class="flm-slider-value">50</span>
+              </div>
+            </div>
+            <div class="flm-progress">
+              <div class="flm-progress-track">
+                <div class="flm-progress-bar" style="width:50%"></div>
+              </div>
+            </div>
+            <span class="status-tag status-tag--at-risk">At Risk</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════
+           OBJECTIVE 3 — Developer Experience
+           ═══════════════════════════════════════════════════ -->
+      <div class="okr-card">
+        <div class="okr-card-header">
+          <div>
+            <h2 class="okr-card-title">Objective 3: Enhance Developer Experience</h2>
+            <div class="okr-card-meta">
+              <div class="flm-persona flm-persona--size32">
+                <div class="flm-persona-coin flm-persona-presence flm-persona-presence--away">LK</div>
+                <div class="flm-persona-details">
+                  <span class="flm-persona-name">Lena Kim</span>
+                </div>
+              </div>
+              <div>
+                <div class="okr-confidence-label">Confidence</div>
+                <div class="flm-rating flm-rating--readonly">
+                  <label class="flm-rating-star flm-rating-star--filled"></label>
+                  <label class="flm-rating-star flm-rating-star--filled"></label>
+                  <label class="flm-rating-star flm-rating-star--filled"></label>
+                  <label class="flm-rating-star flm-rating-star--filled"></label>
+                  <label class="flm-rating-star flm-rating-star--filled"></label>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="flm-progress" style="width:140px;">
+            <span class="flm-progress-label">72%</span>
+            <div class="flm-progress-track">
+              <div class="flm-progress-bar" style="width:72%"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kr-list">
+          <!-- KR 3.1 -->
+          <div class="kr-row">
+            <div class="kr-title"><strong>KR 3.1</strong> Reduce build times by 50% across all repos</div>
+            <div class="flm-slider">
+              <div class="flm-slider-container">
+                <input class="flm-slider-input" type="range" min="0" max="100" value="80">
+                <span class="flm-slider-value">80</span>
+              </div>
+            </div>
+            <div class="flm-progress">
+              <div class="flm-progress-track">
+                <div class="flm-progress-bar" style="width:80%"></div>
+              </div>
+            </div>
+            <span class="status-tag status-tag--on-track">On Track</span>
+          </div>
+
+          <!-- KR 3.2 -->
+          <div class="kr-row">
+            <div class="kr-title"><strong>KR 3.2</strong> Ship new CLI tooling with 90% adoption</div>
+            <div class="flm-slider">
+              <div class="flm-slider-container">
+                <input class="flm-slider-input" type="range" min="0" max="100" value="65">
+                <span class="flm-slider-value">65</span>
+              </div>
+            </div>
+            <div class="flm-progress">
+              <div class="flm-progress-track">
+                <div class="flm-progress-bar" style="width:65%"></div>
+              </div>
+            </div>
+            <span class="status-tag status-tag--on-track">On Track</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Separator ─────────────────────────────────────── -->
+      <div class="flm-separator"></div>
+
+      <!-- ── Recent Activity — Document Cards ──────────────── -->
+      <h3 class="section-title">Recent Updates</h3>
+      <div class="doc-cards-grid">
+        <div class="flm-documentcard">
+          <div class="flm-documentcard-preview">
+            <div class="flm-documentcard-preview-icon">
+              <i class="flm-icon flm-icon--large" data-icon="Document"></i>
+            </div>
+          </div>
+          <div class="flm-documentcard-details">
+            <span class="flm-documentcard-title">Q1 OKR Review Notes</span>
+          </div>
+          <div class="flm-documentcard-activity">
+            <span class="flm-persona-coin" style="width:24px;height:24px;font-size:10px;">AR</span>
+            <div>
+              <span class="flm-documentcard-activity-name">Anika Rao</span>
+              <span class="flm-documentcard-activity-date">Feb 18, 2026</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flm-documentcard">
+          <div class="flm-documentcard-preview">
+            <div class="flm-documentcard-preview-icon">
+              <i class="flm-icon flm-icon--large" data-icon="Document"></i>
+            </div>
+          </div>
+          <div class="flm-documentcard-details">
+            <span class="flm-documentcard-title">User Growth Dashboard Export</span>
+          </div>
+          <div class="flm-documentcard-activity">
+            <span class="flm-persona-coin" style="width:24px;height:24px;font-size:10px;">MT</span>
+            <div>
+              <span class="flm-documentcard-activity-name">Marcus Torres</span>
+              <span class="flm-documentcard-activity-date">Feb 15, 2026</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flm-documentcard">
+          <div class="flm-documentcard-preview">
+            <div class="flm-documentcard-preview-icon">
+              <i class="flm-icon flm-icon--large" data-icon="Document"></i>
+            </div>
+          </div>
+          <div class="flm-documentcard-details">
+            <span class="flm-documentcard-title">DevEx Tooling Roadmap</span>
+          </div>
+          <div class="flm-documentcard-activity">
+            <span class="flm-persona-coin" style="width:24px;height:24px;font-size:10px;">LK</span>
+            <div>
+              <span class="flm-documentcard-activity-name">Lena Kim</span>
+              <span class="flm-documentcard-activity-date">Feb 12, 2026</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flm-documentcard">
+          <div class="flm-documentcard-preview">
+            <div class="flm-documentcard-preview-icon">
+              <i class="flm-icon flm-icon--large" data-icon="Document"></i>
+            </div>
+          </div>
+          <div class="flm-documentcard-details">
+            <span class="flm-documentcard-title">Incident Response Playbook v2</span>
+          </div>
+          <div class="flm-documentcard-activity">
+            <span class="flm-persona-coin" style="width:24px;height:24px;font-size:10px;">AR</span>
+            <div>
+              <span class="flm-documentcard-activity-name">Anika Rao</span>
+              <span class="flm-documentcard-activity-date">Feb 10, 2026</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.demo-content -->
+  </div><!-- /.demo-main -->
+
+  <!-- ════════════════════════════════════════════════════════
+       DIALOG — New Objective
+       ════════════════════════════════════════════════════════ -->
+  <div class="flm-dialog-overlay" id="dlgNewObjective">
+    <div class="flm-dialog" style="max-width:540px;">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title">Create New Objective</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close"></button>
+      </div>
+      <div class="flm-dialog-body">
+
+        <!-- Objective Title -->
+        <div class="flm-textfield" style="margin-bottom:16px;">
+          <label class="flm-label">Objective Title</label>
+          <input class="flm-textfield-input" type="text" placeholder="e.g., Improve Customer Satisfaction">
+        </div>
+
+        <!-- Owner Dropdown -->
+        <div class="flm-dropdown" style="margin-bottom:16px;">
+          <label class="flm-label">Owner</label>
+          <button class="flm-dropdown-trigger">
+            <span class="flm-dropdown-title">Select owner...</span>
+            <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+          </button>
+          <div class="flm-dropdown-listbox">
+            <div class="flm-dropdown-option" data-value="anika">Anika Rao</div>
+            <div class="flm-dropdown-option" data-value="marcus">Marcus Torres</div>
+            <div class="flm-dropdown-option" data-value="lena">Lena Kim</div>
+            <div class="flm-dropdown-option" data-value="jordan">Jordan Patel</div>
+          </div>
+        </div>
+
+        <!-- Time Period ChoiceGroup -->
+        <div class="flm-choicegroup" style="margin-bottom:16px;">
+          <label class="flm-label" style="display:block; margin-bottom:6px;">Time Period</label>
+          <label class="flm-choicegroup-option">
+            <input type="radio" class="flm-choicegroup-input" name="timePeriod" value="q1" checked>
+            <span class="flm-choicegroup-mark"></span>
+            <span class="flm-choicegroup-label">Q1 2026 (Jan - Mar)</span>
+          </label>
+          <label class="flm-choicegroup-option">
+            <input type="radio" class="flm-choicegroup-input" name="timePeriod" value="q2">
+            <span class="flm-choicegroup-mark"></span>
+            <span class="flm-choicegroup-label">Q2 2026 (Apr - Jun)</span>
+          </label>
+          <label class="flm-choicegroup-option">
+            <input type="radio" class="flm-choicegroup-input" name="timePeriod" value="q3">
+            <span class="flm-choicegroup-mark"></span>
+            <span class="flm-choicegroup-label">Q3 2026 (Jul - Sep)</span>
+          </label>
+          <label class="flm-choicegroup-option">
+            <input type="radio" class="flm-choicegroup-input" name="timePeriod" value="q4">
+            <span class="flm-choicegroup-mark"></span>
+            <span class="flm-choicegroup-label">Q4 2026 (Oct - Dec)</span>
+          </label>
+        </div>
+
+        <!-- Tags ComboBox -->
+        <div class="flm-combobox">
+          <label class="flm-label">Tags / Labels</label>
+          <div class="flm-combobox-wrapper">
+            <input class="flm-combobox-input" placeholder="Search or add tags...">
+            <button class="flm-combobox-caret" data-icon="ChevronDown" aria-label="Toggle"></button>
+          </div>
+          <div class="flm-combobox-listbox">
+            <div class="flm-combobox-option" data-value="engineering">Engineering</div>
+            <div class="flm-combobox-option" data-value="product">Product</div>
+            <div class="flm-combobox-option" data-value="growth">Growth</div>
+            <div class="flm-combobox-option" data-value="reliability">Reliability</div>
+            <div class="flm-combobox-option" data-value="devex">Developer Experience</div>
+            <div class="flm-combobox-option" data-value="customer">Customer Success</div>
+          </div>
+        </div>
+
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button" data-dialog-close>Cancel</button>
+        <button class="flm-button flm-button--primary" data-dialog-close>Create Objective</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════
+       SCRIPTS
+       ════════════════════════════════════════════════════════ -->
+  <script src="../../dist/fluentlm.min.js"></script>
+  <script>
+    /* ── Theme Toggle ────────────────────────────────────── */
+    var btnTheme = document.getElementById('btnThemeToggle');
+    btnTheme.addEventListener('click', function () {
+      document.documentElement.classList.toggle('fluent-dark');
+      var isDark = document.documentElement.classList.contains('fluent-dark');
+      btnTheme.textContent = isDark ? 'Light Theme' : 'Dark Theme';
+    });
+
+    /* ── Slider value sync ───────────────────────────────── */
+    document.querySelectorAll('.flm-slider-input').forEach(function (input) {
+      input.addEventListener('input', function () {
+        var display = this.parentElement.querySelector('.flm-slider-value');
+        if (display) display.textContent = this.value;
+        // Also sync the sibling progress bar in the same kr-row
+        var row = this.closest('.kr-row');
+        if (row) {
+          var bar = row.querySelector('.flm-progress-bar');
+          if (bar) bar.style.width = this.value + '%';
+        }
+      });
+    });
+
+    /* ── Nav link switching ──────────────────────────────── */
+    document.querySelectorAll('.flm-nav-link').forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelectorAll('.flm-nav-link').forEach(function (l) {
+          l.classList.remove('flm-nav-link--active');
+        });
+        this.classList.add('flm-nav-link--active');
+      });
+    });
+
+    /* ── MessageBar dismiss ──────────────────────────────── */
+    document.querySelectorAll('.flm-messagebar-dismiss').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        this.closest('.flm-messagebar').style.display = 'none';
+      });
+    });
+  </script>
+
+</body>
+</html>

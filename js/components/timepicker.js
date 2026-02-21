@@ -95,6 +95,7 @@ var FluentLMTimePickerComponent = (function () {
     }
 
     function open() {
+      document.dispatchEvent(new CustomEvent('flm-dismiss-pickers', { detail: { source: el } }));
       listbox.classList.add('flm-timepicker-listbox--open');
       highlighted = -1;
       flipIfNeeded();
@@ -260,6 +261,11 @@ var FluentLMTimePickerComponent = (function () {
       if (!el.contains(e.target) && isOpen()) {
         close();
       }
+    });
+
+    // Close when another picker opens
+    document.addEventListener('flm-dismiss-pickers', function (e) {
+      if (e.detail.source !== el && isOpen()) close();
     });
 
     el.setAttribute('data-timepicker-wired', 'true');

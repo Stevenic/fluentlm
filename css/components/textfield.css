@@ -26,7 +26,7 @@
 textarea.flm-textfield-input {
   height: auto;
   padding: 6px 8px;
-  resize: vertical;
+  resize: none;
 }
 
 .flm-textfield-input::placeholder {
@@ -39,8 +39,6 @@ textarea.flm-textfield-input {
 
 .flm-textfield-input:focus {
   border-color: var(--inputFocusBorderAlt);
-  border-bottom-width: 2px;
-  padding-bottom: 0;
 }
 
 /* Underlined variant */

@@ -562,6 +562,7 @@ var FluentLMComboBoxComponent = (function () {
     }
 
     function open() {
+      document.dispatchEvent(new CustomEvent('flm-dismiss-pickers', { detail: { source: el } }));
       listbox.classList.add('flm-combobox-listbox--open');
       highlighted = -1;
       flipIfNeeded();
@@ -706,6 +707,11 @@ var FluentLMComboBoxComponent = (function () {
       if (!el.contains(e.target) && isOpen()) {
         close();
       }
+    });
+
+    // Close when another picker opens
+    document.addEventListener('flm-dismiss-pickers', function (e) {
+      if (e.detail.source !== el && isOpen()) close();
     });
 
     el.setAttribute('data-combobox-wired', 'true');
@@ -941,6 +947,7 @@ var FluentLMDatePickerComponent = (function () {
     }
 
     function open() {
+      document.dispatchEvent(new CustomEvent('flm-dismiss-pickers', { detail: { source: el } }));
       ensureCallout();
       var today = new Date();
       viewYear = selectedDate ? selectedDate.getFullYear() : today.getFullYear();
@@ -1143,6 +1150,11 @@ var FluentLMDatePickerComponent = (function () {
       }
     });
 
+    // Close when another picker opens
+    document.addEventListener('flm-dismiss-pickers', function (e) {
+      if (e.detail.source !== el && isOpen()) close();
+    });
+
     el.setAttribute('data-datepicker-wired', 'true');
   }
 
@@ -1341,6 +1353,7 @@ var FluentLMDropdownComponent = (function () {
     }
 
     function open() {
+      document.dispatchEvent(new CustomEvent('flm-dismiss-pickers', { detail: { source: el } }));
       listbox.classList.add('flm-dropdown-listbox--open');
       highlighted = -1;
 
@@ -1471,6 +1484,11 @@ var FluentLMDropdownComponent = (function () {
       if (!el.contains(e.target) && isOpen()) {
         close();
       }
+    });
+
+    // Close when another picker opens
+    document.addEventListener('flm-dismiss-pickers', function (e) {
+      if (e.detail.source !== el && isOpen()) close();
     });
 
     el.setAttribute('data-dropdown-wired', 'true');
@@ -1728,8 +1746,8 @@ var FluentLMIconComponent = (function () {
     var svg = FluentIcons.getSvg(name);
     if (!svg) return;
 
-    // For .flm-icon elements, replace contents
-    if (el.classList.contains('flm-icon')) {
+    // For .flm-icon elements or inline icon elements (i, span with data-icon only), replace contents
+    if (el.classList.contains('flm-icon') || ((el.tagName === 'I' || el.tagName === 'SPAN') && el.childNodes.length === 0)) {
       el.innerHTML = '';
       el.appendChild(svg);
     }
@@ -3200,6 +3218,7 @@ var FluentLMTimePickerComponent = (function () {
     }
 
     function open() {
+      document.dispatchEvent(new CustomEvent('flm-dismiss-pickers', { detail: { source: el } }));
       listbox.classList.add('flm-timepicker-listbox--open');
       highlighted = -1;
       flipIfNeeded();
@@ -3365,6 +3384,11 @@ var FluentLMTimePickerComponent = (function () {
       if (!el.contains(e.target) && isOpen()) {
         close();
       }
+    });
+
+    // Close when another picker opens
+    document.addEventListener('flm-dismiss-pickers', function (e) {
+      if (e.detail.source !== el && isOpen()) close();
     });
 
     el.setAttribute('data-timepicker-wired', 'true');

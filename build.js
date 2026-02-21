@@ -50,6 +50,9 @@ const jsParts = [
 const combinedJs = jsParts.join("\n");
 fs.writeFileSync(path.join(dist, "fluentlm.js"), combinedJs);
 
+// --- Docs ---
+fs.copyFileSync(path.join(__dirname, "fluentlm-instructions.md"), path.join(dist, "fluentlm-instructions.md"));
+
 // Minify JS
 execSync(`npx --yes terser "${path.join(dist, "fluentlm.js")}" -o "${path.join(dist, "fluentlm.min.js")}" --compress --mangle`, { stdio: "inherit" });
 
