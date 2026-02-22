@@ -938,17 +938,15 @@
 
         <!-- Builder CommandBar -->
         <div class="builder-header">
-          <span class="builder-title" id="builder-title">financial-risk-report</span>
+          <button class="flm-commandbar-item" data-icon="Back" id="builder-back" style="margin-right: 4px;"></button>
+          <span class="builder-title" id="builder-title" style="flex: none;">financial-risk-report</span>
           <span class="builder-saved" id="builder-saved">Saved</span>
-          <span class="builder-last-run" id="builder-last-run"></span>
+          <span class="flm-commandbar-divider" style="height: 20px;"></span>
+          <button class="flm-commandbar-item" data-icon="Processing" id="builder-view-runs">View Runs</button>
+          <button class="flm-commandbar-item" id="builder-ask-awarity"><svg viewBox="0 0 64 64" width="16" height="16" style="flex-shrink:0;vertical-align:middle;margin-right:4px;"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyBackground)"/></svg>Ask Awarity</button>
+          <div style="flex: 1;"></div>
           <button class="flm-button flm-button--primary" id="builder-run">
             <i class="flm-icon" data-icon="Play"></i> Run
-          </button>
-          <button class="flm-button" id="builder-view-runs">
-            <i class="flm-icon" data-icon="Processing"></i> View Runs
-          </button>
-          <button class="flm-button" id="builder-help">
-            <i class="flm-icon" data-icon="Help"></i> Help
           </button>
           <div class="overflow-menu-wrap">
             <button class="flm-button" id="builder-overflow">...</button>
@@ -1305,7 +1303,7 @@
       var listView = document.getElementById('list-view');
       var builderView = document.getElementById('builder-view');
       var builderTitle = document.getElementById('builder-title');
-      var builderLastRun = document.getElementById('builder-last-run');
+      var builderLastRun = null;
       var builderPipeline = document.getElementById('builder-pipeline');
       var builderSaved = document.getElementById('builder-saved');
       var execBanner = document.getElementById('exec-banner');
@@ -1598,7 +1596,7 @@
         execBanner.classList.remove('exec-banner--visible');
         builderTitle.textContent = wf.name;
         document.getElementById('builder-crumb-name').textContent = wf.name;
-        builderLastRun.textContent = wf.lastRun ? 'Last run: ' + wf.lastRun : '';
+        if (builderLastRun) builderLastRun.textContent = wf.lastRun ? 'Last run: ' + wf.lastRun : '';
         document.getElementById('builder-run').disabled = false;
         renderPipeline();
         builderView.classList.add('builder-view--open');
@@ -2164,7 +2162,7 @@
             document.getElementById('builder-run').disabled = false;
             currentWorkflow.lastRun = 'Feb 22, 2026 3:15 PM';
             currentWorkflow.lastStatus = 'complete';
-            builderLastRun.textContent = 'Last run: ' + currentWorkflow.lastRun;
+            if (builderLastRun) builderLastRun.textContent = 'Last run: ' + currentWorkflow.lastRun;
 
             // Show completion banner
             execBanner.classList.add('exec-banner--visible');
@@ -2315,9 +2313,9 @@
       // Builder "View Runs" button
       document.getElementById('builder-view-runs').addEventListener('click', openRunsView);
 
-      // Builder "Help" button
-      document.getElementById('builder-help').addEventListener('click', function () {
-        showMessage('info', 'Workflow builder help — define linear reasoning pipelines over your catalogs.');
+      // Builder "Back" button
+      document.getElementById('builder-back').addEventListener('click', function () {
+        closeBuilder();
       });
 
       // Runs "Back" button
