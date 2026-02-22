@@ -1,0 +1,2528 @@
+<!DOCTYPE html>
+<html lang="en" class="fluent-awarity-dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workflows — Awarity</title>
+
+  <!-- Themes & combined library CSS -->
+  <link rel="stylesheet" href="../../dist/theme-awarity-light.css">
+  <link rel="stylesheet" href="../../dist/theme-awarity-dark.css">
+  <link rel="stylesheet" href="../../dist/fluentlm.min.css">
+
+  <style>
+    /* ── App Shell ── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+
+    .app-shell {
+      display: flex;
+      height: 100vh;
+    }
+
+    /* ── Left Nav ── */
+    .app-nav {
+      width: 220px;
+      flex-shrink: 0;
+      background-color: var(--bodyStandoutBackground);
+      border-right: 1px solid var(--bodyFrameDivider);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .app-nav-brand {
+      padding: var(--spacingM);
+      font-size: var(--fontSizeXLarge);
+      font-weight: var(--fontWeightSemibold);
+      line-height: var(--lineHeightXLarge);
+      color: var(--bodyText);
+      border-bottom: 1px solid var(--bodyFrameDivider);
+    }
+
+    .app-nav-link {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+      padding: var(--spacingS2) var(--spacingM);
+      color: var(--bodyText);
+      font-size: var(--fontSizeMedium);
+      text-decoration: none;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+    }
+
+    .app-nav-link:hover {
+      background-color: var(--listItemBackgroundHovered);
+      text-decoration: none;
+    }
+
+    .app-nav-link--active {
+      background-color: var(--listItemBackgroundChecked);
+      font-weight: var(--fontWeightSemibold);
+      border-left-color: var(--themePrimary);
+    }
+
+    .app-nav-spacer { flex: 1; }
+
+    /* ── Main Area ── */
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── CommandBar Zone ── */
+    .app-commandbar {
+      border-bottom: 1px solid var(--bodyDivider);
+    }
+
+    /* ── Breadcrumb Zone ── */
+    .app-breadcrumb {
+      padding: var(--spacingS2) var(--spacingL2);
+      border-bottom: 1px solid var(--bodyDivider);
+      background-color: var(--bodyBackground);
+    }
+
+    /* ── MessageBar Zone ── */
+    .app-messagebar-zone {
+      padding: 0 var(--spacingL2);
+    }
+    .app-messagebar-zone:empty { display: none; }
+    .app-messagebar-zone .flm-messagebar {
+      margin-top: var(--spacingS1);
+      border-radius: var(--roundedCorner4);
+    }
+
+    /* ── Content Area ── */
+    .app-content {
+      flex: 1;
+      padding: var(--spacingL2);
+      overflow-y: auto;
+      background-color: var(--bodyBackground);
+    }
+
+    /* ── Horizontal scroll for table ── */
+    #workflows-list {
+      overflow-x: auto;
+    }
+    #workflows-list .flm-detailslist-header,
+    #workflows-list .flm-detailslist-row {
+      min-width: max-content;
+    }
+
+    /* ── Empty State ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      gap: var(--spacingM);
+      color: var(--bodySubtext);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      opacity: 0.4;
+    }
+
+    .empty-state-text {
+      font-size: var(--fontSizeLarge);
+      color: var(--bodySubtext);
+    }
+
+    .empty-state-sub {
+      font-size: var(--fontSizeMedium);
+      color: var(--bodySubtext);
+      opacity: 0.7;
+      max-width: 360px;
+      text-align: center;
+      line-height: var(--lineHeightMedium);
+    }
+
+    /* ── Status Badges ── */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 2px var(--spacingS1);
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+      font-weight: var(--fontWeightSemibold);
+    }
+
+    .status-badge--ready {
+      background-color: color-mix(in srgb, var(--green) 15%, transparent);
+      color: var(--green);
+    }
+
+    .status-badge--never {
+      background-color: color-mix(in srgb, var(--bodySubtext) 15%, transparent);
+      color: var(--bodySubtext);
+    }
+
+    .status-badge--running {
+      background-color: color-mix(in srgb, var(--blue) 15%, transparent);
+      color: var(--blue);
+    }
+
+    .status-badge--error {
+      background-color: color-mix(in srgb, var(--red) 15%, transparent);
+      color: var(--red);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: currentColor;
+    }
+
+    /* ── Shimmer loading table ── */
+    .shimmer-table {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingS2);
+    }
+
+    .shimmer-row {
+      display: flex;
+      gap: var(--spacingM);
+      padding: var(--spacingS1) 0;
+    }
+
+    /* ── Number cells right-aligned ── */
+    .cell-number {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Clickable rows ── */
+    .flm-detailslist-row { cursor: pointer; }
+
+    /* ── Filter bar layout ── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+      margin-bottom: var(--spacingS1);
+    }
+    .filter-bar #category-filter { flex: 1; margin-bottom: 0; }
+
+    /* ── View dropdown ── */
+    .view-dropdown-wrapper { position: relative; }
+    .view-dropdown-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 16px;
+      border: 1px solid var(--bodyDivider);
+      background: transparent; color: var(--bodySubtext);
+      font-size: var(--fontSizeSmall); font-family: inherit;
+      cursor: pointer;
+    }
+    .view-dropdown-btn:hover { border-color: var(--themePrimary); color: var(--themePrimary); }
+    .view-dropdown-menu {
+      display: none; position: absolute; right: 0; top: calc(100% + 4px);
+      min-width: 180px; background: var(--bodyBackground);
+      border: 1px solid var(--bodyDivider); border-radius: var(--roundedCorner4);
+      box-shadow: var(--elevation8); z-index: 10; padding: 4px 0;
+    }
+    .view-dropdown-menu--open { display: block; }
+    .view-dropdown-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 12px; font-size: var(--fontSizeSmall);
+      color: var(--bodyText); cursor: pointer; width: 100%;
+      background: none; border: none; font-family: inherit; text-align: left;
+    }
+    .view-dropdown-item:hover { background: var(--listItemBackgroundHovered); }
+
+    /* ── Category filter pills ── */
+    #category-filter { margin-bottom: var(--spacingS1); }
+    .filter-pill {
+      border-radius: 16px; padding: 4px 14px;
+      border: 1px solid var(--bodyDivider);
+      background: transparent; color: var(--bodySubtext);
+      font-size: var(--fontSizeSmall); font-family: inherit;
+      cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .filter-pill:hover { border-color: var(--themePrimary); color: var(--themePrimary); }
+    .filter-pill--active { background: var(--themePrimary); color: var(--white); border-color: transparent; }
+
+    /* ── Category chips ── */
+    .category-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .category-chip {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+      background-color: color-mix(in srgb, var(--themePrimary) 15%, transparent);
+      color: var(--themePrimary);
+      cursor: pointer;
+    }
+    .category-chip:hover {
+      background-color: color-mix(in srgb, var(--themePrimary) 30%, transparent);
+    }
+
+    /* ── Panel Form ── */
+    .panel-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingM);
+    }
+
+    /* ── Panel footer ── */
+    .panel-footer-actions {
+      display: flex; gap: var(--spacingS1); align-items: center;
+    }
+    .panel-footer-right {
+      margin-left: auto; display: flex; gap: var(--spacingS1);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       BUILDER VIEW — slides in from right over list
+       ════════════════════════════════════════════════════════════════ */
+    .builder-view {
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background-color: var(--bodyBackground);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .builder-view--open {
+      transform: translateX(0);
+    }
+
+    /* ── Builder Header ── */
+    .builder-header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+      padding: var(--spacingS2) var(--spacingL2);
+      border-bottom: 1px solid var(--bodyDivider);
+      background-color: var(--bodyStandoutBackground);
+      min-height: 44px;
+    }
+
+    .builder-title {
+      font-size: var(--fontSizeLarge);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+      flex: 1;
+    }
+
+    .builder-last-run {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+      margin-right: var(--spacingS1);
+    }
+
+    .builder-saved {
+      font-size: var(--fontSizeSmall);
+      color: var(--green);
+      opacity: 0;
+      transition: opacity 0.3s;
+      margin-right: var(--spacingS1);
+    }
+
+    .builder-saved--visible {
+      opacity: 1;
+    }
+
+    /* ── Builder Content ── */
+    .builder-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--spacingL2);
+    }
+
+    .builder-pipeline {
+      max-width: 520px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding-bottom: var(--spacingL2);
+    }
+
+    /* ── Pipeline Connector ── */
+    .pipeline-connector {
+      display: flex;
+      justify-content: center;
+      height: 32px;
+      position: relative;
+    }
+
+    .pipeline-connector::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background-color: var(--bodyDivider);
+    }
+
+    /* ── Step Card ── */
+    .step-card {
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      background-color: var(--bodyStandoutBackground);
+      padding: var(--spacingM) var(--spacingM) var(--spacingL1);
+      position: relative;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      cursor: pointer;
+    }
+
+    .step-card:hover {
+      border-color: var(--themePrimary);
+    }
+
+    .step-card-header {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+    }
+
+    .step-index {
+      font-size: var(--fontSizeSmall);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodySubtext);
+      min-width: 28px;
+    }
+
+    .step-type-badge {
+      display: inline-flex;
+      padding: 2px 8px;
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+      font-weight: var(--fontWeightSemibold);
+      background-color: color-mix(in srgb, var(--themePrimary) 15%, transparent);
+      color: var(--themePrimary);
+    }
+
+    .step-type-badge--input {
+      background-color: color-mix(in srgb, var(--blue) 15%, transparent);
+      color: var(--blue);
+    }
+
+    .step-type-badge--output {
+      background-color: color-mix(in srgb, var(--green) 15%, transparent);
+      color: var(--green);
+    }
+
+    .step-name {
+      font-size: var(--fontSizeMedium);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+    }
+
+    .step-card-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 4px;
+    }
+
+    .step-action-btn {
+      background: none;
+      border: none;
+      color: var(--bodySubtext);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+    }
+
+    .step-action-btn:hover {
+      background-color: var(--listItemBackgroundHovered);
+      color: var(--bodyText);
+    }
+
+    .step-card-summary {
+      margin-top: var(--spacingS1);
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+      line-height: 1.6;
+    }
+
+    .step-card-summary .summary-row {
+      display: flex;
+      gap: var(--spacingS1);
+      padding: 1px 0;
+    }
+
+    .step-card-summary .summary-label {
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodySubtext);
+      white-space: nowrap;
+      min-width: 60px;
+    }
+
+    .step-card-summary .summary-value {
+      color: var(--bodyText);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── Add Step Shadow Card ── */
+    .add-step-card {
+      border: 2px dashed var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      padding: var(--spacingM);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--spacingS1);
+      color: var(--bodySubtext);
+      cursor: pointer;
+      transition: border-color 0.15s, color 0.15s;
+      font-size: var(--fontSizeMedium);
+    }
+
+    .add-step-card:hover {
+      border-color: var(--themePrimary);
+      color: var(--themePrimary);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       SLIDE-OUT TRAY (right side of builder)
+       ════════════════════════════════════════════════════════════════ */
+    .builder-tray-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.3);
+      z-index: 200;
+    }
+
+    .builder-tray-overlay--visible {
+      display: block;
+    }
+
+    .builder-tray {
+      position: fixed;
+      top: 0; right: 0; bottom: 0;
+      width: 420px;
+      max-width: 100vw;
+      background-color: var(--bodyBackground);
+      border-left: 1px solid var(--bodyDivider);
+      z-index: 201;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .builder-tray--open {
+      transform: translateX(0);
+    }
+
+    .tray-header {
+      display: flex;
+      align-items: center;
+      padding: var(--spacingM) var(--spacingL1);
+      border-bottom: 1px solid var(--bodyDivider);
+    }
+
+    .tray-title {
+      font-size: var(--fontSizeMedium);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+      flex: 1;
+    }
+
+    .tray-close {
+      background: none;
+      border: none;
+      color: var(--bodySubtext);
+      cursor: pointer;
+      font-size: var(--fontSizeLarge);
+      padding: 4px;
+    }
+
+    .tray-close:hover { color: var(--bodyText); }
+
+    .tray-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--spacingL1);
+    }
+
+    .tray-footer {
+      padding: var(--spacingM) var(--spacingL1);
+      border-top: 1px solid var(--bodyDivider);
+      display: flex;
+      gap: var(--spacingS1);
+    }
+
+    /* ── Step type picker (inside tray) ── */
+    .step-type-option {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacingS1);
+      padding: var(--spacingS2) var(--spacingM);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      cursor: pointer;
+      transition: border-color 0.15s;
+      margin-bottom: var(--spacingS2);
+    }
+
+    .step-type-option:hover {
+      border-color: var(--themePrimary);
+    }
+
+    .step-type-option--selected {
+      border-color: var(--themePrimary);
+      background-color: color-mix(in srgb, var(--themePrimary) 8%, transparent);
+    }
+
+    .step-type-option-title {
+      font-size: var(--fontSizeMedium);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+    }
+
+    .step-type-option-desc {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       EXECUTION MODE
+       ════════════════════════════════════════════════════════════════ */
+    .exec-timeline {
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .exec-step {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacingM);
+      padding: var(--spacingS2) 0;
+      position: relative;
+    }
+
+    .exec-step + .exec-step {
+      border-top: 1px solid var(--bodyDivider);
+    }
+
+    .exec-step-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .exec-step-icon--pending {
+      background-color: color-mix(in srgb, var(--bodySubtext) 15%, transparent);
+      color: var(--bodySubtext);
+    }
+
+    .exec-step-icon--running {
+      background-color: color-mix(in srgb, var(--blue) 15%, transparent);
+      color: var(--blue);
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    .exec-step-icon--complete {
+      background-color: color-mix(in srgb, var(--green) 15%, transparent);
+      color: var(--green);
+    }
+
+    .exec-step-icon--error {
+      background-color: color-mix(in srgb, var(--red) 15%, transparent);
+      color: var(--red);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .exec-step-body {
+      flex: 1;
+    }
+
+    .exec-step-name {
+      font-size: var(--fontSizeMedium);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+    }
+
+    .exec-step-status {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+      margin-top: 2px;
+    }
+
+    .exec-step-progress {
+      margin-top: var(--spacingS2);
+    }
+
+    .exec-step-progress .flm-progress-track {
+      height: 4px;
+    }
+
+    .exec-step-log {
+      margin-top: var(--spacingS2);
+      font-size: var(--fontSizeSmall);
+      font-family: monospace;
+      color: var(--bodySubtext);
+      background-color: var(--bodyStandoutBackground);
+      border-radius: var(--roundedCorner4);
+      padding: var(--spacingS2) var(--spacingM);
+      max-height: 120px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .exec-step-log--open {
+      display: block;
+    }
+
+    .exec-step-toggle {
+      background: none;
+      border: none;
+      color: var(--themePrimary);
+      cursor: pointer;
+      font-size: var(--fontSizeSmall);
+      padding: 2px 0;
+      margin-top: 2px;
+    }
+
+    .exec-step-toggle:hover {
+      text-decoration: underline;
+    }
+
+    /* ── Execution banner ── */
+    .exec-banner {
+      padding: var(--spacingM) var(--spacingL2);
+      border-bottom: 1px solid var(--bodyDivider);
+      display: none;
+    }
+
+    .exec-banner--visible {
+      display: block;
+    }
+
+    .exec-banner-complete {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+      flex-wrap: wrap;
+    }
+
+    .exec-banner-text {
+      font-size: var(--fontSizeMedium);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--green);
+      margin-right: var(--spacingM);
+    }
+
+    /* ════════════════════════════════════════════════════════════════
+       RUNS VIEW — slides in over the builder
+       ════════════════════════════════════════════════════════════════ */
+    .runs-view {
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      background-color: var(--bodyBackground);
+      z-index: 110;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .runs-view--open {
+      transform: translateX(0);
+    }
+
+    .runs-content {
+      flex: 1;
+      padding: var(--spacingL2);
+      overflow-y: auto;
+    }
+
+    /* ── Run status badge colors (reuse status-badge) ── */
+    .duration-cell {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Overflow menu ── */
+    .overflow-menu-wrap { position: relative; }
+    .overflow-menu {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: calc(100% + 4px);
+      min-width: 180px;
+      background: var(--bodyBackground);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 10;
+      padding: 4px 0;
+    }
+    .overflow-menu--open { display: block; }
+    .overflow-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      font-size: var(--fontSizeSmall);
+      color: var(--bodyText);
+      cursor: pointer;
+      width: 100%;
+      background: none;
+      border: none;
+      font-family: inherit;
+      text-align: left;
+    }
+    .overflow-menu-item:hover { background: var(--listItemBackgroundHovered); }
+    .overflow-menu-item--danger { color: var(--red); }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- ════════════════════════════════════════════════════════════════
+         LEFT NAV
+         ════════════════════════════════════════════════════════════════ -->
+    <nav class="app-nav">
+      <div class="app-nav-brand">Awarity</div>
+
+      <a class="app-nav-link" href="../home/index.html"><svg viewBox="0 0 64 64" width="16" height="16" style="flex-shrink:0;"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyStandoutBackground)"/></svg> Home</a>
+      <a class="app-nav-link" href="../catalogs/index.html"><i class="flm-icon" data-icon="Database"></i> Catalogs</a>
+      <a class="app-nav-link" href="../explorer/index.html"><i class="flm-icon" data-icon="Search"></i> Explore</a>
+      <a class="app-nav-link" href="../structure/index.html"><i class="flm-icon" data-icon="Org"></i> Structure</a>
+      <a class="app-nav-link" href="../lenses/index.html"><i class="flm-icon" data-icon="Filter"></i> Lenses</a>
+      <a class="app-nav-link app-nav-link--active" href="#"><i class="flm-icon" data-icon="Flow"></i> Workflows</a>
+      <a class="app-nav-link" href="../runs/index.html"><i class="flm-icon" data-icon="Processing"></i> Runs</a>
+
+      <div class="app-nav-spacer"></div>
+
+      <a class="app-nav-link" href="../settings/index.html"><i class="flm-icon" data-icon="Settings"></i> Settings</a>
+
+      <div style="padding: var(--spacingM);">
+        <button class="flm-button" id="themeToggle" style="width: 100%;">Switch to Light</button>
+      </div>
+    </nav>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         MAIN AREA — LIST VIEW
+         ════════════════════════════════════════════════════════════════ -->
+    <div class="app-main" id="list-view">
+
+      <!-- CommandBar -->
+      <div class="app-commandbar">
+        <div class="flm-commandbar">
+          <div class="flm-commandbar-items">
+            <button class="flm-button flm-button--primary" data-icon="Add" id="btn-new-workflow" style="margin: 4px 8px;">
+              New Workflow
+            </button>
+            <button class="flm-commandbar-item" data-icon="Play" id="btn-run" disabled>Run</button>
+            <button class="flm-commandbar-item" data-icon="Copy" id="btn-duplicate" disabled>Duplicate</button>
+            <button class="flm-commandbar-item" data-icon="Delete" id="btn-delete" disabled>Delete</button>
+            <span class="flm-commandbar-divider"></span>
+            <button class="flm-commandbar-item" data-icon="Refresh" id="btn-refresh">Refresh</button>
+            <span class="flm-commandbar-divider"></span>
+            <button class="flm-commandbar-item" id="btn-ask-awarity"><svg viewBox="0 0 64 64" width="16" height="16" style="flex-shrink:0;vertical-align:middle;margin-right:4px;"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyBackground)"/></svg>Ask Awarity</button>
+          </div>
+          <div class="flm-commandbar-far" style="align-items: center; padding-right: 8px;">
+            <div class="flm-searchbox" style="min-width: 220px;">
+              <input class="flm-searchbox-input" type="text" placeholder="Search workflows…" id="search-input">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="app-breadcrumb">
+        <ol class="flm-breadcrumb">
+          <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="../home/index.html">Home</a></li>
+          <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link">Workflows</a></li>
+        </ol>
+      </div>
+
+      <!-- MessageBar Zone -->
+      <div class="app-messagebar-zone" id="messagebar-zone"></div>
+
+      <!-- Content -->
+      <div class="app-content" id="content-area">
+
+        <!-- ── Loading State (Shimmer) ── -->
+        <div id="state-loading" style="display: none;">
+          <div class="shimmer-table">
+            <div class="shimmer-row">
+              <div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 3;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+            </div>
+            <div class="shimmer-row">
+              <div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 3;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+            </div>
+            <div class="shimmer-row">
+              <div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 3;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+              <div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Empty State ── -->
+        <div id="state-empty" style="display: none;">
+          <div class="empty-state">
+            <i class="flm-icon empty-state-icon" data-icon="Flow"></i>
+            <span class="empty-state-text">No workflows yet</span>
+            <span class="empty-state-sub">Workflows chain reasoning steps into repeatable, deterministic pipelines over your catalogs.</span>
+            <button class="flm-button flm-button--primary" data-icon="Add" id="btn-empty-create">
+              <i class="flm-icon" data-icon="Add"></i> Create your first workflow
+            </button>
+          </div>
+        </div>
+
+        <!-- ── Data State (DetailsList) ── -->
+        <div id="state-data" style="display: block;">
+          <div class="filter-bar">
+            <div class="flm-overflowset" id="category-filter">
+              <div class="flm-overflowset-items"></div>
+              <button class="flm-overflowset-overflow" aria-label="More categories">...</button>
+            </div>
+            <div class="view-dropdown-wrapper">
+              <button class="view-dropdown-btn" id="view-dropdown-btn">
+                <i class="flm-icon" data-icon="ViewList"></i> View
+              </button>
+              <div class="view-dropdown-menu" id="view-dropdown-menu"></div>
+            </div>
+          </div>
+          <div class="flm-detailslist" id="workflows-list">
+            <div class="flm-detailslist-header" id="workflows-header"></div>
+            <!-- Rows populated by JS -->
+          </div>
+        </div>
+
+      </div><!-- /app-content -->
+
+      <!-- ════════════════════════════════════════════════════════════════
+           BUILDER VIEW — overlays main area, slides in from right
+           ════════════════════════════════════════════════════════════════ -->
+      <div class="builder-view" id="builder-view">
+
+        <!-- Builder CommandBar -->
+        <div class="builder-header">
+          <span class="builder-title" id="builder-title">financial-risk-report</span>
+          <span class="builder-saved" id="builder-saved">Saved</span>
+          <span class="builder-last-run" id="builder-last-run"></span>
+          <button class="flm-button flm-button--primary" id="builder-run">
+            <i class="flm-icon" data-icon="Play"></i> Run
+          </button>
+          <button class="flm-button" id="builder-view-runs">
+            <i class="flm-icon" data-icon="Processing"></i> View Runs
+          </button>
+          <button class="flm-button" id="builder-help">
+            <i class="flm-icon" data-icon="Help"></i> Help
+          </button>
+          <div class="overflow-menu-wrap">
+            <button class="flm-button" id="builder-overflow">...</button>
+            <div class="overflow-menu" id="builder-overflow-menu">
+              <button class="overflow-menu-item" id="builder-edit-wf">Edit</button>
+              <button class="overflow-menu-item overflow-menu-item--danger" id="builder-delete-wf">Delete</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Builder Breadcrumb -->
+        <div class="app-breadcrumb">
+          <ol class="flm-breadcrumb">
+            <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="../home/index.html">Home</a></li>
+            <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#" id="builder-crumb-workflows">Workflows</a></li>
+            <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" id="builder-crumb-name">financial-risk-report</a></li>
+          </ol>
+        </div>
+
+        <!-- Execution Banner (shown after run completes) -->
+        <div class="exec-banner" id="exec-banner">
+          <div class="exec-banner-complete">
+            <span class="exec-banner-text" id="exec-banner-text">Workflow completed successfully.</span>
+            <button class="flm-button flm-button--primary" id="btn-open-output">Open Primary Output</button>
+            <button class="flm-button" id="btn-view-run">View Run</button>
+            <button class="flm-button" id="btn-open-run-folder">Open Folder</button>
+          </div>
+        </div>
+
+        <!-- Builder Content -->
+        <div class="builder-content" id="builder-content">
+          <!-- Pipeline cards rendered by JS -->
+          <div class="builder-pipeline" id="builder-pipeline"></div>
+        </div>
+
+        <!-- ════════════════════════════════════════════════════════════════
+             RUNS VIEW — slides over the builder
+             ════════════════════════════════════════════════════════════════ -->
+        <div class="runs-view" id="runs-view">
+
+          <!-- Runs CommandBar -->
+          <div class="app-commandbar">
+            <div class="flm-commandbar">
+              <div class="flm-commandbar-items">
+                <button class="flm-commandbar-item" data-icon="Back" id="runs-back">Back</button>
+                <span class="flm-commandbar-divider"></span>
+                <button class="flm-commandbar-item" data-icon="Refresh" id="runs-refresh">Refresh</button>
+                <span class="flm-commandbar-divider"></span>
+                <button class="flm-commandbar-item" id="runs-ask-awarity"><svg viewBox="0 0 64 64" width="16" height="16" style="flex-shrink:0;vertical-align:middle;margin-right:4px;"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyBackground)"/></svg>Ask Awarity</button>
+              </div>
+              <div class="flm-commandbar-far" style="align-items: center; padding-right: 8px;">
+                <div class="flm-searchbox" style="min-width: 220px;">
+                  <input class="flm-searchbox-input" type="text" placeholder="Search runs…" id="runs-search-input">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Runs Breadcrumb -->
+          <div class="app-breadcrumb">
+            <ol class="flm-breadcrumb">
+              <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="../home/index.html">Home</a></li>
+              <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#" id="runs-crumb-workflows">Workflows</a></li>
+              <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#" id="runs-crumb-builder">financial-risk-report</a></li>
+              <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link">Runs</a></li>
+            </ol>
+          </div>
+
+          <!-- Runs Content -->
+          <div class="runs-content" id="runs-content">
+            <!-- Empty state -->
+            <div id="runs-state-empty" style="display: none;">
+              <div class="empty-state">
+                <i class="flm-icon empty-state-icon" data-icon="Clock"></i>
+                <span class="empty-state-text">No runs yet</span>
+                <span class="empty-state-sub">Run this workflow to see execution history here.</span>
+              </div>
+            </div>
+
+            <!-- Data state -->
+            <div id="runs-state-data" style="display: block;">
+              <div class="flm-detailslist" id="runs-list">
+                <div class="flm-detailslist-header" id="runs-header"></div>
+                <!-- Rows populated by JS -->
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /runs-view -->
+
+      </div><!-- /builder-view -->
+
+    </div><!-- /app-main -->
+  </div><!-- /app-shell -->
+
+  <!-- ════════════════════════════════════════════════════════════════
+       SLIDE-OUT TRAY (for Add/Edit Step, Edit Input, Edit Output)
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="builder-tray-overlay" id="tray-overlay"></div>
+  <div class="builder-tray" id="builder-tray">
+    <div class="tray-header">
+      <span class="tray-title" id="tray-title">Add Step</span>
+      <button class="tray-close" id="tray-close">&times;</button>
+    </div>
+    <div class="tray-body" id="tray-body">
+      <!-- Dynamic form content -->
+    </div>
+    <div class="tray-footer" id="tray-footer">
+      <button class="flm-button flm-button--primary" id="tray-primary">Add</button>
+      <button class="flm-button" id="tray-cancel">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       NEW WORKFLOW WIZARD DIALOG
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-dialog-overlay" id="new-workflow-dialog" data-light-dismiss style="z-index: 1002;">
+    <div class="flm-dialog" style="max-width: 520px;">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title" id="wizard-title">New Workflow</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
+      </div>
+      <div class="flm-dialog-body">
+
+        <!-- Step 1: Basic Info -->
+        <div id="wizard-step-1">
+          <div class="panel-form">
+            <div class="flm-textfield flm-textfield--required">
+              <label class="flm-label" for="wiz-name">Name</label>
+              <input class="flm-textfield-input" id="wiz-name" placeholder="e.g. financial-risk-report">
+            </div>
+            <div class="flm-textfield">
+              <label class="flm-label" for="wiz-description">Description</label>
+              <textarea class="flm-textfield-input" id="wiz-description" rows="2" style="width: 100%; resize: vertical;" placeholder="What does this workflow do?"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Input Configuration -->
+        <div id="wizard-step-2" style="display: none;">
+          <div class="panel-form">
+            <div>
+              <label class="flm-label">Input Type</label>
+              <div class="flm-choicegroup" style="margin-top: var(--spacingS2);">
+                <label class="flm-choicegroup-option">
+                  <input type="radio" class="flm-choicegroup-input" name="wiz-input-type" value="catalog" checked>
+                  <span class="flm-choicegroup-mark"></span>
+                  <span class="flm-choicegroup-label">Catalog</span>
+                </label>
+              </div>
+            </div>
+            <div class="flm-textfield flm-textfield--required">
+              <label class="flm-label" for="wiz-catalog">Catalog</label>
+              <select class="flm-dropdown" id="wiz-catalog" style="width: 100%;">
+                <option value="">Select a catalog…</option>
+                <option value="sec-filings">sec-filings</option>
+                <option value="legal-contracts">legal-contracts</option>
+                <option value="research-papers">research-papers</option>
+                <option value="compliance-docs">compliance-docs</option>
+              </select>
+            </div>
+            <label class="flm-checkbox" style="margin-top: var(--spacingS2);">
+              <input type="checkbox" class="flm-checkbox-input" id="wiz-ensure-abstracts">
+              <span class="flm-checkbox-mark"></span>
+              <span class="flm-label">Ensure abstracts are generated before run</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Step 3: Output Configuration -->
+        <div id="wizard-step-3" style="display: none;">
+          <div class="panel-form">
+            <div>
+              <label class="flm-label">Output Root</label>
+              <div class="flm-choicegroup" style="margin-top: var(--spacingS2);">
+                <label class="flm-choicegroup-option">
+                  <input type="radio" class="flm-choicegroup-input" name="wiz-output-root" value="default" checked>
+                  <span class="flm-choicegroup-mark"></span>
+                  <span class="flm-choicegroup-label">Default (workflow runs folder)</span>
+                </label>
+                <label class="flm-choicegroup-option">
+                  <input type="radio" class="flm-choicegroup-input" name="wiz-output-root" value="custom">
+                  <span class="flm-choicegroup-mark"></span>
+                  <span class="flm-choicegroup-label">Custom path</span>
+                </label>
+              </div>
+            </div>
+            <div class="flm-textfield" id="wiz-custom-output-wrap" style="display: none;">
+              <label class="flm-label" for="wiz-custom-output">Custom Output Path</label>
+              <input class="flm-textfield-input" id="wiz-custom-output" placeholder="/path/to/output">
+            </div>
+          </div>
+        </div>
+
+        <!-- Inline message bar -->
+        <div id="wizard-messagebar" style="display: none; margin-top: var(--spacingM);"></div>
+
+        <!-- Step indicator -->
+        <div style="display: flex; justify-content: center; gap: 8px; margin-top: var(--spacingL1);">
+          <span class="wizard-dot" id="wiz-dot-1" style="width: 8px; height: 8px; border-radius: 50%; background: var(--themePrimary);"></span>
+          <span class="wizard-dot" id="wiz-dot-2" style="width: 8px; height: 8px; border-radius: 50%; background: var(--bodyDivider);"></span>
+          <span class="wizard-dot" id="wiz-dot-3" style="width: 8px; height: 8px; border-radius: 50%; background: var(--bodyDivider);"></span>
+        </div>
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button" id="wiz-back" style="display: none;">Back</button>
+        <button class="flm-button flm-button--primary" id="wiz-next">Next</button>
+        <button class="flm-button" data-dialog-close>Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       DELETE CONFIRMATION DIALOG
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-dialog-overlay" id="delete-dialog" data-light-dismiss style="z-index: 1002;">
+    <div class="flm-dialog">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title">Delete Workflow</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
+      </div>
+      <div class="flm-dialog-body">
+        <p>Are you sure you want to delete <strong id="delete-workflow-name"></strong>? This will remove the workflow definition and all run history. This action cannot be undone.</p>
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button flm-button--primary" style="background-color: var(--red); border-color: var(--red);" id="btn-confirm-delete">Delete</button>
+        <button class="flm-button" data-dialog-close>Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Combined library JS -->
+  <script src="../../dist/fluentlm.min.js"></script>
+
+  <script>
+    // ── Register custom icons for nav ──
+    FluentIcons.register('Database',    'M8 1C4.13 1 1 2.34 1 4v8c0 1.66 3.13 3 7 3s7-1.34 7-3V4c0-1.66-3.13-3-7-3zM2 6.26C3.41 7.24 5.59 7.8 8 7.8s4.59-.56 6-1.54V8c0 .77-2.42 2-6 2S2 8.77 2 8V6.26zM8 2c3.58 0 6 1.23 6 2s-2.42 2-6 2S2 4.77 2 4s2.42-2 6-2zm0 12c-3.58 0-6-1.23-6-2v-1.74C3.41 11.24 5.59 11.8 8 11.8s4.59-.56 6-1.54V12c0 .77-2.42 2-6 2z');
+    FluentIcons.register('Org',         'M8 1a2 2 0 0 1 2 2v1h2.5a.5.5 0 0 1 .5.5V7h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5h1V5H9v1.5a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5V5H5v2h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5v-4A.5.5 0 0 1 3 7h1V4.5a.5.5 0 0 1 .5-.5H7V3a2 2 0 0 1 1-2z');
+    FluentIcons.register('Flow',        'M2 3.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .35.15L8.71 6H13.5a.5.5 0 0 1 0 1H8.71l-2.86 2.85a.5.5 0 0 1-.35.15h-3a.5.5 0 0 1 0-1h2.79L8 6.5 5.29 4H2.5a.5.5 0 0 1-.5-.5zm0 8a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .35.15L8.71 14H13.5a.5.5 0 0 1 0 1H8.71l-2.86-2.85A.5.5 0 0 0 5.5 12h-3a.5.5 0 0 1-.5-.5z');
+    FluentIcons.register('Processing',  'M8 1.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V2a.5.5 0 0 1 .5-.5zM3.05 3.05a.5.5 0 0 1 .7 0l1.42 1.42a.5.5 0 0 1-.7.7L3.05 3.76a.5.5 0 0 1 0-.7zm9.9 0a.5.5 0 0 1 0 .7l-1.42 1.42a.5.5 0 1 1-.7-.7l1.41-1.42a.5.5 0 0 1 .7 0zM1.5 8a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H2a.5.5 0 0 1-.5-.5zm10 0a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm-6.33 3.17a.5.5 0 0 1 0 .7L3.76 13.3a.5.5 0 0 1-.7-.7l1.41-1.42a.5.5 0 0 1 .7 0zm5.66 0a.5.5 0 0 1 .7 0l1.42 1.42a.5.5 0 0 1-.7.7l-1.42-1.41a.5.5 0 0 1 0-.7zM8 12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5z');
+    FluentIcons.register('Refresh',     'M1.5 8a6.5 6.5 0 0 1 11.25-4.43V2a.5.5 0 0 1 1 0v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1 0-1h1.87A5.5 5.5 0 1 0 13.5 8a.5.5 0 0 1 1 0A6.5 6.5 0 1 1 1.5 8z');
+    FluentIcons.register('Play',        'M5.25 3.1a.75.75 0 0 1 .77.04l7 4.9a.75.75 0 0 1 0 1.22l-7 4.9A.75.75 0 0 1 4.75 13.5V2.75a.75.75 0 0 1 .5-.65z');
+    FluentIcons.register('Copy',        'M5.5 1A1.5 1.5 0 0 0 4 2.5v8A1.5 1.5 0 0 0 5.5 12h5a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 10.5 1h-5zM5 2.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-8zM3 4a1 1 0 0 0-1 1v7.5A1.5 1.5 0 0 0 3.5 14h6a1 1 0 0 0 1-1h-1v.5a.5.5 0 0 1-.5.5h-5.5a.5.5 0 0 1-.5-.5V5h.5z');
+    FluentIcons.register('ChevronLeft', 'M10.35 3.15a.5.5 0 0 1 0 .7L6.21 8l4.14 4.15a.5.5 0 0 1-.7.7l-4.5-4.5a.5.5 0 0 1 0-.7l4.5-4.5a.5.5 0 0 1 .7 0z');
+    FluentIcons.register('ChevronUp',   'M3.15 10.35a.5.5 0 0 1 0-.7L8 4.79l4.85 4.86a.5.5 0 0 1-.7.7L8 6.21l-4.15 4.14a.5.5 0 0 1-.7 0z');
+    FluentIcons.register('ChevronDown', 'M3.15 5.65a.5.5 0 0 1 .7 0L8 9.79l4.15-4.14a.5.5 0 0 1 .7.7l-4.5 4.5a.5.5 0 0 1-.7 0l-4.5-4.5a.5.5 0 0 1 0-.7z');
+    FluentIcons.register('Edit',        'M11.85 1.15a.5.5 0 0 1 .7 0l2.3 2.3a.5.5 0 0 1 0 .7l-8.5 8.5a.5.5 0 0 1-.22.13l-3.5 1a.5.5 0 0 1-.63-.63l1-3.5a.5.5 0 0 1 .13-.22l8.5-8.5z');
+    FluentIcons.register('CheckMark',   'M13.85 4.15a.5.5 0 0 1 0 .7l-7.5 7.5a.5.5 0 0 1-.7 0l-3.5-3.5a.5.5 0 1 1 .7-.7L6 11.29l7.15-7.14a.5.5 0 0 1 .7 0z');
+    FluentIcons.register('Cancel',      'M3.15 3.15a.5.5 0 0 1 .7 0L8 7.29l4.15-4.14a.5.5 0 0 1 .7.7L8.71 8l4.14 4.15a.5.5 0 0 1-.7.7L8 8.71l-4.15 4.14a.5.5 0 0 1-.7-.7L7.29 8 3.15 3.85a.5.5 0 0 1 0-.7z');
+    FluentIcons.register('ViewList',    'M2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z');
+    FluentIcons.register('Help',        'M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-3.5a1.5 1.5 0 0 1 2.87.6c0 .73-.52 1.06-1 1.36l-.13.08c-.4.26-.74.5-.74 1.06a.5.5 0 0 1-1 0c0-1.03.61-1.4 1.1-1.72l.13-.08c.46-.29.64-.44.64-.7a.5.5 0 0 0-1 0 .5.5 0 0 1-1 0zM8 11.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5z');
+    FluentIcons.register('Back',        'M10.35 3.15a.5.5 0 0 1 0 .7L6.21 8l4.14 4.15a.5.5 0 0 1-.7.7l-4.5-4.5a.5.5 0 0 1 0-.7l4.5-4.5a.5.5 0 0 1 .7 0z');
+    FluentIcons.register('Clock',       'M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-3.5a.5.5 0 0 1 .5.5v2.79l1.85 1.86a.5.5 0 0 1-.7.7l-2-2A.5.5 0 0 1 7.5 8V5a.5.5 0 0 1 .5-.5z');
+
+    // ── Register themes & init ──
+    FluentLM.registerTheme('awarity-light', 'fluent-awarity-light');
+    FluentLM.registerTheme('awarity-dark', 'fluent-awarity-dark');
+    FluentLM.setTheme('awarity-dark');
+
+    (function () {
+
+      // ══════════════════════════════════════════════════════════════
+      //  STEP TYPE DEFINITIONS
+      // ══════════════════════════════════════════════════════════════
+
+      var STEP_TYPES = [
+        { type: 'generateAbstracts', label: 'Generate Abstracts', desc: 'Create cached semantic summaries for documents.' },
+        { type: 'classify',          label: 'Classify',           desc: 'Assign documents to predefined labels.' },
+        { type: 'filter',            label: 'Filter',             desc: 'Reduce scope to a subset of documents.' },
+        { type: 'ask',               label: 'Ask',                desc: 'Ask a question and synthesize an answer.' },
+        { type: 'extract',           label: 'Extract',            desc: 'Extract structured data from documents.' }
+      ];
+
+      // ══════════════════════════════════════════════════════════════
+      //  MOCK DATA
+      // ══════════════════════════════════════════════════════════════
+
+      var MOCK_WORKFLOWS = [
+        {
+          name: 'financial-risk-report',
+          description: 'Summarize financial risk disclosures from SEC filings.',
+          categories: ['finance', 'risk', 'triage'],
+          steps: [
+            { type: 'classify', name: 'high-level', mode: 'abstracts', labels: 'structures/labels/high-level.labels.txt', allowMulti: false },
+            { type: 'filter', name: 'financial-only', include: ['Financial Risk'] },
+            { type: 'ask', name: 'summary', question: 'Summarize key financial risk themes for the filtered documents.', mode: 'full', skipInference: false }
+          ],
+          input: { type: 'catalog', catalog: 'sec-filings', ensureAbstracts: true },
+          output: { root: 'default', primary: [{ step: 'summary', output: 'answer' }] },
+          lastRun: 'Feb 22, 2026 2:33 PM',
+          lastStatus: 'complete',
+          defaults: { catalog: 'sec-filings', mode: 'full', lens: 'lenses/financial-risk.lens.md', model: 'claude-sonnet' }
+        },
+        {
+          name: 'compliance-monitoring',
+          description: 'Weekly scan for regulatory compliance gaps across documentation.',
+          categories: ['compliance', 'legal', 'regulatory'],
+          steps: [
+            { type: 'generateAbstracts', name: 'abstracts' },
+            { type: 'classify', name: 'regulation-type', mode: 'abstracts', labels: 'structures/labels/regulation-type.labels.txt', allowMulti: true },
+            { type: 'filter', name: 'high-risk', include: ['GDPR', 'SOX', 'HIPAA'] },
+            { type: 'ask', name: 'gap-analysis', question: 'Identify compliance gaps and remediation priorities.', mode: 'full', skipInference: false }
+          ],
+          input: { type: 'catalog', catalog: 'compliance-docs', ensureAbstracts: false },
+          output: { root: 'default', primary: [{ step: 'gap-analysis', output: 'answer' }] },
+          lastRun: 'Feb 20, 2026 9:15 AM',
+          lastStatus: 'complete',
+          defaults: { catalog: 'compliance-docs', mode: 'full', lens: null, model: 'claude-sonnet' }
+        },
+        {
+          name: 'research-digest',
+          description: 'Produce a weekly digest of new research paper findings.',
+          categories: ['research', 'summary'],
+          steps: [
+            { type: 'classify', name: 'domain', mode: 'abstracts', labels: 'structures/labels/domain.labels.txt', allowMulti: true },
+            { type: 'ask', name: 'digest', question: 'Produce a digest of the most significant recent findings grouped by domain.', mode: 'abstracts', skipInference: false }
+          ],
+          input: { type: 'catalog', catalog: 'research-papers', ensureAbstracts: true },
+          output: { root: 'default', primary: [{ step: 'digest', output: 'answer' }] },
+          lastRun: 'Feb 19, 2026 4:00 PM',
+          lastStatus: 'error',
+          defaults: { catalog: 'research-papers', mode: 'abstracts', lens: null, model: 'claude-sonnet' }
+        },
+        {
+          name: 'new-filing-triage',
+          description: 'Triage incoming SEC filings by risk severity.',
+          categories: ['finance', 'triage'],
+          steps: [
+            { type: 'classify', name: 'severity', mode: 'abstracts', labels: 'structures/labels/severity.labels.txt', allowMulti: false },
+            { type: 'filter', name: 'critical-only', include: ['Critical', 'High'] },
+            { type: 'extract', name: 'key-facts', schema: 'structures/schemas/risk-facts.json' },
+            { type: 'ask', name: 'briefing', question: 'Write a risk briefing for the critical and high-severity filings.', mode: 'full', skipInference: false }
+          ],
+          input: { type: 'catalog', catalog: 'sec-filings', ensureAbstracts: true },
+          output: { root: 'default', primary: [{ step: 'briefing', output: 'answer' }] },
+          lastRun: null,
+          lastStatus: 'never',
+          defaults: { catalog: 'sec-filings', mode: 'full', lens: 'lenses/triage.lens.md', model: 'claude-sonnet' }
+        }
+      ];
+
+      // ══════════════════════════════════════════════════════════════
+      //  STATE
+      // ══════════════════════════════════════════════════════════════
+
+      var currentWorkflow = null;
+      var isExecuting = false;
+      var execInterval = null;
+
+      // ══════════════════════════════════════════════════════════════
+      //  REFS
+      // ══════════════════════════════════════════════════════════════
+
+      var listView = document.getElementById('list-view');
+      var builderView = document.getElementById('builder-view');
+      var builderTitle = document.getElementById('builder-title');
+      var builderLastRun = document.getElementById('builder-last-run');
+      var builderPipeline = document.getElementById('builder-pipeline');
+      var builderSaved = document.getElementById('builder-saved');
+      var execBanner = document.getElementById('exec-banner');
+      var trayOverlay = document.getElementById('tray-overlay');
+      var tray = document.getElementById('builder-tray');
+      var trayTitle = document.getElementById('tray-title');
+      var trayBody = document.getElementById('tray-body');
+      var trayPrimary = document.getElementById('tray-primary');
+      var trayCancel = document.getElementById('tray-cancel');
+      var messageZone = document.getElementById('messagebar-zone');
+      var wizardDialog = document.getElementById('new-workflow-dialog');
+      var deleteDialog = document.getElementById('delete-dialog');
+
+      // ══════════════════════════════════════════════════════════════
+      //  THEME TOGGLE
+      // ══════════════════════════════════════════════════════════════
+
+      var themeBtn = document.getElementById('themeToggle');
+      function updateThemeLabel() {
+        themeBtn.textContent = FluentLM.getTheme() === 'awarity-light' ? 'Switch to Dark' : 'Switch to Light';
+      }
+      updateThemeLabel();
+      themeBtn.addEventListener('click', function () {
+        FluentLM.setTheme(FluentLM.getTheme() === 'awarity-light' ? 'awarity-dark' : 'awarity-light');
+        updateThemeLabel();
+      });
+
+      // ══════════════════════════════════════════════════════════════
+      //  MESSAGE HELPER
+      // ══════════════════════════════════════════════════════════════
+
+      function showMessage(type, text) {
+        messageZone.innerHTML = '<div class="flm-messagebar flm-messagebar--' + type + '">' + text + '</div>';
+        setTimeout(function () { messageZone.innerHTML = ''; }, 5000);
+      }
+
+      // ══════════════════════════════════════════════════════════════
+      //  LIST VIEW — TABLE
+      // ══════════════════════════════════════════════════════════════
+
+      var workflowsList = document.getElementById('workflows-list');
+      var workflowsHeader = document.getElementById('workflows-header');
+
+      var statusMap = {
+        'complete': '<span class="status-badge status-badge--ready"><span class="status-dot"></span> Complete</span>',
+        'never':    '<span class="status-badge status-badge--never"><span class="status-dot"></span> Never Run</span>',
+        'running':  '<span class="status-badge status-badge--running"><span class="status-dot"></span> Running</span>',
+        'error':    '<span class="status-badge status-badge--error"><span class="status-dot"></span> Error</span>'
+      };
+
+      // ── Column definitions ──
+      var COLUMNS = [
+        { key: 'description',  label: 'Description',  minWidth: 200, number: false },
+        { key: 'categories',   label: 'Categories',   minWidth: 140, number: false },
+        { key: 'steps',        label: 'Steps',        minWidth: 80,  number: true },
+        { key: 'lastRun',      label: 'Last Run',     minWidth: 120, number: false },
+        { key: 'status',       label: 'Status',       minWidth: 120, number: false }
+      ];
+
+      var _measureCtx = document.createElement('canvas').getContext('2d');
+      var _cs = getComputedStyle(document.documentElement);
+      _measureCtx.font = '600 ' + (_cs.getPropertyValue('--fontSizeSmall').trim() || '12px') + ' ' + (_cs.getPropertyValue('--fontFamily').trim() || '"Segoe UI", sans-serif');
+      function colWidth(col) {
+        var labelW = Math.ceil(_measureCtx.measureText(col.label).width) + 28;
+        return Math.max(col.minWidth, labelW);
+      }
+
+      var visibleColumns = { description: true, categories: true, steps: true, status: true };
+
+      function getVisibleColumns() {
+        return COLUMNS.filter(function (col) { return visibleColumns[col.key]; });
+      }
+
+      function colStyle(col, isLast) {
+        if (col.key === 'description') return 'min-width: ' + colWidth(col) + 'px; flex: 1;';
+        var w = colWidth(col) + 'px';
+        return isLast ? 'min-width: ' + w + '; flex: 1;' : 'width: ' + w + ';';
+      }
+
+      function cellHtml(col, wf) {
+        switch (col.key) {
+          case 'description':
+            return '<span style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">' + (wf.description || '') + '</span>';
+          case 'categories':
+            var chips = (wf.categories || []).map(function (c) { return '<span class="category-chip">' + c + '</span>'; }).join('');
+            return '<div class="category-chips">' + chips + '</div>';
+          case 'steps':
+            return '' + wf.steps.length;
+          case 'lastRun':
+            return wf.lastRun || '—';
+          case 'status':
+            return statusMap[wf.lastStatus] || wf.lastStatus;
+          default: return '';
+        }
+      }
+
+      function renderHeader() {
+        var visCols = getVisibleColumns();
+        workflowsHeader.innerHTML =
+          '<div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="check-all"><span class="flm-checkbox-mark"></span></label></div>' +
+          '<div class="flm-detailslist-header-cell" style="width: 200px;">Name</div>';
+        visCols.forEach(function (col, i) {
+          var isLast = i === visCols.length - 1;
+          workflowsHeader.innerHTML += '<div class="flm-detailslist-header-cell' + (col.number ? ' cell-number' : '') + '" style="' + colStyle(col, isLast) + '">' + col.label + '</div>';
+        });
+        var checkAll = document.getElementById('check-all');
+        checkAll.addEventListener('change', function () {
+          var checked = checkAll.checked;
+          workflowsList.querySelectorAll('.flm-detailslist-row[data-workflow] .flm-checkbox-input').forEach(function (cb) { cb.checked = checked; });
+          updateToolbarState();
+        });
+      }
+
+      function renderRows() {
+        workflowsList.querySelectorAll('.flm-detailslist-row').forEach(function (r) { r.remove(); });
+
+        MOCK_WORKFLOWS.forEach(function (wf) {
+          var row = document.createElement('div');
+          row.className = 'flm-detailslist-row';
+          row.setAttribute('data-workflow', wf.name);
+          row.setAttribute('data-search', (wf.name + ' ' + wf.description + ' ' + (wf.categories || []).join(' ')).toLowerCase());
+          row.setAttribute('data-categories', (wf.categories || []).join(','));
+
+          var visCols = getVisibleColumns();
+          var html =
+            '<div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label></div>' +
+            '<div class="flm-detailslist-cell" style="width: 200px; font-weight: var(--fontWeightSemibold);">' + wf.name + '</div>';
+
+          visCols.forEach(function (col, i) {
+            var isLast = i === visCols.length - 1;
+            html += '<div class="flm-detailslist-cell' + (col.number ? ' cell-number' : '') + '" style="' + colStyle(col, isLast) + '">' + cellHtml(col, wf) + '</div>';
+          });
+
+          row.innerHTML = html;
+          workflowsList.appendChild(row);
+        });
+
+        bindRowEvents();
+        if (typeof buildFilterBar === 'function') { buildFilterBar(); applyFilters(); }
+      }
+
+      function bindRowEvents() {
+        workflowsList.querySelectorAll('.flm-detailslist-row[data-workflow]').forEach(function (row) {
+          row.addEventListener('click', function (e) {
+            if (e.target.closest('.flm-detailslist-check')) return;
+            var chip = e.target.closest('.category-chip');
+            if (chip) { setCategory(chip.textContent); return; }
+            var name = row.getAttribute('data-workflow');
+            openBuilder(name);
+          });
+        });
+
+        workflowsList.querySelectorAll('.flm-detailslist-row[data-workflow] .flm-checkbox-input').forEach(function (cb) {
+          cb.addEventListener('change', updateToolbarState);
+        });
+      }
+
+      // ── Toolbar State ──
+      var btnRun = document.getElementById('btn-run');
+      var btnDuplicate = document.getElementById('btn-duplicate');
+      var btnDelete = document.getElementById('btn-delete');
+
+      function updateToolbarState() {
+        var checkAll = document.getElementById('check-all');
+        var rowCheckboxes = workflowsList.querySelectorAll('.flm-detailslist-row[data-workflow] .flm-checkbox-input');
+        var count = workflowsList.querySelectorAll('.flm-detailslist-row[data-workflow] .flm-checkbox-input:checked').length;
+        btnRun.disabled = count !== 1;
+        btnDuplicate.disabled = count !== 1;
+        btnDelete.disabled = count === 0;
+        if (checkAll) {
+          checkAll.checked = count > 0 && count === rowCheckboxes.length;
+          checkAll.indeterminate = count > 0 && count < rowCheckboxes.length;
+        }
+      }
+
+      // ── View dropdown ──
+      var viewBtn = document.getElementById('view-dropdown-btn');
+      var viewMenu = document.getElementById('view-dropdown-menu');
+
+      function buildViewMenu() {
+        viewMenu.innerHTML = '';
+        COLUMNS.forEach(function (col) {
+          var btn = document.createElement('button');
+          btn.className = 'view-dropdown-item';
+          var checked = visibleColumns[col.key];
+          btn.innerHTML = '<span style="width:16px;text-align:center;">' + (checked ? '&#10003;' : '') + '</span> ' + col.label;
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            visibleColumns[col.key] = !visibleColumns[col.key];
+            renderHeader();
+            renderRows();
+            buildViewMenu();
+          });
+          viewMenu.appendChild(btn);
+        });
+      }
+
+      viewBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        viewMenu.classList.toggle('view-dropdown-menu--open');
+        if (viewMenu.classList.contains('view-dropdown-menu--open')) buildViewMenu();
+      });
+
+      document.addEventListener('click', function () {
+        viewMenu.classList.remove('view-dropdown-menu--open');
+      });
+
+      // ── Category filter bar ──
+      var activeCategory = 'All';
+
+      function buildFilterBar() {
+        var cats = {};
+        MOCK_WORKFLOWS.forEach(function (w) {
+          (w.categories || []).forEach(function (c) { cats[c] = true; });
+        });
+        var sorted = Object.keys(cats).sort();
+        var items = document.querySelector('#category-filter .flm-overflowset-items');
+        items.innerHTML = '';
+        ['All'].concat(sorted).forEach(function (cat) {
+          var btn = document.createElement('button');
+          btn.className = 'flm-overflowset-item filter-pill' + (cat === activeCategory ? ' filter-pill--active' : '');
+          btn.setAttribute('data-category', cat);
+          btn.textContent = cat;
+          btn.addEventListener('click', function () { setCategory(cat); });
+          items.appendChild(btn);
+        });
+      }
+
+      function setCategory(cat) {
+        activeCategory = cat;
+        document.querySelectorAll('#category-filter .filter-pill').forEach(function (btn) {
+          btn.classList.toggle('filter-pill--active', btn.getAttribute('data-category') === cat);
+        });
+        applyFilters();
+      }
+
+      function applyFilters() {
+        var query = document.getElementById('search-input').value.toLowerCase();
+        workflowsList.querySelectorAll('.flm-detailslist-row[data-workflow]').forEach(function (row) {
+          var searchMatch = row.getAttribute('data-search').indexOf(query) !== -1;
+          var catMatch = activeCategory === 'All' || (',' + row.getAttribute('data-categories') + ',').indexOf(',' + activeCategory + ',') !== -1;
+          row.style.display = (searchMatch && catMatch) ? '' : 'none';
+        });
+      }
+
+      // ── Search filter ──
+      document.getElementById('search-input').addEventListener('input', function () {
+        applyFilters();
+      });
+
+      // ── Refresh ──
+      document.getElementById('btn-refresh').addEventListener('click', function () {
+        showMessage('info', 'Workflow list refreshed.');
+      });
+
+      // ── Toolbar Run ──
+      btnRun.addEventListener('click', function () {
+        var checked = workflowsList.querySelector('.flm-detailslist-row[data-workflow] .flm-checkbox-input:checked');
+        if (!checked) return;
+        var name = checked.closest('.flm-detailslist-row').getAttribute('data-workflow');
+        openBuilder(name);
+        setTimeout(function () { startExecution(); }, 400);
+      });
+
+      // ── Toolbar Duplicate ──
+      btnDuplicate.addEventListener('click', function () {
+        var checked = workflowsList.querySelector('.flm-detailslist-row[data-workflow] .flm-checkbox-input:checked');
+        if (!checked) return;
+        var name = checked.closest('.flm-detailslist-row').getAttribute('data-workflow');
+        var src = MOCK_WORKFLOWS.find(function (w) { return w.name === name; });
+        if (!src) return;
+        var copy = JSON.parse(JSON.stringify(src));
+        copy.name = src.name + '-copy';
+        copy.lastRun = null;
+        copy.lastStatus = 'never';
+        MOCK_WORKFLOWS.push(copy);
+        renderRows();
+        showMessage('success', 'Workflow "' + copy.name + '" created as a copy of "' + name + '".');
+      });
+
+      // ══════════════════════════════════════════════════════════════
+      //  BUILDER VIEW
+      // ══════════════════════════════════════════════════════════════
+
+      function openBuilder(name) {
+        var wf = MOCK_WORKFLOWS.find(function (w) { return w.name === name; });
+        if (!wf) return;
+        currentWorkflow = wf;
+        isExecuting = false;
+        execBanner.classList.remove('exec-banner--visible');
+        builderTitle.textContent = wf.name;
+        document.getElementById('builder-crumb-name').textContent = wf.name;
+        builderLastRun.textContent = wf.lastRun ? 'Last run: ' + wf.lastRun : '';
+        document.getElementById('builder-run').disabled = false;
+        renderPipeline();
+        builderView.classList.add('builder-view--open');
+        // Scroll to bottom so Add Step is visible
+        setTimeout(function () {
+          var content = document.getElementById('builder-content');
+          content.scrollTop = content.scrollHeight;
+        }, 350);
+      }
+
+      function closeBuilder() {
+        builderView.classList.remove('builder-view--open');
+        if (execInterval) { clearInterval(execInterval); execInterval = null; }
+        isExecuting = false;
+        currentWorkflow = null;
+        renderRows();
+      }
+
+      // Breadcrumb "Workflows" link → back to list
+      document.getElementById('builder-crumb-workflows').addEventListener('click', function (e) {
+        e.preventDefault();
+        closeBuilder();
+      });
+
+      // ── Overflow Menu ──
+      var overflowMenu = document.getElementById('builder-overflow-menu');
+      document.getElementById('builder-overflow').addEventListener('click', function (e) {
+        e.stopPropagation();
+        overflowMenu.classList.toggle('overflow-menu--open');
+      });
+      document.addEventListener('click', function () {
+        overflowMenu.classList.remove('overflow-menu--open');
+      });
+
+      document.getElementById('builder-delete-wf').addEventListener('click', function () {
+        if (!currentWorkflow) return;
+        overflowMenu.classList.remove('overflow-menu--open');
+        document.getElementById('delete-workflow-name').textContent = currentWorkflow.name;
+        deleteDialog.classList.add('flm-dialog-overlay--open');
+      });
+
+      document.getElementById('builder-edit-wf').addEventListener('click', function () {
+        overflowMenu.classList.remove('overflow-menu--open');
+        if (!currentWorkflow) return;
+        openTray('edit-workflow');
+      });
+
+      // ── Flash "Saved" indicator ──
+      function flashSaved() {
+        builderSaved.classList.add('builder-saved--visible');
+        setTimeout(function () { builderSaved.classList.remove('builder-saved--visible'); }, 2000);
+      }
+
+      // ══════════════════════════════════════════════════════════════
+      //  RENDER PIPELINE CARDS
+      // ══════════════════════════════════════════════════════════════
+
+      function renderPipeline() {
+        if (!currentWorkflow) return;
+        var wf = currentWorkflow;
+        var html = '';
+
+        // Input card
+        html += renderInputCard(wf);
+        html += '<div class="pipeline-connector"></div>';
+
+        // Step cards
+        wf.steps.forEach(function (step, i) {
+          html += renderStepCard(step, i, wf.steps.length);
+          html += '<div class="pipeline-connector"></div>';
+        });
+
+        // Add Step shadow card
+        html += '<div class="add-step-card" id="add-step-card"><i class="flm-icon" data-icon="Add"></i> Add Step</div>';
+        html += '<div class="pipeline-connector"></div>';
+
+        // Output card
+        html += renderOutputCard(wf);
+
+        builderPipeline.innerHTML = html;
+        bindPipelineEvents();
+      }
+
+      function summaryRow(label, value) {
+        return '<div class="summary-row"><span class="summary-label">' + label + '</span><span class="summary-value">' + value + '</span></div>';
+      }
+
+      function truncate(str, len) {
+        return str.length > len ? str.substring(0, len) + '…' : str;
+      }
+
+      function renderInputCard(wf) {
+        var inp = wf.input || {};
+        var summary = '';
+        summary += summaryRow('Catalog', inp.catalog || '—');
+        summary += summaryRow('Abstracts', inp.ensureAbstracts ? 'Ensure before run' : 'No');
+        return '<div class="step-card" data-card="input">' +
+          '<div class="step-card-header">' +
+            '<span class="step-type-badge step-type-badge--input">INPUT</span>' +
+            '<span class="step-name">' + (inp.type || 'catalog') + '</span>' +
+          '</div>' +
+          '<div class="step-card-summary">' + summary + '</div>' +
+        '</div>';
+      }
+
+      function renderStepCard(step, index, total) {
+        var stepNum = String(index + 1).padStart(2, '0');
+        var summary = buildStepSummary(step);
+        return '<div class="step-card" data-card="step" data-step-index="' + index + '">' +
+          '<div class="step-card-header">' +
+            '<span class="step-index">' + stepNum + '</span>' +
+            '<span class="step-type-badge">' + step.type + '</span>' +
+            (step.name ? '<span class="step-name">' + step.name + '</span>' : '') +
+            '<div class="step-card-actions">' +
+              (index > 0 ? '<button class="step-action-btn" data-action="move-up" title="Move Up"><i class="flm-icon" data-icon="ChevronUp"></i></button>' : '') +
+              (index < total - 1 ? '<button class="step-action-btn" data-action="move-down" title="Move Down"><i class="flm-icon" data-icon="ChevronDown"></i></button>' : '') +
+              '<button class="step-action-btn" data-action="delete-step" title="Delete" style="color: var(--red);"><i class="flm-icon" data-icon="Cancel"></i></button>' +
+            '</div>' +
+          '</div>' +
+          (summary ? '<div class="step-card-summary">' + summary + '</div>' : '') +
+        '</div>';
+      }
+
+      function buildStepSummary(step) {
+        var parts = '';
+        if (step.mode) parts += summaryRow('Mode', step.mode);
+        if (step.labels) parts += summaryRow('Labels', step.labels.split('/').pop());
+        if (step.allowMulti !== undefined) parts += summaryRow('Multi-label', step.allowMulti ? 'Yes' : 'No');
+        if (step.include) parts += summaryRow('Include', step.include.join(', '));
+        if (step.question) parts += summaryRow('Question', truncate(step.question, 80));
+        if (step.schema) parts += summaryRow('Schema', step.schema.split('/').pop());
+        return parts;
+      }
+
+      function renderOutputCard(wf) {
+        var out = wf.output || {};
+        var primaryList = (out.primary || []).map(function (p) { return p.step + '.' + p.output; }).join(', ');
+        var summary = '';
+        summary += summaryRow('Root', out.root || 'default');
+        summary += summaryRow('Primary', primaryList || '—');
+        return '<div class="step-card" data-card="output">' +
+          '<div class="step-card-header">' +
+            '<span class="step-type-badge step-type-badge--output">OUTPUT</span>' +
+            '<span class="step-name">Configuration</span>' +
+          '</div>' +
+          '<div class="step-card-summary">' + summary + '</div>' +
+        '</div>';
+      }
+
+      function bindPipelineEvents() {
+        // Add Step
+        var addCard = document.getElementById('add-step-card');
+        if (addCard) {
+          addCard.addEventListener('click', function () { openTray('add-step'); });
+        }
+
+        // Action buttons (move, delete) — stop propagation so card click doesn't also fire
+        builderPipeline.querySelectorAll('[data-action]').forEach(function (btn) {
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var action = btn.getAttribute('data-action');
+            var card = btn.closest('.step-card');
+            var idx = card ? parseInt(card.getAttribute('data-step-index'), 10) : -1;
+
+            switch (action) {
+              case 'delete-step':
+                if (!isNaN(idx) && currentWorkflow) {
+                  currentWorkflow.steps.splice(idx, 1);
+                  renderPipeline();
+                  flashSaved();
+                }
+                break;
+              case 'move-up':
+                if (!isNaN(idx) && idx > 0 && currentWorkflow) {
+                  var tmp = currentWorkflow.steps[idx];
+                  currentWorkflow.steps[idx] = currentWorkflow.steps[idx - 1];
+                  currentWorkflow.steps[idx - 1] = tmp;
+                  renderPipeline();
+                  flashSaved();
+                }
+                break;
+              case 'move-down':
+                if (!isNaN(idx) && idx < currentWorkflow.steps.length - 1 && currentWorkflow) {
+                  var tmp2 = currentWorkflow.steps[idx];
+                  currentWorkflow.steps[idx] = currentWorkflow.steps[idx + 1];
+                  currentWorkflow.steps[idx + 1] = tmp2;
+                  renderPipeline();
+                  flashSaved();
+                }
+                break;
+            }
+          });
+        });
+
+        // All cards clickable → open tray
+        builderPipeline.querySelectorAll('.step-card').forEach(function (card) {
+          card.addEventListener('click', function () {
+            var cardType = card.getAttribute('data-card');
+            if (cardType === 'input') {
+              openTray('edit-input');
+            } else if (cardType === 'output') {
+              openTray('edit-output');
+            } else if (cardType === 'step') {
+              var idx = parseInt(card.getAttribute('data-step-index'), 10);
+              openTray('edit-step', idx);
+            }
+          });
+        });
+      }
+
+      // ══════════════════════════════════════════════════════════════
+      //  SLIDE-OUT TRAY
+      // ══════════════════════════════════════════════════════════════
+
+      var currentTrayMode = null;
+      var currentEditIndex = -1;
+
+      function openTray(mode, stepIndex) {
+        currentTrayMode = mode;
+        currentEditIndex = stepIndex !== undefined ? stepIndex : -1;
+
+        switch (mode) {
+          case 'add-step':
+            trayTitle.textContent = 'Add Step';
+            trayPrimary.textContent = 'Add';
+            trayBody.innerHTML = buildAddStepForm();
+            bindAddStepForm();
+            break;
+          case 'edit-step':
+            trayTitle.textContent = 'Edit Step';
+            trayPrimary.textContent = 'Save';
+            var step = currentWorkflow.steps[stepIndex];
+            trayBody.innerHTML = buildEditStepForm(step);
+            break;
+          case 'edit-input':
+            trayTitle.textContent = 'Edit Input';
+            trayPrimary.textContent = 'Save';
+            trayBody.innerHTML = buildEditInputForm();
+            break;
+          case 'edit-output':
+            trayTitle.textContent = 'Edit Output';
+            trayPrimary.textContent = 'Save';
+            trayBody.innerHTML = buildEditOutputForm();
+            break;
+          case 'edit-workflow':
+            trayTitle.textContent = 'Edit Workflow';
+            trayPrimary.textContent = 'Save';
+            trayBody.innerHTML = buildEditWorkflowForm();
+            break;
+        }
+
+        trayOverlay.classList.add('builder-tray-overlay--visible');
+        tray.classList.add('builder-tray--open');
+      }
+
+      function closeTray() {
+        tray.classList.remove('builder-tray--open');
+        trayOverlay.classList.remove('builder-tray-overlay--visible');
+        currentTrayMode = null;
+        currentEditIndex = -1;
+      }
+
+      document.getElementById('tray-close').addEventListener('click', closeTray);
+      trayCancel.addEventListener('click', closeTray);
+      trayOverlay.addEventListener('click', closeTray);
+
+      // ── Add Step Form ──
+      function buildAddStepForm() {
+        var html = '<div class="panel-form">';
+        STEP_TYPES.forEach(function (st, i) {
+          html += '<div class="step-type-option' + (i === 0 ? ' step-type-option--selected' : '') + '" data-type="' + st.type + '">' +
+            '<div><div class="step-type-option-title">' + st.label + '</div>' +
+            '<div class="step-type-option-desc">' + st.desc + '</div></div>' +
+          '</div>';
+        });
+        html += '<div class="flm-textfield" style="margin-top: var(--spacingS1);">' +
+          '<label class="flm-label" for="tray-step-name">Step Name (optional)</label>' +
+          '<input class="flm-textfield-input" id="tray-step-name" placeholder="e.g. high-level">' +
+        '</div>';
+        html += '</div>';
+        return html;
+      }
+
+      function bindAddStepForm() {
+        trayBody.querySelectorAll('.step-type-option').forEach(function (opt) {
+          opt.addEventListener('click', function () {
+            trayBody.querySelectorAll('.step-type-option').forEach(function (o) { o.classList.remove('step-type-option--selected'); });
+            opt.classList.add('step-type-option--selected');
+          });
+        });
+      }
+
+      // ── Edit Step Form ──
+      function buildEditStepForm(step) {
+        var html = '<div class="panel-form">';
+        html += '<div class="flm-textfield"><label class="flm-label">Type</label>' +
+          '<input class="flm-textfield-input" value="' + step.type + '" disabled></div>';
+        html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-name">Name</label>' +
+          '<input class="flm-textfield-input" id="tray-edit-name" value="' + (step.name || '') + '"></div>';
+
+        // Type-specific fields
+        if (step.type === 'classify') {
+          html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-mode">Mode</label>' +
+            '<select class="flm-dropdown" id="tray-edit-mode" style="width: 100%;"><option' + (step.mode === 'abstracts' ? ' selected' : '') + '>abstracts</option><option' + (step.mode === 'full' ? ' selected' : '') + '>full</option></select></div>';
+          html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-labels">Labels File</label>' +
+            '<input class="flm-textfield-input" id="tray-edit-labels" value="' + (step.labels || '') + '"></div>';
+          html += '<label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="tray-edit-multi"' + (step.allowMulti ? ' checked' : '') + '><span class="flm-checkbox-mark"></span><span class="flm-label">Allow multi-label</span></label>';
+        } else if (step.type === 'filter') {
+          html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-include">Include Labels (comma-separated)</label>' +
+            '<input class="flm-textfield-input" id="tray-edit-include" value="' + (step.include ? step.include.join(', ') : '') + '"></div>';
+        } else if (step.type === 'ask') {
+          html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-question">Question</label>' +
+            '<textarea class="flm-textfield-input" id="tray-edit-question" rows="4" style="width: 100%; resize: vertical;">' + (step.question || '') + '</textarea></div>';
+          html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-ask-mode">Mode</label>' +
+            '<select class="flm-dropdown" id="tray-edit-ask-mode" style="width: 100%;"><option' + (step.mode === 'full' ? ' selected' : '') + '>full</option><option' + (step.mode === 'abstracts' ? ' selected' : '') + '>abstracts</option></select></div>';
+          html += '<label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="tray-edit-skip"' + (step.skipInference ? ' checked' : '') + '><span class="flm-checkbox-mark"></span><span class="flm-label">Skip inference</span></label>';
+        } else if (step.type === 'extract') {
+          html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-schema">Schema File</label>' +
+            '<input class="flm-textfield-input" id="tray-edit-schema" value="' + (step.schema || '') + '"></div>';
+        }
+
+        html += '</div>';
+        return html;
+      }
+
+      // ── Edit Input Form ──
+      function buildEditInputForm() {
+        var inp = currentWorkflow ? currentWorkflow.input : {};
+        return '<div class="panel-form">' +
+          '<div class="flm-textfield"><label class="flm-label" for="tray-inp-catalog">Catalog</label>' +
+            '<select class="flm-dropdown" id="tray-inp-catalog" style="width: 100%;">' +
+              '<option value="sec-filings"' + (inp.catalog === 'sec-filings' ? ' selected' : '') + '>sec-filings</option>' +
+              '<option value="legal-contracts"' + (inp.catalog === 'legal-contracts' ? ' selected' : '') + '>legal-contracts</option>' +
+              '<option value="research-papers"' + (inp.catalog === 'research-papers' ? ' selected' : '') + '>research-papers</option>' +
+              '<option value="compliance-docs"' + (inp.catalog === 'compliance-docs' ? ' selected' : '') + '>compliance-docs</option>' +
+            '</select></div>' +
+          '<label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="tray-inp-abstracts"' + (inp.ensureAbstracts ? ' checked' : '') + '><span class="flm-checkbox-mark"></span><span class="flm-label">Ensure abstracts before run</span></label>' +
+        '</div>';
+      }
+
+      // ── Edit Output Form ──
+      function buildEditOutputForm() {
+        var out = currentWorkflow ? currentWorkflow.output : {};
+        var primaryText = (out.primary || []).map(function (p) { return p.step + '.' + p.output; }).join(', ');
+        return '<div class="panel-form">' +
+          '<div><label class="flm-label">Output Root</label>' +
+            '<div class="flm-choicegroup" style="margin-top: var(--spacingS2);">' +
+              '<label class="flm-choicegroup-option"><input type="radio" class="flm-choicegroup-input" name="tray-out-root" value="default"' + (out.root === 'default' ? ' checked' : '') + '><span class="flm-choicegroup-mark"></span><span class="flm-choicegroup-label">Default</span></label>' +
+              '<label class="flm-choicegroup-option"><input type="radio" class="flm-choicegroup-input" name="tray-out-root" value="custom"' + (out.root !== 'default' ? ' checked' : '') + '><span class="flm-choicegroup-mark"></span><span class="flm-choicegroup-label">Custom</span></label>' +
+            '</div></div>' +
+          '<div class="flm-textfield"><label class="flm-label" for="tray-out-primary">Primary Outputs (step.output, comma-separated)</label>' +
+            '<input class="flm-textfield-input" id="tray-out-primary" value="' + primaryText + '"></div>' +
+        '</div>';
+      }
+
+      // ── Edit Workflow Form ──
+      function buildEditWorkflowForm() {
+        var wf = currentWorkflow || {};
+        var catsValue = (wf.categories || []).join(', ');
+        return '<div class="panel-form">' +
+          '<div class="flm-textfield flm-textfield--required"><label class="flm-label" for="tray-wf-name">Name</label>' +
+            '<input class="flm-textfield-input" id="tray-wf-name" value="' + (wf.name || '') + '"></div>' +
+          '<div class="flm-textfield"><label class="flm-label" for="tray-wf-description">Description</label>' +
+            '<textarea class="flm-textfield-input" id="tray-wf-description" rows="3" style="width: 100%; resize: vertical;">' + (wf.description || '') + '</textarea></div>' +
+          '<div class="flm-textfield"><label class="flm-label" for="tray-wf-categories">Categories (comma-separated)</label>' +
+            '<input class="flm-textfield-input" id="tray-wf-categories" value="' + catsValue + '"></div>' +
+          '<div class="flm-textfield"><label class="flm-label" for="tray-wf-model">Default Model</label>' +
+            '<select class="flm-dropdown" id="tray-wf-model" style="width: 100%;">' +
+              '<option value="claude-sonnet"' + ((wf.defaults || {}).model === 'claude-sonnet' ? ' selected' : '') + '>claude-sonnet</option>' +
+              '<option value="claude-haiku"' + ((wf.defaults || {}).model === 'claude-haiku' ? ' selected' : '') + '>claude-haiku</option>' +
+              '<option value="claude-opus"' + ((wf.defaults || {}).model === 'claude-opus' ? ' selected' : '') + '>claude-opus</option>' +
+            '</select></div>' +
+          '<div class="flm-textfield"><label class="flm-label" for="tray-wf-lens">Default Lens</label>' +
+            '<input class="flm-textfield-input" id="tray-wf-lens" value="' + ((wf.defaults || {}).lens || '') + '" placeholder="e.g. lenses/financial-risk.lens.md"></div>' +
+        '</div>';
+      }
+
+      // ── Tray Primary Button ──
+      trayPrimary.addEventListener('click', function () {
+        if (!currentWorkflow) { closeTray(); return; }
+
+        switch (currentTrayMode) {
+          case 'add-step':
+            var selected = trayBody.querySelector('.step-type-option--selected');
+            if (!selected) return;
+            var newStep = { type: selected.getAttribute('data-type') };
+            var nameInput = document.getElementById('tray-step-name');
+            if (nameInput && nameInput.value.trim()) newStep.name = nameInput.value.trim();
+            // Set defaults
+            if (newStep.type === 'classify') { newStep.mode = 'abstracts'; newStep.labels = ''; newStep.allowMulti = false; }
+            if (newStep.type === 'filter') { newStep.include = []; }
+            if (newStep.type === 'ask') { newStep.question = ''; newStep.mode = 'full'; newStep.skipInference = false; }
+            if (newStep.type === 'extract') { newStep.schema = ''; }
+            currentWorkflow.steps.push(newStep);
+            renderPipeline();
+            flashSaved();
+            closeTray();
+            break;
+
+          case 'edit-step':
+            var step = currentWorkflow.steps[currentEditIndex];
+            if (!step) { closeTray(); return; }
+            var editName = document.getElementById('tray-edit-name');
+            if (editName) step.name = editName.value.trim();
+            // Type-specific saves
+            if (step.type === 'classify') {
+              var modeEl = document.getElementById('tray-edit-mode');
+              var labelsEl = document.getElementById('tray-edit-labels');
+              var multiEl = document.getElementById('tray-edit-multi');
+              if (modeEl) step.mode = modeEl.value;
+              if (labelsEl) step.labels = labelsEl.value;
+              if (multiEl) step.allowMulti = multiEl.checked;
+            } else if (step.type === 'filter') {
+              var incEl = document.getElementById('tray-edit-include');
+              if (incEl) step.include = incEl.value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+            } else if (step.type === 'ask') {
+              var qEl = document.getElementById('tray-edit-question');
+              var askModeEl = document.getElementById('tray-edit-ask-mode');
+              var skipEl = document.getElementById('tray-edit-skip');
+              if (qEl) step.question = qEl.value;
+              if (askModeEl) step.mode = askModeEl.value;
+              if (skipEl) step.skipInference = skipEl.checked;
+            } else if (step.type === 'extract') {
+              var schEl = document.getElementById('tray-edit-schema');
+              if (schEl) step.schema = schEl.value;
+            }
+            renderPipeline();
+            flashSaved();
+            closeTray();
+            break;
+
+          case 'edit-input':
+            var catEl = document.getElementById('tray-inp-catalog');
+            var absEl = document.getElementById('tray-inp-abstracts');
+            if (catEl) currentWorkflow.input.catalog = catEl.value;
+            if (absEl) currentWorkflow.input.ensureAbstracts = absEl.checked;
+            if (currentWorkflow.defaults) currentWorkflow.defaults.catalog = currentWorkflow.input.catalog;
+            renderPipeline();
+            flashSaved();
+            closeTray();
+            break;
+
+          case 'edit-output':
+            var rootEl = document.querySelector('input[name="tray-out-root"]:checked');
+            var primEl = document.getElementById('tray-out-primary');
+            if (rootEl) currentWorkflow.output.root = rootEl.value;
+            if (primEl) {
+              currentWorkflow.output.primary = primEl.value.split(',').map(function (s) {
+                var parts = s.trim().split('.');
+                return parts.length === 2 ? { step: parts[0], output: parts[1] } : null;
+              }).filter(Boolean);
+            }
+            renderPipeline();
+            flashSaved();
+            closeTray();
+            break;
+
+          case 'edit-workflow':
+            var wfNameEl = document.getElementById('tray-wf-name');
+            var wfDescEl = document.getElementById('tray-wf-description');
+            var wfCatsEl = document.getElementById('tray-wf-categories');
+            var wfModelEl = document.getElementById('tray-wf-model');
+            var wfLensEl = document.getElementById('tray-wf-lens');
+            if (wfNameEl && wfNameEl.value.trim()) {
+              currentWorkflow.name = wfNameEl.value.trim();
+              builderTitle.textContent = currentWorkflow.name;
+              document.getElementById('builder-crumb-name').textContent = currentWorkflow.name;
+            }
+            if (wfDescEl) currentWorkflow.description = wfDescEl.value.trim();
+            if (wfCatsEl) currentWorkflow.categories = wfCatsEl.value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+            if (!currentWorkflow.defaults) currentWorkflow.defaults = {};
+            if (wfModelEl) currentWorkflow.defaults.model = wfModelEl.value;
+            if (wfLensEl) currentWorkflow.defaults.lens = wfLensEl.value.trim() || null;
+            flashSaved();
+            closeTray();
+            break;
+        }
+      });
+
+      // ══════════════════════════════════════════════════════════════
+      //  EXECUTION MODE
+      // ══════════════════════════════════════════════════════════════
+
+      document.getElementById('builder-run').addEventListener('click', startExecution);
+
+      function startExecution() {
+        if (!currentWorkflow || isExecuting) return;
+        isExecuting = true;
+        execBanner.classList.remove('exec-banner--visible');
+        document.getElementById('builder-run').disabled = true;
+
+        // Render execution timeline
+        var wf = currentWorkflow;
+        var html = '<div class="exec-timeline" id="exec-timeline">';
+
+        // Input step (immediately complete)
+        html += '<div class="exec-step" data-exec="input">' +
+          '<div class="exec-step-icon exec-step-icon--complete"><i class="flm-icon" data-icon="CheckMark"></i></div>' +
+          '<div class="exec-step-body">' +
+            '<div class="exec-step-name">Input: ' + (wf.input.catalog || '—') + '</div>' +
+            '<div class="exec-step-status">Ready</div>' +
+          '</div></div>';
+
+        // Workflow steps
+        wf.steps.forEach(function (step, i) {
+          var num = String(i + 1).padStart(2, '0');
+          html += '<div class="exec-step" data-exec="step-' + i + '">' +
+            '<div class="exec-step-icon exec-step-icon--pending">—</div>' +
+            '<div class="exec-step-body">' +
+              '<div class="exec-step-name">' + num + ' ' + step.type + (step.name ? ' — ' + step.name : '') + '</div>' +
+              '<div class="exec-step-status">Pending</div>' +
+              '<div class="exec-step-progress" style="display: none;"><div class="flm-progress"><div class="flm-progress-track"><div class="flm-progress-bar" style="width: 0%"></div></div></div></div>' +
+              '<button class="exec-step-toggle" style="display: none;">Show logs</button>' +
+              '<div class="exec-step-log"></div>' +
+            '</div></div>';
+        });
+
+        html += '</div>';
+        html += '<div style="text-align: center; margin-top: var(--spacingL1);"><button class="flm-button" id="exec-cancel" style="color: var(--red);">Cancel</button></div>';
+        builderPipeline.innerHTML = html;
+
+        // Cancel button
+        document.getElementById('exec-cancel').addEventListener('click', function () {
+          if (execInterval) { clearInterval(execInterval); execInterval = null; }
+          isExecuting = false;
+          document.getElementById('builder-run').disabled = false;
+          renderPipeline();
+          showMessage('warning', 'Workflow execution cancelled.');
+        });
+
+        // Bind log toggles
+        builderPipeline.querySelectorAll('.exec-step-toggle').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var log = btn.nextElementSibling;
+            var isOpen = log.classList.toggle('exec-step-log--open');
+            btn.textContent = isOpen ? 'Hide logs' : 'Show logs';
+          });
+        });
+
+        // Simulate execution
+        simulateExecution();
+      }
+
+      function simulateExecution() {
+        if (!currentWorkflow) return;
+        var steps = currentWorkflow.steps;
+        var currentStep = 0;
+        var progress = 0;
+        var LOGS = [
+          'Initializing step…',
+          'Processing batch 1/4…',
+          'Processing batch 2/4…',
+          'Processing batch 3/4…',
+          'Processing batch 4/4…',
+          'Finalizing outputs…'
+        ];
+
+        execInterval = setInterval(function () {
+          if (currentStep >= steps.length) {
+            clearInterval(execInterval);
+            execInterval = null;
+            isExecuting = false;
+            document.getElementById('builder-run').disabled = false;
+            currentWorkflow.lastRun = 'Feb 22, 2026 3:15 PM';
+            currentWorkflow.lastStatus = 'complete';
+            builderLastRun.textContent = 'Last run: ' + currentWorkflow.lastRun;
+
+            // Show completion banner
+            execBanner.classList.add('exec-banner--visible');
+            document.getElementById('exec-banner-text').textContent = 'Workflow completed successfully.';
+            return;
+          }
+
+          var stepEl = builderPipeline.querySelector('[data-exec="step-' + currentStep + '"]');
+          if (!stepEl) return;
+
+          var icon = stepEl.querySelector('.exec-step-icon');
+          var status = stepEl.querySelector('.exec-step-status');
+          var progressWrap = stepEl.querySelector('.exec-step-progress');
+          var progressBar = progressWrap ? progressWrap.querySelector('.flm-progress-bar') : null;
+          var toggleBtn = stepEl.querySelector('.exec-step-toggle');
+          var logEl = stepEl.querySelector('.exec-step-log');
+
+          if (progress === 0) {
+            // Start step
+            icon.className = 'exec-step-icon exec-step-icon--running';
+            icon.innerHTML = '<i class="flm-icon" data-icon="Processing"></i>';
+            status.textContent = 'Running…';
+            progressWrap.style.display = 'block';
+            toggleBtn.style.display = 'inline';
+          }
+
+          progress += 20;
+
+          if (progressBar) progressBar.style.width = Math.min(progress, 100) + '%';
+          status.textContent = 'Running (' + Math.min(progress, 100) + '%)';
+
+          // Add log line
+          var logIdx = Math.floor(progress / 20) - 1;
+          if (logIdx >= 0 && logIdx < LOGS.length) {
+            logEl.textContent += (logEl.textContent ? '\n' : '') + LOGS[logIdx];
+          }
+
+          if (progress >= 100) {
+            // Complete step
+            icon.className = 'exec-step-icon exec-step-icon--complete';
+            icon.innerHTML = '<i class="flm-icon" data-icon="CheckMark"></i>';
+            status.textContent = 'Complete';
+            logEl.textContent += '\nStep completed.';
+            currentStep++;
+            progress = 0;
+          }
+        }, 500);
+      }
+
+      // ── Execution Banner Buttons ──
+      document.getElementById('btn-open-output').addEventListener('click', function () {
+        showMessage('info', 'Opening primary output…');
+      });
+
+      document.getElementById('btn-view-run').addEventListener('click', function () {
+        showMessage('info', 'Navigating to run details…');
+      });
+
+      document.getElementById('btn-open-run-folder').addEventListener('click', function () {
+        showMessage('info', 'Opening run folder…');
+      });
+
+      // ══════════════════════════════════════════════════════════════
+      //  RUNS VIEW
+      // ══════════════════════════════════════════════════════════════
+
+      var runsView = document.getElementById('runs-view');
+      var runsList = document.getElementById('runs-list');
+      var runsHeader = document.getElementById('runs-header');
+
+      // Mock run data per workflow
+      var MOCK_RUNS = {
+        'financial-risk-report': [
+          { runId: 'Workflows@workflow.financial-risk-report@20260222T143312', timestamp: 'Feb 22, 2026 2:33 PM', status: 'complete', duration: '3m 2s', steps: 3, primaryOutput: '04.ask__answer.md' },
+          { runId: 'Workflows@workflow.financial-risk-report@20260221T091500', timestamp: 'Feb 21, 2026 9:15 AM', status: 'complete', duration: '2m 48s', steps: 3, primaryOutput: '04.ask__answer.md' },
+          { runId: 'Workflows@workflow.financial-risk-report@20260220T160000', timestamp: 'Feb 20, 2026 4:00 PM', status: 'complete', duration: '3m 15s', steps: 3, primaryOutput: '04.ask__answer.md' },
+          { runId: 'Workflows@workflow.financial-risk-report@20260219T110000', timestamp: 'Feb 19, 2026 11:00 AM', status: 'error', duration: '1m 22s', steps: 3, primaryOutput: '—' }
+        ],
+        'compliance-monitoring': [
+          { runId: 'Workflows@workflow.compliance-monitoring@20260220T091500', timestamp: 'Feb 20, 2026 9:15 AM', status: 'complete', duration: '4m 10s', steps: 4, primaryOutput: '04.ask__answer.md' },
+          { runId: 'Workflows@workflow.compliance-monitoring@20260218T091500', timestamp: 'Feb 18, 2026 9:15 AM', status: 'complete', duration: '3m 55s', steps: 4, primaryOutput: '04.ask__answer.md' }
+        ],
+        'research-digest': [
+          { runId: 'Workflows@workflow.research-digest@20260219T160000', timestamp: 'Feb 19, 2026 4:00 PM', status: 'error', duration: '1m 5s', steps: 2, primaryOutput: '—' },
+          { runId: 'Workflows@workflow.research-digest@20260218T160000', timestamp: 'Feb 18, 2026 4:00 PM', status: 'complete', duration: '2m 12s', steps: 2, primaryOutput: '02.ask__answer.md' }
+        ]
+      };
+
+      var runsStatusMap = {
+        'complete': '<span class="status-badge status-badge--ready"><span class="status-dot"></span> Complete</span>',
+        'error':    '<span class="status-badge status-badge--error"><span class="status-dot"></span> Error</span>',
+        'running':  '<span class="status-badge status-badge--running"><span class="status-dot"></span> Running</span>'
+      };
+
+      function openRunsView() {
+        if (!currentWorkflow) return;
+        document.getElementById('runs-crumb-builder').textContent = currentWorkflow.name;
+        renderRunsTable();
+        runsView.classList.add('runs-view--open');
+      }
+
+      function closeRunsView() {
+        runsView.classList.remove('runs-view--open');
+      }
+
+      function renderRunsTable() {
+        if (!currentWorkflow) return;
+        var runs = MOCK_RUNS[currentWorkflow.name] || [];
+
+        // Show empty or data state
+        document.getElementById('runs-state-empty').style.display = runs.length === 0 ? 'flex' : 'none';
+        document.getElementById('runs-state-data').style.display = runs.length > 0 ? 'block' : 'none';
+
+        if (runs.length === 0) return;
+
+        // Render header
+        runsHeader.innerHTML =
+          '<div class="flm-detailslist-header-cell" style="flex: 1; min-width: 200px;">Timestamp</div>' +
+          '<div class="flm-detailslist-header-cell" style="width: 120px;">Status</div>' +
+          '<div class="flm-detailslist-header-cell" style="width: 100px;">Duration</div>' +
+          '<div class="flm-detailslist-header-cell cell-number" style="width: 80px;">Steps</div>' +
+          '<div class="flm-detailslist-header-cell" style="flex: 1; min-width: 180px;">Primary Output</div>';
+
+        // Render rows
+        runsList.querySelectorAll('.flm-detailslist-row').forEach(function (r) { r.remove(); });
+
+        runs.forEach(function (run) {
+          var row = document.createElement('div');
+          row.className = 'flm-detailslist-row';
+          row.setAttribute('data-run', run.runId);
+          row.setAttribute('data-search', (run.timestamp + ' ' + run.status + ' ' + run.runId).toLowerCase());
+
+          row.innerHTML =
+            '<div class="flm-detailslist-cell" style="flex: 1; min-width: 200px; font-weight: var(--fontWeightSemibold);">' + run.timestamp + '</div>' +
+            '<div class="flm-detailslist-cell" style="width: 120px;">' + (runsStatusMap[run.status] || run.status) + '</div>' +
+            '<div class="flm-detailslist-cell duration-cell" style="width: 100px;">' + run.duration + '</div>' +
+            '<div class="flm-detailslist-cell cell-number" style="width: 80px;">' + run.steps + '</div>' +
+            '<div class="flm-detailslist-cell" style="flex: 1; min-width: 180px; color: var(--bodySubtext); font-family: monospace; font-size: var(--fontSizeSmall);">' + run.primaryOutput + '</div>';
+
+          row.addEventListener('click', function () {
+            showMessage('info', 'Opening run detail for ' + run.runId + '…');
+          });
+
+          runsList.appendChild(row);
+        });
+      }
+
+      // Builder "View Runs" button
+      document.getElementById('builder-view-runs').addEventListener('click', openRunsView);
+
+      // Builder "Help" button
+      document.getElementById('builder-help').addEventListener('click', function () {
+        showMessage('info', 'Workflow builder help — define linear reasoning pipelines over your catalogs.');
+      });
+
+      // Runs "Back" button
+      document.getElementById('runs-back').addEventListener('click', closeRunsView);
+
+      // Runs breadcrumb clicks
+      document.getElementById('runs-crumb-workflows').addEventListener('click', function (e) {
+        e.preventDefault();
+        closeRunsView();
+        closeBuilder();
+      });
+      document.getElementById('runs-crumb-builder').addEventListener('click', function (e) {
+        e.preventDefault();
+        closeRunsView();
+      });
+
+      // Runs "Refresh" button
+      document.getElementById('runs-refresh').addEventListener('click', function () {
+        renderRunsTable();
+        showMessage('info', 'Runs refreshed.');
+      });
+
+      // Runs search
+      document.getElementById('runs-search-input').addEventListener('input', function () {
+        var query = this.value.toLowerCase();
+        runsList.querySelectorAll('.flm-detailslist-row[data-run]').forEach(function (row) {
+          row.style.display = row.getAttribute('data-search').indexOf(query) !== -1 ? '' : 'none';
+        });
+      });
+
+      // Execution banner "View Run" button → open runs view
+      document.getElementById('btn-view-run').addEventListener('click', function () {
+        openRunsView();
+      });
+
+      // ══════════════════════════════════════════════════════════════
+      //  NEW WORKFLOW WIZARD
+      // ══════════════════════════════════════════════════════════════
+
+      var wizStep = 1;
+
+      function openWizard() {
+        wizStep = 1;
+        updateWizardStep();
+        document.getElementById('wiz-name').value = '';
+        document.getElementById('wiz-description').value = '';
+        document.getElementById('wiz-catalog').value = '';
+        document.getElementById('wiz-ensure-abstracts').checked = false;
+        document.querySelector('input[name="wiz-output-root"][value="default"]').checked = true;
+        document.getElementById('wiz-custom-output-wrap').style.display = 'none';
+        document.getElementById('wiz-custom-output').value = '';
+        document.getElementById('wizard-messagebar').style.display = 'none';
+        wizardDialog.classList.add('flm-dialog-overlay--open');
+      }
+
+      function updateWizardStep() {
+        document.getElementById('wizard-step-1').style.display = wizStep === 1 ? 'block' : 'none';
+        document.getElementById('wizard-step-2').style.display = wizStep === 2 ? 'block' : 'none';
+        document.getElementById('wizard-step-3').style.display = wizStep === 3 ? 'block' : 'none';
+        document.getElementById('wiz-back').style.display = wizStep > 1 ? 'inline-block' : 'none';
+        document.getElementById('wiz-next').textContent = wizStep === 3 ? 'Create' : 'Next';
+        document.getElementById('wizard-messagebar').style.display = 'none';
+
+        // Step dots
+        for (var d = 1; d <= 3; d++) {
+          document.getElementById('wiz-dot-' + d).style.background = d === wizStep ? 'var(--themePrimary)' : (d < wizStep ? 'var(--green)' : 'var(--bodyDivider)');
+        }
+      }
+
+      document.getElementById('btn-new-workflow').addEventListener('click', openWizard);
+      document.getElementById('btn-empty-create').addEventListener('click', openWizard);
+
+      document.getElementById('wiz-next').addEventListener('click', function () {
+        if (wizStep === 1) {
+          var name = document.getElementById('wiz-name').value.trim();
+          if (!name) {
+            document.getElementById('wizard-messagebar').style.display = 'block';
+            document.getElementById('wizard-messagebar').innerHTML = '<div class="flm-messagebar flm-messagebar--error">Name is required.</div>';
+            return;
+          }
+          if (MOCK_WORKFLOWS.find(function (w) { return w.name.toLowerCase() === name.toLowerCase(); })) {
+            document.getElementById('wizard-messagebar').style.display = 'block';
+            document.getElementById('wizard-messagebar').innerHTML = '<div class="flm-messagebar flm-messagebar--error">A workflow named "' + name + '" already exists.</div>';
+            return;
+          }
+          wizStep = 2;
+          updateWizardStep();
+        } else if (wizStep === 2) {
+          var catalog = document.getElementById('wiz-catalog').value;
+          if (!catalog) {
+            document.getElementById('wizard-messagebar').style.display = 'block';
+            document.getElementById('wizard-messagebar').innerHTML = '<div class="flm-messagebar flm-messagebar--error">Please select a catalog.</div>';
+            return;
+          }
+          wizStep = 3;
+          updateWizardStep();
+        } else {
+          // Create workflow
+          var newWf = {
+            name: document.getElementById('wiz-name').value.trim(),
+            description: document.getElementById('wiz-description').value.trim(),
+            steps: [],
+            input: {
+              type: 'catalog',
+              catalog: document.getElementById('wiz-catalog').value,
+              ensureAbstracts: document.getElementById('wiz-ensure-abstracts').checked
+            },
+            output: {
+              root: document.querySelector('input[name="wiz-output-root"]:checked').value,
+              primary: []
+            },
+            lastRun: null,
+            lastStatus: 'never',
+            defaults: {
+              catalog: document.getElementById('wiz-catalog').value,
+              mode: 'full',
+              lens: null,
+              model: 'claude-sonnet'
+            }
+          };
+
+          MOCK_WORKFLOWS.push(newWf);
+          wizardDialog.classList.remove('flm-dialog-overlay--open');
+          renderRows();
+          showMessage('success', 'Workflow "' + newWf.name + '" created.');
+          openBuilder(newWf.name);
+        }
+      });
+
+      document.getElementById('wiz-back').addEventListener('click', function () {
+        if (wizStep > 1) {
+          wizStep--;
+          updateWizardStep();
+        }
+      });
+
+      // Custom output toggle
+      document.querySelectorAll('input[name="wiz-output-root"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+          document.getElementById('wiz-custom-output-wrap').style.display = radio.value === 'custom' ? 'block' : 'none';
+        });
+      });
+
+      // Close wizard
+      wizardDialog.addEventListener('click', function (e) {
+        if (e.target.hasAttribute('data-dialog-close') || e.target === wizardDialog) {
+          wizardDialog.classList.remove('flm-dialog-overlay--open');
+        }
+      });
+
+      // ══════════════════════════════════════════════════════════════
+      //  DELETE DIALOG
+      // ══════════════════════════════════════════════════════════════
+
+      var deleteTarget = null;
+
+      document.getElementById('btn-delete').addEventListener('click', function () {
+        var checked = workflowsList.querySelectorAll('.flm-detailslist-row[data-workflow] .flm-checkbox-input:checked');
+        if (checked.length === 0) return;
+        var names = [];
+        checked.forEach(function (cb) { names.push(cb.closest('.flm-detailslist-row').getAttribute('data-workflow')); });
+        deleteTarget = names;
+        document.getElementById('delete-workflow-name').textContent = names.join(', ');
+        deleteDialog.classList.add('flm-dialog-overlay--open');
+      });
+
+      document.getElementById('btn-confirm-delete').addEventListener('click', function () {
+        deleteDialog.classList.remove('flm-dialog-overlay--open');
+        if (deleteTarget) {
+          MOCK_WORKFLOWS = MOCK_WORKFLOWS.filter(function (w) { return deleteTarget.indexOf(w.name) === -1; });
+          deleteTarget = null;
+          if (currentWorkflow && !MOCK_WORKFLOWS.find(function (w) { return w === currentWorkflow; })) {
+            closeBuilder();
+          }
+          renderRows();
+          showMessage('success', 'Workflow(s) deleted.');
+        }
+      });
+
+      deleteDialog.addEventListener('click', function (e) {
+        if (e.target.hasAttribute('data-dialog-close') || e.target === deleteDialog) {
+          deleteDialog.classList.remove('flm-dialog-overlay--open');
+        }
+      });
+
+      // ══════════════════════════════════════════════════════════════
+      //  STATE SWITCHER (for demo: toggle via console)
+      // ══════════════════════════════════════════════════════════════
+
+      window.showState = function (state) {
+        document.getElementById('state-loading').style.display = state === 'loading' ? 'block' : 'none';
+        document.getElementById('state-empty').style.display = state === 'empty' ? 'flex' : 'none';
+        document.getElementById('state-data').style.display = state === 'data' ? 'block' : 'none';
+      };
+
+      // ══════════════════════════════════════════════════════════════
+      //  INIT
+      // ══════════════════════════════════════════════════════════════
+
+      renderHeader();
+      renderRows();
+      buildFilterBar();
+      window.showState('data');
+
+    })();
+  </script>
+</body>
+</html>
