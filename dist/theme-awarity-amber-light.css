@@ -1,0 +1,170 @@
+/* ==========================================================================
+   FluentLM — Awarity Amber Light Theme
+   Brand palette: Amber #f59e0b, Orange #ea580c, Yellow #fbbf24, Warm Gray #78716c
+   Applied when <html class="fluent-awarity-amber-light">.
+   ========================================================================== */
+
+.fluent-awarity-amber-light {
+  /* -----------------------------------------------------------------------
+     BODY / BACKGROUND
+     ----------------------------------------------------------------------- */
+  --bodyBackground:          #ffffff;
+  --bodyBackgroundHovered:   #fdfaf5;
+  --bodyBackgroundChecked:   #fef3e2;
+  --bodyStandoutBackground:  #fefcf8;
+  --bodyFrameBackground:     #ffffff;
+  --bodyFrameDivider:        #e7ddd0;
+  --bodyDivider:             #e7ddd0;
+
+  /* -----------------------------------------------------------------------
+     TEXT
+     ----------------------------------------------------------------------- */
+  --bodyText:                #292524;
+  --bodyTextChecked:         #1c1917;
+  --bodySubtext:             #78716c;
+  --disabledText:            #a8a29e;
+  --disabledBodyText:        #a8a29e;
+  --disabledSubtext:         #d6d3d1;
+  --disabledBodySubtext:     #c0bbb6;
+
+  /* -----------------------------------------------------------------------
+     LINKS
+     ----------------------------------------------------------------------- */
+  --link:                    #d97706;
+  --linkHovered:             #b45309;
+  --actionLink:              #292524;
+  --actionLinkHovered:       #1c1917;
+
+  /* -----------------------------------------------------------------------
+     BUTTONS — Default
+     ----------------------------------------------------------------------- */
+  --buttonBackground:              #ffffff;
+  --buttonBackgroundHovered:       #fdf8f0;
+  --buttonBackgroundChecked:       #fef3cd;
+  --buttonBackgroundCheckedHovered: #fde9a8;
+  --buttonBackgroundPressed:       #fef3cd;
+  --buttonBackgroundDisabled:      #fdfaf5;
+  --buttonBorder:                  #a8a29e;
+  --buttonBorderDisabled:          #e7ddd0;
+  --buttonText:                    #292524;
+  --buttonTextHovered:             #1c1917;
+  --buttonTextChecked:             #1c1917;
+  --buttonTextCheckedHovered:      #000000;
+  --buttonTextPressed:             #1c1917;
+  --buttonTextDisabled:            #a8a29e;
+
+  /* -----------------------------------------------------------------------
+     BUTTONS — Primary
+     ----------------------------------------------------------------------- */
+  --primaryButtonBackground:          #f59e0b;
+  --primaryButtonBackgroundHovered:   #d97706;
+  --primaryButtonBackgroundPressed:   #b45309;
+  --primaryButtonBackgroundDisabled:  #e7ddd0;
+  --primaryButtonBorder:              transparent;
+  --primaryButtonText:                #1c1917;
+  --primaryButtonTextHovered:         #1c1917;
+  --primaryButtonTextPressed:         #ffffff;
+  --primaryButtonTextDisabled:        #c0bbb6;
+
+  /* -----------------------------------------------------------------------
+     BUTTONS — Accent
+     ----------------------------------------------------------------------- */
+  --accentButtonBackground:  #f59e0b;
+  --accentButtonText:        #1c1917;
+
+  /* -----------------------------------------------------------------------
+     INPUTS
+     ----------------------------------------------------------------------- */
+  --inputBackground:                    #ffffff;
+  --inputBackgroundChecked:             #f59e0b;
+  --inputBackgroundCheckedHovered:      #d97706;
+  --inputPlaceholderBackgroundChecked:  #fde68a;
+  --inputForegroundChecked:             #1c1917;
+  --inputBorder:                        #8a8480;
+  --smallInputBorder:                   #8a8480;
+  --inputBorderHovered:                 #292524;
+  --inputFocusBorderAlt:                #f59e0b;
+  --inputText:                          #292524;
+  --inputTextHovered:                   #1c1917;
+  --inputPlaceholderText:               #8a8480;
+  --inputIcon:                          #d97706;
+  --inputIconHovered:                   #b45309;
+  --inputIconDisabled:                  #a8a29e;
+
+  /* -----------------------------------------------------------------------
+     LISTS
+     ----------------------------------------------------------------------- */
+  --listBackground:                  #ffffff;
+  --listText:                        #292524;
+  --listItemBackgroundHovered:       #fdf8f0;
+  --listItemBackgroundChecked:       #fef3cd;
+  --listItemBackgroundCheckedHovered: #fde9a8;
+  --listHeaderBackgroundHovered:     #fdf8f0;
+  --listHeaderBackgroundPressed:     #fef3cd;
+
+  /* -----------------------------------------------------------------------
+     MENUS
+     ----------------------------------------------------------------------- */
+  --menuBackground:              #ffffff;
+  --menuDivider:                 #e7ddd0;
+  --menuIcon:                    #d97706;
+  --menuHeader:                  #d97706;
+  --menuItemBackgroundHovered:   #fdf8f0;
+  --menuItemBackgroundPressed:   #fef3cd;
+  --menuItemText:                #292524;
+  --menuItemTextHovered:         #1c1917;
+
+  /* -----------------------------------------------------------------------
+     CARDS
+     ----------------------------------------------------------------------- */
+  --cardStandoutBackground:  #ffffff;
+  --cardShadow:              0 1.6px 3.6px 0 rgba(245, 158, 11, 0.10),
+                             0 0.3px 0.9px 0 rgba(245, 158, 11, 0.08);
+  --cardShadowHovered:       0 3.2px 7.2px 0 rgba(245, 158, 11, 0.12),
+                             0 0.6px 1.8px 0 rgba(245, 158, 11, 0.10);
+  --variantBorder:           #e7ddd0;
+  --variantBorderHovered:    #fbbf24;
+
+  /* -----------------------------------------------------------------------
+     DISABLED / FOCUS
+     ----------------------------------------------------------------------- */
+  --disabledBackground:  #fdf8f0;
+  --disabledBorder:      #e7ddd0;
+  --focusBorder:         #78716c;
+
+  /* -----------------------------------------------------------------------
+     STATUS — Backgrounds
+     ----------------------------------------------------------------------- */
+  --infoBackground:           #fefce8;
+  --errorBackground:          #FDE7E9;
+  --blockingBackground:       #FDE7E9;
+  --warningBackground:        #FFF4CE;
+  --severeWarningBackground:  #FED9CC;
+  --successBackground:        #e4f0dc;
+
+  /* -----------------------------------------------------------------------
+     STATUS — Icons
+     ----------------------------------------------------------------------- */
+  --infoIcon:           #d97706;
+  --errorIcon:          #A80000;
+  --blockingIcon:       #FDE7E9;
+  --warningIcon:        #797775;
+  --severeWarningIcon:  var(--orange);
+  --successIcon:        #4a7c29;
+
+  /* -----------------------------------------------------------------------
+     STATUS — Text
+     ----------------------------------------------------------------------- */
+  --errorText:    #a4262c;
+  --messageText:  #292524;
+  --messageLink:  #b45309;
+  --messageLinkHovered: #92400e;
+  --warningText:  #292524;
+  --successText:  #4a7c29;
+
+  /* -----------------------------------------------------------------------
+     MISC
+     ----------------------------------------------------------------------- */
+  --defaultStateBackground:  #fefcf8;
+  --overlayBackground:       rgba(41, 37, 36, 0.4);
+}

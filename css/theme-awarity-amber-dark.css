@@ -1,10 +1,10 @@
 /* ==========================================================================
-   FluentLM — Awarity Dark Theme (Blue)
-   Brand palette: Blue #2563eb, Indigo #4f46e5, Sky #60a5fa, Slate #475569
-   Applied when <html class="fluent-awarity-dark">.
+   FluentLM — Awarity Amber Dark Theme
+   Brand palette: Amber #f59e0b, Orange #ea580c, Yellow #fbbf24, Warm Gray #78716c
+   Applied when <html class="fluent-awarity-amber-dark">.
    ========================================================================== */
 
-.fluent-awarity-dark {
+.fluent-awarity-amber-dark {
   /* -----------------------------------------------------------------------
      BODY / BACKGROUND
      ----------------------------------------------------------------------- */
@@ -30,8 +30,8 @@
   /* -----------------------------------------------------------------------
      LINKS
      ----------------------------------------------------------------------- */
-  --link:                    #60a5fa;
-  --linkHovered:             #93bbfd;
+  --link:                    #fbbf24;
+  --linkHovered:             #fcd34d;
   --actionLink:              #d4e4e8;
   --actionLinkHovered:       #ffffff;
 
@@ -56,39 +56,39 @@
   /* -----------------------------------------------------------------------
      BUTTONS — Primary
      ----------------------------------------------------------------------- */
-  --primaryButtonBackground:          #2563eb;
-  --primaryButtonBackgroundHovered:   #3b82f6;
-  --primaryButtonBackgroundPressed:   #1d4ed8;
+  --primaryButtonBackground:          #f59e0b;
+  --primaryButtonBackgroundHovered:   #fbbf24;
+  --primaryButtonBackgroundPressed:   #d97706;
   --primaryButtonBackgroundDisabled:  #162629;
   --primaryButtonBorder:              transparent;
-  --primaryButtonText:                #ffffff;
-  --primaryButtonTextHovered:         #ffffff;
-  --primaryButtonTextPressed:         #ffffff;
+  --primaryButtonText:                #1c1917;
+  --primaryButtonTextHovered:         #1c1917;
+  --primaryButtonTextPressed:         #1c1917;
   --primaryButtonTextDisabled:        #3e5a62;
 
   /* -----------------------------------------------------------------------
      BUTTONS — Accent
      ----------------------------------------------------------------------- */
-  --accentButtonBackground:  #2563eb;
-  --accentButtonText:        #ffffff;
+  --accentButtonBackground:  #f59e0b;
+  --accentButtonText:        #1c1917;
 
   /* -----------------------------------------------------------------------
      INPUTS
      ----------------------------------------------------------------------- */
   --inputBackground:                    #0f1c1f;
-  --inputBackgroundChecked:             #2563eb;
-  --inputBackgroundCheckedHovered:      #3b82f6;
-  --inputPlaceholderBackgroundChecked:  #1e40af;
-  --inputForegroundChecked:             #ffffff;
+  --inputBackgroundChecked:             #f59e0b;
+  --inputBackgroundCheckedHovered:      #fbbf24;
+  --inputPlaceholderBackgroundChecked:  #92400e;
+  --inputForegroundChecked:             #1c1917;
   --inputBorder:                        #3e5a62;
   --smallInputBorder:                   #3e5a62;
   --inputBorderHovered:                 #8eaaB2;
-  --inputFocusBorderAlt:                #60a5fa;
+  --inputFocusBorderAlt:                #fbbf24;
   --inputText:                          #d4e4e8;
   --inputTextHovered:                   #ffffff;
   --inputPlaceholderText:               #4d6e76;
-  --inputIcon:                          #60a5fa;
-  --inputIconHovered:                   #2563eb;
+  --inputIcon:                          #fbbf24;
+  --inputIconHovered:                   #f59e0b;
   --inputIconDisabled:                  #3e5a62;
 
   /* -----------------------------------------------------------------------
@@ -107,8 +107,8 @@
      ----------------------------------------------------------------------- */
   --menuBackground:              #0f1c1f;
   --menuDivider:                 #1d3236;
-  --menuIcon:                    #60a5fa;
-  --menuHeader:                  #60a5fa;
+  --menuIcon:                    #fbbf24;
+  --menuHeader:                  #fbbf24;
   --menuItemBackgroundHovered:   #162629;
   --menuItemBackgroundPressed:   #1d3236;
   --menuItemText:                #d4e4e8;
@@ -143,7 +143,7 @@
   /* -----------------------------------------------------------------------
      STATUS — Icons
      ----------------------------------------------------------------------- */
-  --infoIcon:           #60a5fa;
+  --infoIcon:           #fbbf24;
   --errorIcon:          #F1707B;
   --blockingIcon:       #3d1f1f;
   --warningIcon:        #8eaaB2;
@@ -155,8 +155,8 @@
      ----------------------------------------------------------------------- */
   --errorText:    #F1707B;
   --messageText:  #d4e4e8;
-  --messageLink:  #60a5fa;
-  --messageLinkHovered: #93bbfd;
+  --messageLink:  #fbbf24;
+  --messageLinkHovered: #fcd34d;
   --warningText:  #d4e4e8;
   --successText:  #8eb878;
 

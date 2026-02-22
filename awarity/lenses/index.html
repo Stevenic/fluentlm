@@ -8,6 +8,8 @@
   <!-- Themes & combined library CSS -->
   <link rel="stylesheet" href="../../dist/theme-awarity-light.css">
   <link rel="stylesheet" href="../../dist/theme-awarity-dark.css">
+  <link rel="stylesheet" href="../../dist/theme-awarity-amber-light.css">
+  <link rel="stylesheet" href="../../dist/theme-awarity-amber-dark.css">
   <link rel="stylesheet" href="../../dist/fluentlm.min.css">
 
   <style>
@@ -1071,6 +1073,8 @@
     // ── Register themes & init ──
     FluentLM.registerTheme('awarity-light', 'fluent-awarity-light');
     FluentLM.registerTheme('awarity-dark', 'fluent-awarity-dark');
+    FluentLM.registerTheme('awarity-amber-light', 'fluent-awarity-amber-light');
+    FluentLM.registerTheme('awarity-amber-dark', 'fluent-awarity-amber-dark');
     FluentLM.setTheme('awarity-dark');
 
     (function () {
@@ -1268,12 +1272,24 @@
 
       // ── Theme Toggle ──
       var themeBtn = document.getElementById('themeToggle');
+      var themeNames = {
+        'awarity-light': 'Blue Light',
+        'awarity-dark': 'Blue Dark',
+        'awarity-amber-light': 'Amber Light',
+        'awarity-amber-dark': 'Amber Dark'
+      };
+      var themeCycle = ['awarity-dark', 'awarity-light', 'awarity-amber-dark', 'awarity-amber-light'];
+      function nextTheme(current) {
+        var idx = themeCycle.indexOf(current);
+        return themeCycle[(idx + 1) % themeCycle.length];
+      }
       function updateThemeLabel() {
-        themeBtn.textContent = FluentLM.getTheme() === 'awarity-light' ? 'Switch to Dark' : 'Switch to Light';
+        var next = nextTheme(FluentLM.getTheme());
+        themeBtn.textContent = 'Theme: ' + (themeNames[next] || next);
       }
       updateThemeLabel();
       themeBtn.addEventListener('click', function () {
-        FluentLM.setTheme(FluentLM.getTheme() === 'awarity-light' ? 'awarity-dark' : 'awarity-light');
+        FluentLM.setTheme(nextTheme(FluentLM.getTheme()));
         updateThemeLabel();
       });
 
