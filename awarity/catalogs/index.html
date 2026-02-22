@@ -115,6 +115,15 @@
       background-color: var(--bodyBackground);
     }
 
+    /* ── Horizontal scroll for table ── */
+    #catalogs-list {
+      overflow-x: auto;
+    }
+    #catalogs-list .flm-detailslist-header,
+    #catalogs-list .flm-detailslist-row {
+      min-width: max-content;
+    }
+
     /* ── Empty State ── */
     .empty-state {
       display: flex;
@@ -247,15 +256,230 @@
     .panel-activity-label { color: var(--bodyText); }
     .panel-activity-time { color: var(--bodySubtext); }
 
-    /* ── Clickable rows ── */
-    .flm-detailslist-row { cursor: pointer; }
-
-    /* ── New Catalog Panel Form ── */
-    .new-catalog-form {
+    /* ── Panel Form ── */
+    .panel-form {
       display: flex;
       flex-direction: column;
       gap: var(--spacingM);
     }
+
+    /* ── Dirty Badge ── */
+    .dirty-badge {
+      display: none;
+      margin-bottom: var(--spacingM);
+    }
+
+    .dirty-badge--visible {
+      display: block;
+    }
+
+    /* ── Usage Sections ── */
+    .usage-section {
+      margin-bottom: var(--spacingL1);
+    }
+
+    .usage-section-title {
+      font-size: var(--fontSizeMedium);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+      margin-bottom: var(--spacingS2);
+    }
+
+    .usage-empty {
+      font-size: var(--fontSizeMedium);
+      color: var(--bodySubtext);
+      padding: var(--spacingM) 0;
+    }
+
+    .usage-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacingS2) 0;
+      border-bottom: 1px solid var(--bodyDivider);
+      font-size: var(--fontSizeMedium);
+    }
+
+    .usage-item:last-child { border-bottom: none; }
+
+    .usage-item-name { color: var(--bodyText); }
+
+    .usage-item-date { color: var(--bodySubtext); font-size: var(--fontSizeSmall); }
+
+    /* ── Category Input (picker) ── */
+    .category-input-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--inputBorder);
+      border-radius: var(--roundedCorner4);
+      background-color: var(--inputBackground);
+      min-height: 32px;
+      align-items: center;
+      cursor: text;
+    }
+
+    .category-input-wrap:focus-within {
+      border-color: var(--themePrimary);
+    }
+
+    .category-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 1px 6px;
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+      background-color: color-mix(in srgb, var(--themePrimary) 15%, transparent);
+      color: var(--themePrimary);
+    }
+
+    .category-tag-remove {
+      cursor: pointer;
+      font-size: 10px;
+      opacity: 0.7;
+      background: none;
+      border: none;
+      color: inherit;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .category-tag-remove:hover { opacity: 1; }
+
+    .category-input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: var(--fontSizeMedium);
+      color: var(--bodyText);
+      flex: 1;
+      min-width: 80px;
+      font-family: inherit;
+    }
+
+    .category-suggestions {
+      display: none;
+      position: absolute;
+      z-index: 10;
+      background-color: var(--bodyBackground);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      max-height: 160px;
+      overflow-y: auto;
+      margin-top: 2px;
+      min-width: 160px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .category-suggestion {
+      padding: var(--spacingS2) var(--spacingM);
+      font-size: var(--fontSizeMedium);
+      color: var(--bodyText);
+      cursor: pointer;
+    }
+
+    .category-suggestion:hover {
+      background-color: var(--listItemBackgroundHovered);
+    }
+
+    /* ── Filter bar layout ── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+      margin-bottom: var(--spacingS1);
+    }
+    .filter-bar #category-filter { flex: 1; margin-bottom: 0; }
+
+    /* ── View dropdown ── */
+    .view-dropdown-wrapper { position: relative; }
+    .view-dropdown-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 16px;
+      border: 1px solid var(--bodyDivider);
+      background: transparent; color: var(--bodySubtext);
+      font-size: var(--fontSizeSmall); font-family: inherit;
+      cursor: pointer;
+    }
+    .view-dropdown-btn:hover { border-color: var(--themePrimary); color: var(--themePrimary); }
+    .view-dropdown-menu {
+      display: none; position: absolute; right: 0; top: calc(100% + 4px);
+      min-width: 180px; background: var(--bodyBackground);
+      border: 1px solid var(--bodyDivider); border-radius: var(--roundedCorner4);
+      box-shadow: var(--elevation8); z-index: 10; padding: 4px 0;
+    }
+    .view-dropdown-menu--open { display: block; }
+    .view-dropdown-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 12px; font-size: var(--fontSizeSmall);
+      color: var(--bodyText); cursor: pointer; width: 100%;
+      background: none; border: none; font-family: inherit; text-align: left;
+    }
+    .view-dropdown-item:hover { background: var(--listItemBackgroundHovered); }
+
+    /* ── Category filter pills ── */
+    #category-filter { margin-bottom: var(--spacingS1); }
+    .filter-pill {
+      border-radius: 16px; padding: 4px 14px;
+      border: 1px solid var(--bodyDivider);
+      background: transparent; color: var(--bodySubtext);
+      font-size: var(--fontSizeSmall); font-family: inherit;
+      cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .filter-pill:hover { border-color: var(--themePrimary); color: var(--themePrimary); }
+    .filter-pill--active { background: var(--themePrimary); color: var(--white); border-color: transparent; }
+
+    /* ── Category chips ── */
+    .category-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+    .category-chip {
+      display: inline-block; padding: 1px 8px;
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+      background-color: color-mix(in srgb, var(--themePrimary) 15%, transparent);
+      color: var(--themePrimary);
+      cursor: pointer;
+    }
+    .category-chip:hover {
+      background-color: color-mix(in srgb, var(--themePrimary) 30%, transparent);
+    }
+
+    /* ── Pivot tabs ── */
+    .pivot-bar {
+      display: flex;
+      border-bottom: 1px solid var(--bodyDivider);
+      background-color: var(--bodyStandoutBackground);
+      margin: 0 calc(-1 * var(--spacingL1));
+      padding: 0 var(--spacingL1);
+    }
+    .pivot-tab {
+      padding: var(--spacingS2) var(--spacingL1);
+      font-size: var(--fontSizeMedium);
+      color: var(--bodySubtext);
+      cursor: pointer; border: none; background: none;
+      border-bottom: 2px solid transparent;
+      font-family: inherit; transition: color 0.15s;
+    }
+    .pivot-tab:hover { color: var(--bodyText); }
+    .pivot-tab--active {
+      color: var(--themePrimary);
+      border-bottom-color: var(--themePrimary);
+      font-weight: var(--fontWeightSemibold);
+    }
+    .pivot-panel { display: none; padding-top: var(--spacingM); }
+    .pivot-panel--active { display: block; }
+
+    /* ── Panel footer ── */
+    .panel-footer-actions {
+      display: flex; gap: var(--spacingS1); align-items: center;
+    }
+    .panel-footer-right {
+      margin-left: auto; display: flex; gap: var(--spacingS1);
+    }
+
+    /* ── Clickable rows ── */
+    .flm-detailslist-row { cursor: pointer; }
 
     /* ── Shimmer loading table ── */
     .shimmer-table {
@@ -322,7 +546,7 @@
           </div>
           <div class="flm-commandbar-far" style="align-items: center; padding-right: 8px;">
             <div class="flm-searchbox" style="min-width: 220px;">
-              <input class="flm-searchbox-input" type="search" placeholder="Search catalogs…" id="search-input">
+              <input class="flm-searchbox-input" type="text" placeholder="Search catalogs…" id="search-input">
             </div>
           </div>
         </div>
@@ -407,105 +631,21 @@
 
         <!-- ── Data State (DetailsList) ── -->
         <div id="state-data" style="display: block;">
+          <div class="filter-bar">
+            <div class="flm-overflowset" id="category-filter">
+              <div class="flm-overflowset-items"></div>
+              <button class="flm-overflowset-overflow" aria-label="More categories">...</button>
+            </div>
+            <div class="view-dropdown-wrapper">
+              <button class="view-dropdown-btn" id="view-dropdown-btn">
+                <i class="flm-icon" data-icon="ViewList"></i> View
+              </button>
+              <div class="view-dropdown-menu" id="view-dropdown-menu"></div>
+            </div>
+          </div>
           <div class="flm-detailslist" id="catalogs-list">
-            <div class="flm-detailslist-header">
-              <div class="flm-detailslist-check">
-                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="check-all"><span class="flm-checkbox-mark"></span></label>
-              </div>
-              <div class="flm-detailslist-header-cell" style="width: 200px;">Name</div>
-              <div class="flm-detailslist-header-cell cell-number" style="width: 100px;">Documents</div>
-              <div class="flm-detailslist-header-cell cell-number" style="width: 100px;">Chunks</div>
-              <div class="flm-detailslist-header-cell cell-number" style="width: 100px;">Abstracts</div>
-              <div class="flm-detailslist-header-cell cell-number" style="width: 120px;">Classifications</div>
-              <div class="flm-detailslist-header-cell" style="width: 140px;">Last Updated</div>
-              <div class="flm-detailslist-header-cell" style="flex: 1;">Status</div>
-            </div>
-
-            <!-- Row 1: Ready -->
-            <div class="flm-detailslist-row" data-catalog="sec-filings">
-              <div class="flm-detailslist-check">
-                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label>
-              </div>
-              <div class="flm-detailslist-cell" style="width: 200px; font-weight: var(--fontWeightSemibold);">sec-filings</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">2,341</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">18,420</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">2,341</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 120px;">3</div>
-              <div class="flm-detailslist-cell" style="width: 140px;">Feb 20, 2026</div>
-              <div class="flm-detailslist-cell" style="flex: 1;">
-                <span class="status-badge status-badge--ready"><span class="status-dot"></span> Ready</span>
-              </div>
-            </div>
-
-            <!-- Row 2: Abstracts Missing -->
-            <div class="flm-detailslist-row" data-catalog="legal-contracts">
-              <div class="flm-detailslist-check">
-                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label>
-              </div>
-              <div class="flm-detailslist-cell" style="width: 200px; font-weight: var(--fontWeightSemibold);">legal-contracts</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">847</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">6,120</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">0</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 120px;">0</div>
-              <div class="flm-detailslist-cell" style="width: 140px;">Feb 19, 2026</div>
-              <div class="flm-detailslist-cell" style="flex: 1;">
-                <span class="status-badge status-badge--warning"><span class="status-dot"></span> Abstracts Missing</span>
-              </div>
-            </div>
-
-            <!-- Row 3: Processing -->
-            <div class="flm-detailslist-row" data-catalog="research-papers">
-              <div class="flm-detailslist-check">
-                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label>
-              </div>
-              <div class="flm-detailslist-cell" style="width: 200px; font-weight: var(--fontWeightSemibold);">research-papers</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">512</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">3,840</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">287</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 120px;">1</div>
-              <div class="flm-detailslist-cell" style="width: 140px;">Feb 21, 2026</div>
-              <div class="flm-detailslist-cell" style="flex: 1;">
-                <span class="status-badge status-badge--processing"><span class="status-dot"></span> Processing</span>
-                <div class="row-progress">
-                  <div class="flm-progress">
-                    <div class="flm-progress-track"><div class="flm-progress-bar" style="width: 56%"></div></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Row 4: Error -->
-            <div class="flm-detailslist-row" data-catalog="email-archive">
-              <div class="flm-detailslist-check">
-                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label>
-              </div>
-              <div class="flm-detailslist-cell" style="width: 200px; font-weight: var(--fontWeightSemibold);">email-archive</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">4,200</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">—</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">—</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 120px;">0</div>
-              <div class="flm-detailslist-cell" style="width: 140px;">Feb 18, 2026</div>
-              <div class="flm-detailslist-cell" style="flex: 1;">
-                <span class="status-badge status-badge--error"><span class="status-dot"></span> Error</span>
-              </div>
-            </div>
-
-            <!-- Row 5: Ready -->
-            <div class="flm-detailslist-row" data-catalog="compliance-docs">
-              <div class="flm-detailslist-check">
-                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label>
-              </div>
-              <div class="flm-detailslist-cell" style="width: 200px; font-weight: var(--fontWeightSemibold);">compliance-docs</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">1,105</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">8,930</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 100px;">1,105</div>
-              <div class="flm-detailslist-cell cell-number" style="width: 120px;">5</div>
-              <div class="flm-detailslist-cell" style="width: 140px;">Feb 17, 2026</div>
-              <div class="flm-detailslist-cell" style="flex: 1;">
-                <span class="status-badge status-badge--ready"><span class="status-dot"></span> Ready</span>
-              </div>
-            </div>
-
+            <div class="flm-detailslist-header" id="catalogs-header"></div>
+            <!-- Rows populated by JS -->
           </div>
         </div>
 
@@ -520,145 +660,198 @@
   <div class="flm-panel flm-panel--medium" id="detail-panel">
     <div class="flm-panel-header">
       <h2 class="flm-panel-title" id="detail-panel-title">sec-filings</h2>
+      <span style="font-size: var(--fontSizeSmall); color: var(--bodySubtext); margin-left: var(--spacingS1);" id="detail-panel-subtitle"></span>
       <button class="flm-panel-close" data-icon="Cancel" aria-label="Close" id="detail-panel-close"></button>
     </div>
     <div class="flm-panel-body">
+
+      <!-- Quick Actions -->
+      <div style="display: flex; gap: var(--spacingS1); margin-bottom: var(--spacingM);">
+        <button class="flm-button" id="btn-use-explore"><i class="flm-icon" data-icon="Search"></i> Use in Explore</button>
+        <button class="flm-button" id="btn-use-workflow"><i class="flm-icon" data-icon="Flow"></i> Use in Workflow</button>
+      </div>
+
+      <!-- Dirty badge -->
+      <div class="dirty-badge" id="dirty-badge">
+        <div class="flm-messagebar flm-messagebar--warning">You have unsaved changes.</div>
+      </div>
 
       <!-- Error banner (shown for error catalogs) -->
       <div id="detail-error-bar" style="display: none; margin-bottom: var(--spacingM);">
         <div class="flm-messagebar flm-messagebar--error">Ingest failed: unable to parse 12 documents. Check source files for encoding issues.</div>
       </div>
 
-      <!-- Overview -->
-      <div class="panel-section">
-        <div class="panel-section-title">Overview</div>
-        <div class="panel-meta">
-          <span class="panel-meta-label">Documents</span>
-          <span class="panel-meta-value" id="detail-documents">2,341</span>
-          <span class="panel-meta-label">Chunks</span>
-          <span class="panel-meta-value" id="detail-chunks">18,420</span>
-          <span class="panel-meta-label">Abstracts</span>
-          <span class="panel-meta-value" id="detail-abstracts">2,341</span>
-          <span class="panel-meta-label">Classifications</span>
-          <span class="panel-meta-value" id="detail-classifications">3</span>
-          <span class="panel-meta-label">Storage</span>
-          <span class="panel-meta-value" id="detail-storage">~/.awarity/catalogs/sec-filings</span>
-          <span class="panel-meta-label">Created</span>
-          <span class="panel-meta-value" id="detail-created">Feb 14, 2026</span>
-          <span class="panel-meta-label">Status</span>
-          <span class="panel-meta-value" id="detail-status"><span class="status-badge status-badge--ready"><span class="status-dot"></span> Ready</span></span>
+      <!-- Tabs -->
+      <div class="pivot-bar" id="detail-pivot-bar">
+        <button class="pivot-tab pivot-tab--active" data-tab="edit">Edit</button>
+        <button class="pivot-tab" data-tab="abstracts">Abstracts</button>
+        <button class="pivot-tab" data-tab="usage">Usage</button>
+      </div>
+
+      <!-- ── Tab: Edit ── -->
+      <div class="pivot-panel pivot-panel--active" id="tab-edit">
+        <div class="panel-form">
+          <div class="flm-textfield flm-textfield--required">
+            <label class="flm-label" for="edit-name">Name</label>
+            <input class="flm-textfield-input" id="edit-name" placeholder="e.g. sec-filings">
+          </div>
+          <div class="flm-textfield">
+            <label class="flm-label" for="edit-description">Description</label>
+            <textarea class="flm-textfield-input" id="edit-description" rows="2" style="width: 100%; resize: vertical;" placeholder="Optional description"></textarea>
+          </div>
+          <div>
+            <label class="flm-label">Categories</label>
+            <div style="position: relative;">
+              <div class="category-input-wrap" id="edit-categories-wrap">
+                <input class="category-input" id="edit-categories-input" placeholder="Add category…">
+              </div>
+              <div class="category-suggestions" id="edit-categories-suggestions"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Details (read-only) -->
+        <div class="panel-section" style="margin-top: var(--spacingL1);">
+          <div class="panel-section-title">Details</div>
+          <div class="panel-meta">
+            <span class="panel-meta-label">Documents</span>
+            <span class="panel-meta-value" id="detail-documents">2,341</span>
+            <span class="panel-meta-label">Chunks</span>
+            <span class="panel-meta-value" id="detail-chunks">18,420</span>
+            <span class="panel-meta-label">Abstracts</span>
+            <span class="panel-meta-value" id="detail-abstracts">2,341</span>
+            <span class="panel-meta-label">Classifications</span>
+            <span class="panel-meta-value" id="detail-classifications">3</span>
+            <span class="panel-meta-label">Location</span>
+            <span class="panel-meta-value" id="detail-location">~/.awarity/catalogs/sec-filings</span>
+            <span class="panel-meta-label">Created</span>
+            <span class="panel-meta-value" id="detail-created">Feb 14, 2026</span>
+            <span class="panel-meta-label">Status</span>
+            <span class="panel-meta-value" id="detail-status"><span class="status-badge status-badge--ready"><span class="status-dot"></span> Ready</span></span>
+          </div>
         </div>
       </div>
 
-      <!-- Actions -->
-      <div class="panel-section">
-        <div class="panel-section-title">Actions</div>
-        <div class="panel-actions">
-          <button class="flm-button"><i class="flm-icon" data-icon="TextDocument"></i> Generate Abstracts</button>
-          <button class="flm-button"><i class="flm-icon" data-icon="Search"></i> Ask Question</button>
-          <button class="flm-button"><i class="flm-icon" data-icon="Tag"></i> Run Classification</button>
-          <button class="flm-button" id="btn-delete-catalog" style="color: var(--red);"><i class="flm-icon" data-icon="Delete"></i> Delete Catalog</button>
+      <!-- ── Tab: Abstracts ── -->
+      <div class="pivot-panel" id="tab-abstracts">
+        <div class="panel-section">
+          <div class="panel-meta" style="margin-bottom: var(--spacingM);">
+            <span class="panel-meta-label">Abstract Count</span>
+            <span class="panel-meta-value" id="detail-abstract-count">2,341</span>
+          </div>
+        </div>
+        <div class="flm-textfield">
+          <label class="flm-label" for="edit-abstract-rules">Generation Rules</label>
+          <textarea class="flm-textfield-input" id="edit-abstract-rules" rows="12" style="width: 100%; resize: vertical; font-family: monospace;" placeholder="Enter abstract generation rules…"></textarea>
         </div>
       </div>
 
-      <!-- Error-specific actions -->
-      <div class="panel-section" id="detail-error-actions" style="display: none;">
-        <div class="panel-section-title">Troubleshoot</div>
-        <div class="panel-actions">
-          <button class="flm-button"><i class="flm-icon" data-icon="TextDocument"></i> View Logs</button>
-          <button class="flm-button flm-button--primary"><i class="flm-icon" data-icon="Refresh"></i> Retry Ingest</button>
+      <!-- ── Tab: Usage ── -->
+      <div class="pivot-panel" id="tab-usage">
+        <div class="usage-section">
+          <div class="usage-section-title">Explore queries using this catalog</div>
+          <div id="usage-explore"></div>
         </div>
-      </div>
-
-      <!-- Activity -->
-      <div class="panel-section">
-        <div class="panel-section-title">Recent Activity</div>
-        <div id="detail-activity">
-          <div class="panel-activity-item">
-            <span class="panel-activity-label">Classification: risk-type</span>
-            <span class="panel-activity-time">2 hours ago</span>
-          </div>
-          <div class="panel-activity-item">
-            <span class="panel-activity-label">Abstracts generated</span>
-            <span class="panel-activity-time">1 day ago</span>
-          </div>
-          <div class="panel-activity-item">
-            <span class="panel-activity-label">Catalog ingested</span>
-            <span class="panel-activity-time">6 days ago</span>
-          </div>
+        <div class="usage-section">
+          <div class="usage-section-title">Workflows using this catalog</div>
+          <div id="usage-workflows"></div>
+        </div>
+        <div class="usage-section">
+          <div class="usage-section-title">Classification runs using this catalog</div>
+          <div id="usage-classifications"></div>
         </div>
       </div>
 
     </div>
     <div class="flm-panel-footer">
-      <button class="flm-button" id="detail-panel-close-btn">Close</button>
+      <div class="panel-footer-actions">
+        <button class="flm-button" id="detail-panel-close-btn">Close</button>
+        <button class="flm-button flm-button--primary" id="btn-save-catalog" disabled>Save</button>
+        <div class="panel-footer-right">
+          <button class="flm-button" id="btn-delete-catalog" style="color: var(--red);"><i class="flm-icon" data-icon="Delete"></i> Delete</button>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- ════════════════════════════════════════════════════════════════
-       NEW CATALOG PANEL
+       NEW CATALOG WIZARD DIALOG
        ════════════════════════════════════════════════════════════════ -->
-  <div class="flm-panel-overlay" id="new-panel-overlay"></div>
-  <div class="flm-panel flm-panel--medium" id="new-panel">
-    <div class="flm-panel-header">
-      <h2 class="flm-panel-title">New Catalog</h2>
-      <button class="flm-panel-close" data-icon="Cancel" aria-label="Close" id="new-panel-close"></button>
-    </div>
-    <div class="flm-panel-body">
-      <div class="new-catalog-form" id="new-catalog-form">
-
-        <div class="flm-textfield flm-textfield--required">
-          <label class="flm-label" for="new-name">Catalog Name</label>
-          <input class="flm-textfield-input" id="new-name" placeholder="e.g. sec-filings">
-        </div>
-
-        <div>
-          <label class="flm-label">Source Type</label>
-          <div class="flm-choicegroup" style="margin-top: var(--spacingS2);">
-            <label class="flm-choicegroup-option">
-              <input type="radio" class="flm-choicegroup-input" name="source-type" value="folder" checked>
-              <span class="flm-choicegroup-mark"></span>
-              <span class="flm-choicegroup-label">Folder</span>
-            </label>
-            <label class="flm-choicegroup-option">
-              <input type="radio" class="flm-choicegroup-input" name="source-type" value="filelist">
-              <span class="flm-choicegroup-mark"></span>
-              <span class="flm-choicegroup-label">File list</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="flm-textfield flm-textfield--required">
-          <label class="flm-label" for="new-path">Path</label>
-          <div class="flm-textfield-wrapper">
-            <input class="flm-textfield-input" id="new-path" placeholder="/path/to/documents">
-            <button class="flm-button flm-button--icon" type="button" id="btn-browse" aria-label="Browse" data-tooltip="Browse for folder" style="flex-shrink: 0; border: none; background: transparent;"><i class="flm-icon" data-icon="FolderOpen"></i></button>
-          </div>
-          <input type="file" id="file-picker" webkitdirectory style="display: none;">
-        </div>
-
-        <label class="flm-checkbox" style="margin-top: var(--spacingS2);">
-          <input type="checkbox" class="flm-checkbox-input" id="new-auto-abstracts">
-          <span class="flm-checkbox-mark"></span>
-          <span class="flm-label">Auto-generate abstracts after ingest</span>
-        </label>
-
-        <!-- Progress (shown during creation) -->
-        <div id="new-progress" style="display: none;">
-          <div class="flm-progress flm-progress--indeterminate">
-            <span class="flm-progress-label">Creating catalog…</span>
-            <div class="flm-progress-track"><div class="flm-progress-bar"></div></div>
-          </div>
-        </div>
-
-        <!-- Inline message bar for errors -->
-        <div id="new-messagebar" style="display: none;"></div>
-
+  <div class="flm-dialog-overlay" id="new-catalog-dialog" data-light-dismiss style="z-index: 1002;">
+    <div class="flm-dialog" style="max-width: 520px;">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title">New Catalog</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
       </div>
-    </div>
-    <div class="flm-panel-footer">
-      <button class="flm-button flm-button--primary" id="btn-create-catalog">Create</button>
-      <button class="flm-button" id="new-panel-cancel">Cancel</button>
+      <div class="flm-dialog-body">
+
+        <!-- Step 1: Source -->
+        <div id="new-step-1">
+          <div class="panel-form">
+            <div>
+              <label class="flm-label">Source Type</label>
+              <div class="flm-choicegroup" style="margin-top: var(--spacingS2);">
+                <label class="flm-choicegroup-option">
+                  <input type="radio" class="flm-choicegroup-input" name="source-type" value="folder" checked>
+                  <span class="flm-choicegroup-mark"></span>
+                  <span class="flm-choicegroup-label">Folder</span>
+                </label>
+                <label class="flm-choicegroup-option">
+                  <input type="radio" class="flm-choicegroup-input" name="source-type" value="filelist">
+                  <span class="flm-choicegroup-mark"></span>
+                  <span class="flm-choicegroup-label">File list</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="flm-textfield flm-textfield--required">
+              <label class="flm-label" for="new-path">Path</label>
+              <div class="flm-textfield-wrapper">
+                <input class="flm-textfield-input" id="new-path" placeholder="/path/to/documents">
+                <button class="flm-button flm-button--icon" type="button" id="btn-browse" aria-label="Browse" data-tooltip="Browse for folder" style="flex-shrink: 0; border: none; background: transparent;"><i class="flm-icon" data-icon="FolderOpen"></i></button>
+              </div>
+              <input type="file" id="file-picker" webkitdirectory style="display: none;">
+            </div>
+
+            <label class="flm-checkbox" style="margin-top: var(--spacingS2);">
+              <input type="checkbox" class="flm-checkbox-input" id="new-auto-abstracts">
+              <span class="flm-checkbox-mark"></span>
+              <span class="flm-label">Auto-generate abstracts after ingest</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Step 2: Details -->
+        <div id="new-step-2" style="display: none;">
+          <div class="panel-form">
+            <div class="flm-textfield flm-textfield--required">
+              <label class="flm-label" for="new-name">Name</label>
+              <input class="flm-textfield-input" id="new-name" placeholder="e.g. sec-filings">
+            </div>
+            <div class="flm-textfield">
+              <label class="flm-label" for="new-description">Description</label>
+              <textarea class="flm-textfield-input" id="new-description" rows="2" style="width: 100%; resize: vertical;" placeholder="Optional description"></textarea>
+            </div>
+            <div>
+              <label class="flm-label">Categories</label>
+              <div style="position: relative;">
+                <div class="category-input-wrap" id="new-categories-wrap">
+                  <input class="category-input" id="new-categories-input" placeholder="Add category…">
+                </div>
+                <div class="category-suggestions" id="new-categories-suggestions"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inline message bar -->
+        <div id="new-messagebar" style="display: none; margin-top: var(--spacingM);"></div>
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button" id="btn-new-back" style="display: none;">Back</button>
+        <button class="flm-button flm-button--primary" id="btn-new-next">Next</button>
+        <button class="flm-button" data-dialog-close>Cancel</button>
+      </div>
     </div>
   </div>
 
@@ -681,6 +874,45 @@
     </div>
   </div>
 
+  <!-- ════════════════════════════════════════════════════════════════
+       UNSAVED CHANGES DIALOG
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-dialog-overlay" id="unsaved-dialog" data-light-dismiss style="z-index: 1003;">
+    <div class="flm-dialog">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title">Unsaved Changes</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
+      </div>
+      <div class="flm-dialog-body">
+        <p>You have unsaved changes. What would you like to do?</p>
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button flm-button--primary" id="btn-unsaved-save">Save</button>
+        <button class="flm-button" id="btn-unsaved-discard" style="color: var(--red);">Discard</button>
+        <button class="flm-button" data-dialog-close>Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       REGENERATE ABSTRACTS DIALOG
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-dialog-overlay" id="regenerate-dialog" data-light-dismiss style="z-index: 1003;">
+    <div class="flm-dialog">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title">Regenerate Abstracts</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
+      </div>
+      <div class="flm-dialog-body">
+        <p>Abstract generation rules have changed. Regenerate abstracts now?</p>
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button flm-button--primary" id="btn-regenerate-confirm">Regenerate</button>
+        <button class="flm-button" id="btn-regenerate-skip">Skip</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Combined library JS -->
   <script src="../../dist/fluentlm.min.js"></script>
 
@@ -695,6 +927,7 @@
     FluentIcons.register('Tag',        'M2 3.5A1.5 1.5 0 0 1 3.5 2h3.59a1.5 1.5 0 0 1 1.06.44l5.41 5.41a1.5 1.5 0 0 1 0 2.12l-3.59 3.59a1.5 1.5 0 0 1-2.12 0L2.44 8.15A1.5 1.5 0 0 1 2 7.09V3.5zM5 4a1 1 0 1 0 0 2 1 1 0 0 0 0-2z');
     FluentIcons.register('Download',   'M8 1.5a.5.5 0 0 1 .5.5v7.79l2.15-2.14a.5.5 0 0 1 .7.7l-3 3a.5.5 0 0 1-.7 0l-3-3a.5.5 0 1 1 .7-.7L7.5 9.79V2a.5.5 0 0 1 .5-.5zM2.5 12a.5.5 0 0 1 .5.5v1h10v-1a.5.5 0 0 1 1 0v1.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-1.5a.5.5 0 0 1 .5-.5z');
     FluentIcons.register('FolderOpen', 'M2 4.5A1.5 1.5 0 0 1 3.5 3h3.09a1.5 1.5 0 0 1 1.06.44L8.71 4.5H12.5A1.5 1.5 0 0 1 14 6v.5h.25a.75.75 0 0 1 .72.96l-1.5 5.25A1.5 1.5 0 0 1 12.03 14H3.5A1.5 1.5 0 0 1 2 12.5v-8zM3.5 4a.5.5 0 0 0-.5.5V6h4.5a.5.5 0 0 0 .35-.15L6.79 4.79A.5.5 0 0 0 6.59 4H3.5z');
+    FluentIcons.register('ViewList',   'M2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z');
 
     // ── Register themes & init ──
     FluentLM.registerTheme('awarity-light', 'fluent-awarity-light');
@@ -702,95 +935,151 @@
     FluentLM.setTheme('awarity-dark');
 
     (function () {
+      // ── Suggested categories ──
+      var SUGGESTED_CATEGORIES = ['finance', 'legal', 'compliance', 'security', 'research', 'regulatory', 'technical', 'communications', 'triage', 'extraction'];
+
       // ── Mock Data ──
       var MOCK_CATALOGS = [
         {
           name: 'sec-filings',
+          description: 'SEC filings corpus including 10-K, 10-Q, and 8-K documents.',
+          categories: ['finance', 'regulatory'],
           documents: 2341,
           chunks: 18420,
           abstracts: 2341,
           classifications: 3,
           status: 'ready',
           lastUpdated: 'Feb 20, 2026',
-          storage: '~/.awarity/catalogs/sec-filings',
+          location: '~/.awarity/catalogs/sec-filings',
           created: 'Feb 14, 2026',
-          activity: [
-            { label: 'Classification: risk-type', time: '2 hours ago' },
-            { label: 'Abstracts generated', time: '1 day ago' },
-            { label: 'Catalog ingested', time: '6 days ago' }
-          ]
+          abstractRules: 'Summarize each document in 2-3 sentences.\nFocus on financial metrics, risk disclosures, and forward-looking statements.\nInclude key dates and monetary figures.',
+          usage: {
+            explore: [
+              { name: 'Top risk disclosures across SEC filings', lastUsed: '2 hours ago' },
+              { name: 'Cybersecurity incident analysis', lastUsed: '1 day ago' },
+              { name: 'Liquidity risk assessment Q4', lastUsed: '3 days ago' }
+            ],
+            workflows: [
+              { name: 'Weekly risk digest', lastUsed: '1 day ago' },
+              { name: 'New filing triage', lastUsed: '4 days ago' }
+            ],
+            classifications: [
+              { name: 'risk-type classifier', lastUsed: '2 days ago' },
+              { name: 'severity-level classifier', lastUsed: '5 days ago' }
+            ]
+          }
         },
         {
           name: 'legal-contracts',
+          description: 'Collection of legal contracts and agreements.',
+          categories: ['legal', 'compliance'],
           documents: 847,
           chunks: 6120,
           abstracts: 0,
           classifications: 0,
           status: 'abstracts-missing',
           lastUpdated: 'Feb 19, 2026',
-          storage: '~/.awarity/catalogs/legal-contracts',
+          location: '~/.awarity/catalogs/legal-contracts',
           created: 'Feb 16, 2026',
-          activity: [
-            { label: 'Catalog ingested', time: '3 days ago' }
-          ]
+          abstractRules: '',
+          usage: {
+            explore: [],
+            workflows: [],
+            classifications: []
+          }
         },
         {
           name: 'research-papers',
+          description: 'Academic and technical research papers on AI and ML topics.',
+          categories: ['research', 'technical'],
           documents: 512,
           chunks: 3840,
           abstracts: 287,
           classifications: 1,
           status: 'processing',
           lastUpdated: 'Feb 21, 2026',
-          storage: '~/.awarity/catalogs/research-papers',
+          location: '~/.awarity/catalogs/research-papers',
           created: 'Feb 10, 2026',
-          activity: [
-            { label: 'Generating abstracts (56%)', time: 'In progress' },
-            { label: 'Classification: domain', time: '2 days ago' },
-            { label: 'Catalog ingested', time: '11 days ago' }
-          ]
+          abstractRules: 'Extract key findings, methodology, and conclusions.\nHighlight novel contributions and limitations.',
+          usage: {
+            explore: [
+              { name: 'Latest advances in transformer architectures', lastUsed: '1 day ago' }
+            ],
+            workflows: [
+              { name: 'Research digest', lastUsed: '3 days ago' }
+            ],
+            classifications: [
+              { name: 'domain classifier', lastUsed: '2 days ago' }
+            ]
+          }
         },
         {
           name: 'email-archive',
+          description: '',
+          categories: ['communications'],
           documents: 4200,
           chunks: null,
           abstracts: null,
           classifications: 0,
           status: 'error',
           lastUpdated: 'Feb 18, 2026',
-          storage: '~/.awarity/catalogs/email-archive',
+          location: '~/.awarity/catalogs/email-archive',
           created: 'Feb 18, 2026',
           error: 'Ingest failed: unable to parse 12 documents. Check source files for encoding issues.',
-          activity: [
-            { label: 'Ingest failed', time: '3 days ago' }
-          ]
+          abstractRules: '',
+          usage: {
+            explore: [],
+            workflows: [],
+            classifications: []
+          }
         },
         {
           name: 'compliance-docs',
+          description: 'Compliance documentation across regulatory frameworks.',
+          categories: ['compliance', 'regulatory', 'legal'],
           documents: 1105,
           chunks: 8930,
           abstracts: 1105,
           classifications: 5,
           status: 'ready',
           lastUpdated: 'Feb 17, 2026',
-          storage: '~/.awarity/catalogs/compliance-docs',
+          location: '~/.awarity/catalogs/compliance-docs',
           created: 'Feb 5, 2026',
-          activity: [
-            { label: 'Classification: regulation-type', time: '4 days ago' },
-            { label: 'Classification: risk-level', time: '5 days ago' },
-            { label: 'Abstracts generated', time: '2 weeks ago' },
-            { label: 'Catalog ingested', time: '2 weeks ago' }
-          ]
+          abstractRules: 'Summarize regulatory obligations and compliance requirements.\nIdentify specific regulation references (e.g. SOX, GDPR, HIPAA).\nNote any deadlines or enforcement actions.',
+          usage: {
+            explore: [
+              { name: 'GDPR compliance gaps', lastUsed: '3 days ago' },
+              { name: 'SOX audit requirements', lastUsed: '1 week ago' }
+            ],
+            workflows: [
+              { name: 'Compliance monitoring', lastUsed: '2 days ago' },
+              { name: 'Regulatory change alerts', lastUsed: '5 days ago' }
+            ],
+            classifications: [
+              { name: 'regulation-type classifier', lastUsed: '4 days ago' },
+              { name: 'risk-level classifier', lastUsed: '5 days ago' }
+            ]
+          }
         }
       ];
+
+      // ── State ──
+      var currentCatalog = null;
+      var isDirty = false;
+      var abstractRulesDirty = false;
+      var editCategories = [];
+      var newCategories = [];
+      var initialSnapshot = {};
 
       // ── Refs ──
       var detailPanel = document.getElementById('detail-panel');
       var detailOverlay = document.getElementById('detail-panel-overlay');
       var detailTitle = document.getElementById('detail-panel-title');
-      var newPanel = document.getElementById('new-panel');
-      var newOverlay = document.getElementById('new-panel-overlay');
+      var detailSubtitle = document.getElementById('detail-panel-subtitle');
+      var newCatalogDialog = document.getElementById('new-catalog-dialog');
       var deleteDialog = document.getElementById('delete-dialog');
+      var unsavedDialog = document.getElementById('unsaved-dialog');
+      var regenerateDialog = document.getElementById('regenerate-dialog');
       var messageZone = document.getElementById('messagebar-zone');
 
       // ── Theme Toggle ──
@@ -815,67 +1104,337 @@
         overlay.classList.remove('flm-panel-overlay--visible');
       }
 
+      // ── Category Tags Rendering ──
+      function renderCategoryTags(prefix) {
+        var cats = prefix === 'edit' ? editCategories : newCategories;
+        var wrap = document.getElementById(prefix + '-categories-wrap');
+        var input = document.getElementById(prefix + '-categories-input');
+        // Remove existing tags
+        wrap.querySelectorAll('.category-tag').forEach(function (t) { t.remove(); });
+        // Add tags before input
+        cats.forEach(function (cat) {
+          var tag = document.createElement('span');
+          tag.className = 'category-tag';
+          tag.innerHTML = cat + ' <button class="category-tag-remove" data-cat="' + cat + '">&times;</button>';
+          wrap.insertBefore(tag, input);
+        });
+        // Bind remove buttons
+        wrap.querySelectorAll('.category-tag-remove').forEach(function (btn) {
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var val = btn.getAttribute('data-cat');
+            if (prefix === 'edit') {
+              editCategories = editCategories.filter(function (c) { return c !== val; });
+              renderCategoryTags('edit');
+              checkDirty();
+            } else {
+              newCategories = newCategories.filter(function (c) { return c !== val; });
+              renderCategoryTags('new');
+            }
+          });
+        });
+      }
+
+      // ── Category Input Setup ──
+      function setupCategoryInput(prefix) {
+        var input = document.getElementById(prefix + '-categories-input');
+        var suggestions = document.getElementById(prefix + '-categories-suggestions');
+
+        input.addEventListener('input', function () {
+          var val = this.value.toLowerCase().trim();
+          var cats = prefix === 'edit' ? editCategories : newCategories;
+          if (!val) { suggestions.style.display = 'none'; return; }
+
+          var matches = SUGGESTED_CATEGORIES.filter(function (s) {
+            return s.indexOf(val) !== -1 && cats.indexOf(s) === -1;
+          });
+
+          if (matches.length === 0) { suggestions.style.display = 'none'; return; }
+
+          suggestions.innerHTML = matches.map(function (m) {
+            return '<div class="category-suggestion" data-value="' + m + '">' + m + '</div>';
+          }).join('');
+          suggestions.style.display = 'block';
+        });
+
+        input.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            var val = this.value.trim().replace(/,/g, '').toLowerCase();
+            if (!val) return;
+            if (prefix === 'edit') {
+              if (editCategories.indexOf(val) === -1) { editCategories.push(val); renderCategoryTags('edit'); checkDirty(); }
+            } else {
+              if (newCategories.indexOf(val) === -1) { newCategories.push(val); renderCategoryTags('new'); }
+            }
+            this.value = '';
+            suggestions.style.display = 'none';
+          }
+        });
+
+        suggestions.addEventListener('click', function (e) {
+          var opt = e.target.closest('.category-suggestion');
+          if (!opt) return;
+          var val = opt.getAttribute('data-value');
+          if (prefix === 'edit') {
+            if (editCategories.indexOf(val) === -1) { editCategories.push(val); renderCategoryTags('edit'); checkDirty(); }
+          } else {
+            if (newCategories.indexOf(val) === -1) { newCategories.push(val); renderCategoryTags('new'); }
+          }
+          input.value = '';
+          suggestions.style.display = 'none';
+        });
+
+        input.addEventListener('blur', function () {
+          setTimeout(function () { suggestions.style.display = 'none'; }, 200);
+        });
+      }
+
+      // ── Dirty Tracking ──
+      function captureSnapshot() {
+        initialSnapshot = {
+          name: document.getElementById('edit-name').value,
+          description: document.getElementById('edit-description').value,
+          categories: editCategories.slice().sort().join(','),
+          abstractRules: document.getElementById('edit-abstract-rules').value
+        };
+        isDirty = false;
+        abstractRulesDirty = false;
+        updateDirtyState();
+      }
+
+      function checkDirty() {
+        var currentName = document.getElementById('edit-name').value;
+        var currentDesc = document.getElementById('edit-description').value;
+        var currentCats = editCategories.slice().sort().join(',');
+        var currentRules = document.getElementById('edit-abstract-rules').value;
+
+        abstractRulesDirty = currentRules !== initialSnapshot.abstractRules;
+        isDirty = currentName !== initialSnapshot.name ||
+                  currentDesc !== initialSnapshot.description ||
+                  currentCats !== initialSnapshot.categories ||
+                  abstractRulesDirty;
+        updateDirtyState();
+      }
+
+      function updateDirtyState() {
+        var badge = document.getElementById('dirty-badge');
+        badge.classList.toggle('dirty-badge--visible', isDirty);
+        document.getElementById('btn-save-catalog').disabled = !isDirty;
+        document.getElementById('detail-panel-close-btn').textContent = isDirty ? 'Cancel' : 'Close';
+      }
+
+      // Bind input events for dirty tracking
+      document.getElementById('edit-name').addEventListener('input', checkDirty);
+      document.getElementById('edit-description').addEventListener('input', checkDirty);
+      document.getElementById('edit-abstract-rules').addEventListener('input', checkDirty);
+
+      // ── Usage Tab Population ──
+      function populateUsage(catalog) {
+        var u = catalog.usage || {};
+        ['explore', 'workflows', 'classifications'].forEach(function (section) {
+          var el = document.getElementById('usage-' + section);
+          var items = u[section] || [];
+          if (items.length === 0) {
+            el.innerHTML = '<div class="usage-empty">No usage recorded yet.</div>';
+          } else {
+            el.innerHTML = items.map(function (item) {
+              return '<div class="usage-item"><span class="usage-item-name">' + item.name + '</span><span class="usage-item-date">' + item.lastUsed + '</span></div>';
+            }).join('');
+          }
+        });
+      }
+
       // ── Detail Panel ──
       function openDetailPanel(catalogName) {
         var cat = MOCK_CATALOGS.find(function (c) { return c.name === catalogName; });
         if (!cat) return;
 
+        currentCatalog = cat;
+
         detailTitle.textContent = cat.name;
+        detailSubtitle.textContent = 'Last updated ' + cat.lastUpdated;
+
+        // Edit tab fields
+        document.getElementById('edit-name').value = cat.name;
+        document.getElementById('edit-description').value = cat.description || '';
+        editCategories = (cat.categories || []).slice();
+        renderCategoryTags('edit');
+
+        // Details grid
         document.getElementById('detail-documents').textContent = cat.documents ? cat.documents.toLocaleString() : '—';
         document.getElementById('detail-chunks').textContent = cat.chunks ? cat.chunks.toLocaleString() : '—';
         document.getElementById('detail-abstracts').textContent = cat.abstracts != null ? cat.abstracts.toLocaleString() : '—';
         document.getElementById('detail-classifications').textContent = cat.classifications;
-        document.getElementById('detail-storage').textContent = cat.storage;
+        document.getElementById('detail-location').textContent = cat.location;
         document.getElementById('detail-created').textContent = cat.created;
 
         // Status badge
-        var statusMap = {
+        var panelStatusMap = {
           'ready': '<span class="status-badge status-badge--ready"><span class="status-dot"></span> Ready</span>',
           'abstracts-missing': '<span class="status-badge status-badge--warning"><span class="status-dot"></span> Abstracts Missing</span>',
           'processing': '<span class="status-badge status-badge--processing"><span class="status-dot"></span> Processing</span>',
           'error': '<span class="status-badge status-badge--error"><span class="status-dot"></span> Error</span>'
         };
-        document.getElementById('detail-status').innerHTML = statusMap[cat.status] || cat.status;
+        document.getElementById('detail-status').innerHTML = panelStatusMap[cat.status] || cat.status;
 
         // Error state
         document.getElementById('detail-error-bar').style.display = cat.status === 'error' ? 'block' : 'none';
-        document.getElementById('detail-error-actions').style.display = cat.status === 'error' ? 'block' : 'none';
 
-        // Activity
-        var activityHtml = cat.activity.map(function (a) {
-          return '<div class="panel-activity-item"><span class="panel-activity-label">' + a.label + '</span><span class="panel-activity-time">' + a.time + '</span></div>';
-        }).join('');
-        document.getElementById('detail-activity').innerHTML = activityHtml;
+        // Abstracts tab
+        document.getElementById('detail-abstract-count').textContent = cat.abstracts != null ? cat.abstracts.toLocaleString() : '—';
+        document.getElementById('edit-abstract-rules').value = cat.abstractRules || '';
+
+        // Usage tab
+        populateUsage(cat);
+
+        // Reset dirty state and capture snapshot
+        captureSnapshot();
+
+        // Reset to Edit tab
+        switchDetailTab('edit');
 
         openPanel(detailPanel, detailOverlay);
       }
 
-      // Close detail panel
-      document.getElementById('detail-panel-close').addEventListener('click', function () { closePanel(detailPanel, detailOverlay); });
-      document.getElementById('detail-panel-close-btn').addEventListener('click', function () { closePanel(detailPanel, detailOverlay); });
-      detailOverlay.addEventListener('click', function () { closePanel(detailPanel, detailOverlay); });
+      // ── Detail Panel Tabs ──
+      function switchDetailTab(tabId) {
+        document.querySelectorAll('#detail-pivot-bar .pivot-tab').forEach(function (t) { t.classList.remove('pivot-tab--active'); });
+        document.querySelectorAll('#detail-panel .pivot-panel').forEach(function (p) { p.classList.remove('pivot-panel--active'); });
+        document.querySelector('#detail-pivot-bar .pivot-tab[data-tab="' + tabId + '"]').classList.add('pivot-tab--active');
+        document.getElementById('tab-' + tabId).classList.add('pivot-panel--active');
+      }
 
-      // ── Row Clicks ──
-      document.querySelectorAll('.flm-detailslist-row[data-catalog]').forEach(function (row) {
-        row.addEventListener('click', function (e) {
-          // Don't open panel when clicking checkbox
-          if (e.target.closest('.flm-detailslist-check')) return;
-          openDetailPanel(row.getAttribute('data-catalog'));
+      document.querySelectorAll('#detail-pivot-bar .pivot-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          switchDetailTab(tab.getAttribute('data-tab'));
         });
       });
 
-      // ── New Catalog Panel ──
-      function openNewPanel() {
-        document.getElementById('new-name').value = '';
-        document.getElementById('new-path').value = '';
-        document.getElementById('new-auto-abstracts').checked = false;
-        document.getElementById('new-progress').style.display = 'none';
-        document.getElementById('new-messagebar').style.display = 'none';
-        document.querySelector('input[name="source-type"][value="folder"]').checked = true;
-        openPanel(newPanel, newOverlay);
+      // ── Save Catalog ──
+      function saveCatalog() {
+        if (!currentCatalog) return;
+        var name = document.getElementById('edit-name').value.trim();
+        if (!name) {
+          showMessage('error', 'Catalog name is required.');
+          return;
+        }
+
+        // Check uniqueness
+        var duplicate = MOCK_CATALOGS.find(function (c) {
+          return c.name.toLowerCase() === name.toLowerCase() && c !== currentCatalog;
+        });
+        if (duplicate) {
+          showMessage('error', 'A catalog named "' + name + '" already exists.');
+          return;
+        }
+
+        var wasAbstractRulesDirty = abstractRulesDirty;
+
+        // Write back to catalog
+        currentCatalog.name = name;
+        currentCatalog.description = document.getElementById('edit-description').value.trim();
+        currentCatalog.categories = editCategories.slice();
+        currentCatalog.abstractRules = document.getElementById('edit-abstract-rules').value;
+        currentCatalog.lastUpdated = 'Feb 21, 2026';
+
+        // Reset dirty
+        captureSnapshot();
+        renderRows();
+        detailTitle.textContent = name;
+        showMessage('success', 'Catalog "' + name + '" saved.');
+
+        // If abstract rules changed, prompt regeneration
+        if (wasAbstractRulesDirty) {
+          regenerateDialog.classList.add('flm-dialog-overlay--open');
+        }
       }
 
-      // ── Browse for folder ──
+      document.getElementById('btn-save-catalog').addEventListener('click', saveCatalog);
+
+      // ── Close/Cancel Behavior ──
+      function tryCloseDetailPanel() {
+        if (isDirty) {
+          unsavedDialog.classList.add('flm-dialog-overlay--open');
+        } else {
+          closePanel(detailPanel, detailOverlay);
+          currentCatalog = null;
+        }
+      }
+
+      // X button and overlay: prompt if dirty
+      document.getElementById('detail-panel-close').addEventListener('click', tryCloseDetailPanel);
+      detailOverlay.addEventListener('click', tryCloseDetailPanel);
+
+      // Close/Cancel button: Close when clean, Cancel (close without prompt) when dirty
+      document.getElementById('detail-panel-close-btn').addEventListener('click', function () {
+        closePanel(detailPanel, detailOverlay);
+        currentCatalog = null;
+        isDirty = false;
+      });
+
+      // ── Unsaved Changes Dialog ──
+      document.getElementById('btn-unsaved-save').addEventListener('click', function () {
+        unsavedDialog.classList.remove('flm-dialog-overlay--open');
+        saveCatalog();
+        closePanel(detailPanel, detailOverlay);
+        currentCatalog = null;
+      });
+
+      document.getElementById('btn-unsaved-discard').addEventListener('click', function () {
+        unsavedDialog.classList.remove('flm-dialog-overlay--open');
+        isDirty = false;
+        abstractRulesDirty = false;
+        closePanel(detailPanel, detailOverlay);
+        currentCatalog = null;
+      });
+
+      unsavedDialog.addEventListener('click', function (e) {
+        if (e.target.hasAttribute('data-dialog-close') || e.target === unsavedDialog) {
+          unsavedDialog.classList.remove('flm-dialog-overlay--open');
+        }
+      });
+
+      // ── Regenerate Abstracts Dialog ──
+      document.getElementById('btn-regenerate-confirm').addEventListener('click', function () {
+        regenerateDialog.classList.remove('flm-dialog-overlay--open');
+        showMessage('success', 'Abstracts are being regenerated for "' + (currentCatalog ? currentCatalog.name : '') + '".');
+      });
+
+      document.getElementById('btn-regenerate-skip').addEventListener('click', function () {
+        regenerateDialog.classList.remove('flm-dialog-overlay--open');
+      });
+
+      regenerateDialog.addEventListener('click', function (e) {
+        if (e.target.hasAttribute('data-dialog-close') || e.target === regenerateDialog) {
+          regenerateDialog.classList.remove('flm-dialog-overlay--open');
+        }
+      });
+
+      // ── New Catalog Wizard ──
+      var newStep = 1;
+
+      function openNewCatalogDialog() {
+        newStep = 1;
+        newCategories = [];
+        document.getElementById('new-step-1').style.display = 'block';
+        document.getElementById('new-step-2').style.display = 'none';
+        document.getElementById('btn-new-back').style.display = 'none';
+        document.getElementById('btn-new-next').textContent = 'Next';
+        document.getElementById('new-path').value = '';
+        document.getElementById('new-auto-abstracts').checked = false;
+        document.getElementById('new-name').value = '';
+        document.getElementById('new-description').value = '';
+        document.getElementById('new-messagebar').style.display = 'none';
+        document.querySelector('input[name="source-type"][value="folder"]').checked = true;
+        renderCategoryTags('new');
+        newCatalogDialog.classList.add('flm-dialog-overlay--open');
+      }
+
+      document.getElementById('btn-new-catalog').addEventListener('click', openNewCatalogDialog);
+      document.getElementById('btn-empty-create').addEventListener('click', openNewCatalogDialog);
+
+      // Browse for folder
       var filePicker = document.getElementById('file-picker');
       document.getElementById('btn-browse').addEventListener('click', function () {
         filePicker.click();
@@ -887,39 +1446,84 @@
         }
       });
 
-      document.getElementById('btn-new-catalog').addEventListener('click', openNewPanel);
-      document.getElementById('btn-empty-create').addEventListener('click', openNewPanel);
-      document.getElementById('new-panel-close').addEventListener('click', function () { closePanel(newPanel, newOverlay); });
-      document.getElementById('new-panel-cancel').addEventListener('click', function () { closePanel(newPanel, newOverlay); });
-      newOverlay.addEventListener('click', function () { closePanel(newPanel, newOverlay); });
+      // Next / Create
+      document.getElementById('btn-new-next').addEventListener('click', function () {
+        if (newStep === 1) {
+          var path = document.getElementById('new-path').value.trim();
+          if (!path) {
+            document.getElementById('new-messagebar').style.display = 'block';
+            document.getElementById('new-messagebar').innerHTML = '<div class="flm-messagebar flm-messagebar--error">Path is required.</div>';
+            return;
+          }
+          document.getElementById('new-messagebar').style.display = 'none';
+          newStep = 2;
+          document.getElementById('new-step-1').style.display = 'none';
+          document.getElementById('new-step-2').style.display = 'block';
+          document.getElementById('btn-new-back').style.display = 'inline-block';
+          document.getElementById('btn-new-next').textContent = 'Create';
+        } else {
+          // Create
+          var name = document.getElementById('new-name').value.trim();
+          if (!name) {
+            document.getElementById('new-messagebar').style.display = 'block';
+            document.getElementById('new-messagebar').innerHTML = '<div class="flm-messagebar flm-messagebar--error">Name is required.</div>';
+            return;
+          }
+          // Check uniqueness
+          if (MOCK_CATALOGS.find(function (c) { return c.name.toLowerCase() === name.toLowerCase(); })) {
+            document.getElementById('new-messagebar').style.display = 'block';
+            document.getElementById('new-messagebar').innerHTML = '<div class="flm-messagebar flm-messagebar--error">A catalog named "' + name + '" already exists.</div>';
+            return;
+          }
 
-      // Create button
-      document.getElementById('btn-create-catalog').addEventListener('click', function () {
-        var name = document.getElementById('new-name').value.trim();
-        var path = document.getElementById('new-path').value.trim();
+          var path = document.getElementById('new-path').value.trim();
+          var newCatalog = {
+            name: name,
+            description: document.getElementById('new-description').value.trim(),
+            categories: newCategories.slice(),
+            documents: 0,
+            chunks: 0,
+            abstracts: 0,
+            classifications: 0,
+            status: 'processing',
+            lastUpdated: 'Feb 21, 2026',
+            location: '~/.awarity/catalogs/' + name,
+            created: 'Feb 21, 2026',
+            abstractRules: '',
+            usage: { explore: [], workflows: [], classifications: [] }
+          };
 
-        if (!name || !path) {
-          document.getElementById('new-messagebar').style.display = 'block';
-          document.getElementById('new-messagebar').innerHTML = '<div class="flm-messagebar flm-messagebar--error">Please fill in all required fields.</div>';
-          return;
+          MOCK_CATALOGS.push(newCatalog);
+          newCatalogDialog.classList.remove('flm-dialog-overlay--open');
+          renderRows();
+          showMessage('success', 'Catalog "' + name + '" created.');
+          openDetailPanel(name);
         }
+      });
 
-        // Show progress
-        document.getElementById('new-progress').style.display = 'block';
+      // Back
+      document.getElementById('btn-new-back').addEventListener('click', function () {
+        newStep = 1;
+        document.getElementById('new-step-1').style.display = 'block';
+        document.getElementById('new-step-2').style.display = 'none';
+        document.getElementById('btn-new-back').style.display = 'none';
+        document.getElementById('btn-new-next').textContent = 'Next';
         document.getElementById('new-messagebar').style.display = 'none';
+      });
 
-        // Simulate creation
-        setTimeout(function () {
-          closePanel(newPanel, newOverlay);
-          showMessage('success', 'Catalog "' + name + '" created successfully.');
-        }, 1500);
+      // Close new catalog dialog
+      newCatalogDialog.addEventListener('click', function (e) {
+        if (e.target.hasAttribute('data-dialog-close') || e.target === newCatalogDialog) {
+          newCatalogDialog.classList.remove('flm-dialog-overlay--open');
+        }
       });
 
       // ── Delete Dialog ──
       var currentDeleteCatalog = '';
 
       document.getElementById('btn-delete-catalog').addEventListener('click', function () {
-        currentDeleteCatalog = detailTitle.textContent;
+        if (!currentCatalog) return;
+        currentDeleteCatalog = currentCatalog.name;
         document.getElementById('delete-catalog-name').textContent = currentDeleteCatalog;
         deleteDialog.classList.add('flm-dialog-overlay--open');
       });
@@ -938,7 +1542,16 @@
       document.getElementById('btn-confirm-delete').addEventListener('click', function () {
         deleteDialog.classList.remove('flm-dialog-overlay--open');
         closePanel(detailPanel, detailOverlay);
+        currentCatalog = null;
+        isDirty = false;
         showMessage('success', 'Catalog "' + currentDeleteCatalog + '" deleted.');
+      });
+
+      // Close delete dialog
+      deleteDialog.addEventListener('click', function (e) {
+        if (e.target.hasAttribute('data-dialog-close') || e.target === deleteDialog) {
+          deleteDialog.classList.remove('flm-dialog-overlay--open');
+        }
       });
 
       // ── MessageBar helper ──
@@ -950,35 +1563,210 @@
       // ── Selection & toolbar state ──
       var btnGenerate = document.getElementById('btn-generate');
       var btnDelete = document.getElementById('btn-delete');
-      var checkAll = document.getElementById('check-all');
-      var rowCheckboxes = document.querySelectorAll('.flm-detailslist-row[data-catalog] .flm-checkbox-input');
 
       function updateToolbarState() {
-        var count = document.querySelectorAll('.flm-detailslist-row[data-catalog] .flm-checkbox-input:checked').length;
+        var checkAll = document.getElementById('check-all');
+        var rowCheckboxes = catalogsList.querySelectorAll('.flm-detailslist-row[data-catalog] .flm-checkbox-input');
+        var count = catalogsList.querySelectorAll('.flm-detailslist-row[data-catalog] .flm-checkbox-input:checked').length;
         btnGenerate.disabled = count === 0;
         btnDelete.disabled = count === 0;
-        // Sync check-all state
-        checkAll.checked = count > 0 && count === rowCheckboxes.length;
-        checkAll.indeterminate = count > 0 && count < rowCheckboxes.length;
+        if (checkAll) {
+          checkAll.checked = count > 0 && count === rowCheckboxes.length;
+          checkAll.indeterminate = count > 0 && count < rowCheckboxes.length;
+        }
       }
 
-      checkAll.addEventListener('change', function () {
-        var checked = checkAll.checked;
-        rowCheckboxes.forEach(function (cb) { cb.checked = checked; });
-        updateToolbarState();
+      // ── Column definitions ──
+      var COLUMNS = [
+        { key: 'categories',      label: 'Categories',      minWidth: 140, number: false },
+        { key: 'documents',       label: 'Documents',       minWidth: 80,  number: true },
+        { key: 'chunks',          label: 'Chunks',          minWidth: 80,  number: true },
+        { key: 'abstracts',       label: 'Abstracts',       minWidth: 80,  number: true },
+        { key: 'classifications', label: 'Classifications', minWidth: 80,  number: true },
+        { key: 'lastUpdated',     label: 'Last Updated',    minWidth: 100, number: false },
+        { key: 'status',          label: 'Status',          minWidth: 120, number: false }
+      ];
+
+      var _measureCtx = document.createElement('canvas').getContext('2d');
+      var _cs = getComputedStyle(document.documentElement);
+      _measureCtx.font = '600 ' + (_cs.getPropertyValue('--fontSizeSmall').trim() || '12px') + ' ' + (_cs.getPropertyValue('--fontFamily').trim() || '"Segoe UI", sans-serif');
+      function colWidth(col) {
+        var labelW = Math.ceil(_measureCtx.measureText(col.label).width) + 28;
+        return Math.max(col.minWidth, labelW);
+      }
+      var visibleColumns = { categories: true, documents: true, status: true };
+
+      function getVisibleColumns() {
+        return COLUMNS.filter(function (col) { return visibleColumns[col.key]; });
+      }
+
+      // ── Render Table Rows ──
+      var catalogsList = document.getElementById('catalogs-list');
+      var catalogsHeader = document.getElementById('catalogs-header');
+      var statusMap = {
+        'ready': '<span class="status-badge status-badge--ready"><span class="status-dot"></span> Ready</span>',
+        'abstracts-missing': '<span class="status-badge status-badge--warning"><span class="status-dot"></span> Abstracts Missing</span>',
+        'processing': '<span class="status-badge status-badge--processing"><span class="status-dot"></span> Processing</span>',
+        'error': '<span class="status-badge status-badge--error"><span class="status-dot"></span> Error</span>'
+      };
+
+      function colStyle(col, isLast) {
+        var w = colWidth(col) + 'px';
+        return isLast ? 'min-width: ' + w + '; flex: 1;' : 'width: ' + w + ';';
+      }
+
+      function renderHeader() {
+        var visCols = getVisibleColumns();
+        catalogsHeader.innerHTML =
+          '<div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="check-all"><span class="flm-checkbox-mark"></span></label></div>' +
+          '<div class="flm-detailslist-header-cell" style="width: 200px;">Name</div>';
+        visCols.forEach(function (col, i) {
+          var isLast = i === visCols.length - 1;
+          catalogsHeader.innerHTML += '<div class="flm-detailslist-header-cell' + (col.number ? ' cell-number' : '') + '" style="' + colStyle(col, isLast) + '">' + col.label + '</div>';
+        });
+        var checkAll = document.getElementById('check-all');
+        checkAll.addEventListener('change', function () {
+          var checked = checkAll.checked;
+          catalogsList.querySelectorAll('.flm-detailslist-row[data-catalog] .flm-checkbox-input').forEach(function (cb) { cb.checked = checked; });
+          updateToolbarState();
+        });
+      }
+
+      function cellHtml(col, cat) {
+        switch (col.key) {
+          case 'categories':
+            var chips = (cat.categories || []).map(function (c) { return '<span class="category-chip">' + c + '</span>'; }).join('');
+            return '<div class="category-chips">' + chips + '</div>';
+          case 'documents': return cat.documents ? cat.documents.toLocaleString() : '—';
+          case 'chunks': return cat.chunks ? cat.chunks.toLocaleString() : '—';
+          case 'abstracts': return cat.abstracts != null ? cat.abstracts.toLocaleString() : '—';
+          case 'classifications': return '' + cat.classifications;
+          case 'lastUpdated': return cat.lastUpdated;
+          case 'status':
+            var html = statusMap[cat.status] || cat.status;
+            if (cat.status === 'processing') html += '<div class="row-progress"><div class="flm-progress"><div class="flm-progress-track"><div class="flm-progress-bar" style="width: 56%"></div></div></div></div>';
+            return html;
+          default: return '';
+        }
+      }
+
+      function renderRows() {
+        var existing = catalogsList.querySelectorAll('.flm-detailslist-row');
+        existing.forEach(function (r) { r.remove(); });
+
+        MOCK_CATALOGS.forEach(function (cat) {
+          var row = document.createElement('div');
+          row.className = 'flm-detailslist-row';
+          row.setAttribute('data-catalog', cat.name);
+          row.setAttribute('data-search', (cat.name + ' ' + (cat.categories || []).join(' ')).toLowerCase());
+          row.setAttribute('data-categories', (cat.categories || []).join(','));
+
+          var visCols = getVisibleColumns();
+          var html =
+            '<div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label></div>' +
+            '<div class="flm-detailslist-cell" style="width: 200px; font-weight: var(--fontWeightSemibold);">' + cat.name + '</div>';
+
+          visCols.forEach(function (col, i) {
+            var isLast = i === visCols.length - 1;
+            html += '<div class="flm-detailslist-cell' + (col.number ? ' cell-number' : '') + '" style="' + colStyle(col, isLast) + '">' + cellHtml(col, cat) + '</div>';
+          });
+
+          row.innerHTML = html;
+          catalogsList.appendChild(row);
+        });
+
+        bindRowEvents();
+        if (typeof buildFilterBar === 'function') { buildFilterBar(); applyFilters(); }
+      }
+
+      function bindRowEvents() {
+        catalogsList.querySelectorAll('.flm-detailslist-row[data-catalog]').forEach(function (row) {
+          row.addEventListener('click', function (e) {
+            if (e.target.closest('.flm-detailslist-check')) return;
+            var chip = e.target.closest('.category-chip');
+            if (chip) { setCategory(chip.textContent); return; }
+            openDetailPanel(row.getAttribute('data-catalog'));
+          });
+        });
+
+        catalogsList.querySelectorAll('.flm-detailslist-row[data-catalog] .flm-checkbox-input').forEach(function (cb) {
+          cb.addEventListener('change', updateToolbarState);
+        });
+      }
+
+      // ── View dropdown ──
+      var viewBtn = document.getElementById('view-dropdown-btn');
+      var viewMenu = document.getElementById('view-dropdown-menu');
+
+      function buildViewMenu() {
+        viewMenu.innerHTML = '';
+        COLUMNS.forEach(function (col) {
+          var btn = document.createElement('button');
+          btn.className = 'view-dropdown-item';
+          var checked = visibleColumns[col.key];
+          btn.innerHTML = '<span style="width:16px;text-align:center;">' + (checked ? '&#10003;' : '') + '</span> ' + col.label;
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            visibleColumns[col.key] = !visibleColumns[col.key];
+            renderHeader();
+            renderRows();
+            buildViewMenu();
+          });
+          viewMenu.appendChild(btn);
+        });
+      }
+
+      viewBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        viewMenu.classList.toggle('view-dropdown-menu--open');
+        if (viewMenu.classList.contains('view-dropdown-menu--open')) buildViewMenu();
       });
 
-      rowCheckboxes.forEach(function (cb) {
-        cb.addEventListener('change', updateToolbarState);
+      document.addEventListener('click', function () {
+        viewMenu.classList.remove('view-dropdown-menu--open');
       });
+
+      // ── Category filter bar ──
+      var activeCategory = 'All';
+
+      function buildFilterBar() {
+        var cats = {};
+        MOCK_CATALOGS.forEach(function (c) {
+          (c.categories || []).forEach(function (cat) { cats[cat] = true; });
+        });
+        var sorted = Object.keys(cats).sort();
+        var items = document.querySelector('#category-filter .flm-overflowset-items');
+        items.innerHTML = '';
+        ['All'].concat(sorted).forEach(function (cat) {
+          var btn = document.createElement('button');
+          btn.className = 'flm-overflowset-item filter-pill' + (cat === activeCategory ? ' filter-pill--active' : '');
+          btn.setAttribute('data-category', cat);
+          btn.textContent = cat;
+          btn.addEventListener('click', function () { setCategory(cat); });
+          items.appendChild(btn);
+        });
+      }
+
+      function setCategory(cat) {
+        activeCategory = cat;
+        document.querySelectorAll('#category-filter .filter-pill').forEach(function (btn) {
+          btn.classList.toggle('filter-pill--active', btn.getAttribute('data-category') === cat);
+        });
+        applyFilters();
+      }
+
+      function applyFilters() {
+        var query = document.getElementById('search-input').value.toLowerCase();
+        catalogsList.querySelectorAll('.flm-detailslist-row[data-catalog]').forEach(function (row) {
+          var searchMatch = row.getAttribute('data-search').indexOf(query) !== -1;
+          var catMatch = activeCategory === 'All' || (',' + row.getAttribute('data-categories') + ',').indexOf(',' + activeCategory + ',') !== -1;
+          row.style.display = (searchMatch && catMatch) ? '' : 'none';
+        });
+      }
 
       // ── Search filter ──
       document.getElementById('search-input').addEventListener('input', function () {
-        var query = this.value.toLowerCase();
-        document.querySelectorAll('.flm-detailslist-row[data-catalog]').forEach(function (row) {
-          var name = row.getAttribute('data-catalog');
-          row.style.display = name.indexOf(query) !== -1 ? '' : 'none';
-        });
+        applyFilters();
       });
 
       // ── Refresh button ──
@@ -987,12 +1775,18 @@
       });
 
       // ── State switcher (for demo: toggle via console) ──
-      // Usage: showState('loading'), showState('empty'), showState('data')
       window.showState = function (state) {
         document.getElementById('state-loading').style.display = state === 'loading' ? 'block' : 'none';
         document.getElementById('state-empty').style.display = state === 'empty' ? 'flex' : 'none';
         document.getElementById('state-data').style.display = state === 'data' ? 'block' : 'none';
       };
+
+      // ── Init ──
+      setupCategoryInput('edit');
+      setupCategoryInput('new');
+      renderHeader();
+      renderRows();
+      buildFilterBar();
 
       // Default: show data state
       window.showState('data');

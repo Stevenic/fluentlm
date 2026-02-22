@@ -155,6 +155,50 @@
       font-variant-numeric: tabular-nums;
     }
 
+    /* ── Horizontal scroll for table ── */
+    #lenses-list {
+      overflow-x: auto;
+    }
+    #lenses-list .flm-detailslist-header,
+    #lenses-list .flm-detailslist-row {
+      min-width: max-content;
+    }
+
+    /* ── Filter bar layout ── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+      margin-bottom: var(--spacingS1);
+    }
+    .filter-bar #category-filter { flex: 1; margin-bottom: 0; }
+
+    /* ── View dropdown ── */
+    .view-dropdown-wrapper { position: relative; }
+    .view-dropdown-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 16px;
+      border: 1px solid var(--bodyDivider);
+      background: transparent; color: var(--bodySubtext);
+      font-size: var(--fontSizeSmall); font-family: inherit;
+      cursor: pointer;
+    }
+    .view-dropdown-btn:hover { border-color: var(--themePrimary); color: var(--themePrimary); }
+    .view-dropdown-menu {
+      display: none; position: absolute; right: 0; top: calc(100% + 4px);
+      min-width: 180px; background: var(--bodyBackground);
+      border: 1px solid var(--bodyDivider); border-radius: var(--roundedCorner4);
+      box-shadow: var(--elevation8); z-index: 10; padding: 4px 0;
+    }
+    .view-dropdown-menu--open { display: block; }
+    .view-dropdown-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 12px; font-size: var(--fontSizeSmall);
+      color: var(--bodyText); cursor: pointer; width: 100%;
+      background: none; border: none; font-family: inherit; text-align: left;
+    }
+    .view-dropdown-item:hover { background: var(--listItemBackgroundHovered); }
+
     /* ── Category filter pills ── */
     #category-filter { margin-bottom: var(--spacingS1); }
     .filter-pill {
@@ -657,22 +701,20 @@
 
         <!-- ── Data State (DetailsList) ── -->
         <div id="state-data" style="display: block;">
-          <div class="flm-overflowset" id="category-filter">
-            <div class="flm-overflowset-items"></div>
-            <button class="flm-overflowset-overflow" aria-label="More categories">...</button>
+          <div class="filter-bar">
+            <div class="flm-overflowset" id="category-filter">
+              <div class="flm-overflowset-items"></div>
+              <button class="flm-overflowset-overflow" aria-label="More categories">...</button>
+            </div>
+            <div class="view-dropdown-wrapper">
+              <button class="view-dropdown-btn" id="view-dropdown-btn">
+                <i class="flm-icon" data-icon="ViewList"></i> View
+              </button>
+              <div class="view-dropdown-menu" id="view-dropdown-menu"></div>
+            </div>
           </div>
           <div class="flm-detailslist" id="lenses-list">
-            <div class="flm-detailslist-header">
-              <div class="flm-detailslist-check">
-                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="check-all"><span class="flm-checkbox-mark"></span></label>
-              </div>
-              <div class="flm-detailslist-header-cell" style="width: 240px;">Name</div>
-              <div class="flm-detailslist-header-cell" style="flex: 1;">Description</div>
-              <div class="flm-detailslist-header-cell" style="width: 200px;">Categories</div>
-              <div class="flm-detailslist-header-cell cell-number" style="width: 100px;">Used In</div>
-              <div class="flm-detailslist-header-cell" style="width: 150px;">Last Updated</div>
-            </div>
-
+            <div class="flm-detailslist-header" id="lenses-header"></div>
             <!-- Rows populated by JS -->
           </div>
         </div>
@@ -1022,6 +1064,7 @@
     FluentIcons.register('Download',     'M8 1.5a.5.5 0 0 1 .5.5v7.79l2.15-2.14a.5.5 0 0 1 .7.7l-3 3a.5.5 0 0 1-.7 0l-3-3a.5.5 0 1 1 .7-.7L7.5 9.79V2a.5.5 0 0 1 .5-.5zM2.5 12a.5.5 0 0 1 .5.5v1h10v-1a.5.5 0 0 1 1 0v1.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-1.5a.5.5 0 0 1 .5-.5z');
     FluentIcons.register('Copy',         'M5.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h6a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-6zM4 3.5A1.5 1.5 0 0 1 5.5 2h6A1.5 1.5 0 0 1 13 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-6A1.5 1.5 0 0 1 4 12.5v-9zM2 5.5a.5.5 0 0 1 .5.5v7.5A1.5 1.5 0 0 0 4 15h6a.5.5 0 0 1 0 1H4a2.5 2.5 0 0 1-2.5-2.5V6a.5.5 0 0 1 .5-.5z');
     FluentIcons.register('Beaker',       'M6 1.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H9v4.28l3.89 5.83A1.5 1.5 0 0 1 11.64 14H4.36a1.5 1.5 0 0 1-1.25-2.33L7 5.84V2H6.5a.5.5 0 0 1-.5-.5zM8 6.16L4.36 11.67a.5.5 0 0 0 .42.77h6.44a.5.5 0 0 0 .42-.77L8 5.84V2h0v4.16z');
+    FluentIcons.register('ViewList',     'M2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z');
 
     // ── Register themes & init ──
     FluentLM.registerTheme('awarity-light', 'fluent-awarity-light');
@@ -1238,9 +1281,74 @@
         setTimeout(function () { messageZone.innerHTML = ''; }, 5000);
       }
 
+      // ── Column definitions ──
+      var COLUMNS = [
+        { key: 'description',    label: 'Description',    minWidth: 200, number: false },
+        { key: 'categories',     label: 'Categories',     minWidth: 140, number: false },
+        { key: 'usedInCount',    label: 'Used In',        minWidth: 80,  number: true },
+        { key: 'lastUpdated',    label: 'Last Updated',   minWidth: 100, number: false }
+      ];
+
+      var _measureCtx = document.createElement('canvas').getContext('2d');
+      var _cs = getComputedStyle(document.documentElement);
+      _measureCtx.font = '600 ' + (_cs.getPropertyValue('--fontSizeSmall').trim() || '12px') + ' ' + (_cs.getPropertyValue('--fontFamily').trim() || '"Segoe UI", sans-serif');
+      function colWidth(col) {
+        var labelW = Math.ceil(_measureCtx.measureText(col.label).width) + 28;
+        return Math.max(col.minWidth, labelW);
+      }
+
+      // Default visible: categories and description (description stretches)
+      var visibleColumns = { description: true, categories: true };
+
+      function getVisibleColumns() {
+        return COLUMNS.filter(function (col) { return visibleColumns[col.key]; });
+      }
+
+      // ── Render Header ──
+      var lensesHeader = document.getElementById('lenses-header');
+
+      function colStyle(col, isLast) {
+        // Description always stretches via flex:1 when it's the last visible column or explicitly
+        if (col.key === 'description') return 'min-width: ' + colWidth(col) + 'px; flex: 1;';
+        var w = colWidth(col) + 'px';
+        return isLast ? 'min-width: ' + w + '; flex: 1;' : 'width: ' + w + ';';
+      }
+
+      function renderHeader() {
+        var visCols = getVisibleColumns();
+        lensesHeader.innerHTML =
+          '<div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="check-all"><span class="flm-checkbox-mark"></span></label></div>' +
+          '<div class="flm-detailslist-header-cell" style="width: 240px;">Name</div>';
+        visCols.forEach(function (col, i) {
+          var isLast = i === visCols.length - 1;
+          lensesHeader.innerHTML += '<div class="flm-detailslist-header-cell' + (col.number ? ' cell-number' : '') + '" style="' + colStyle(col, isLast) + '">' + col.label + '</div>';
+        });
+        // Re-bind check-all since it was recreated
+        var checkAll = document.getElementById('check-all');
+        checkAll.addEventListener('change', function () {
+          var checked = checkAll.checked;
+          lensList.querySelectorAll('.flm-detailslist-row[data-lens] .flm-checkbox-input').forEach(function (cb) { cb.checked = checked; });
+          updateToolbarState();
+        });
+      }
+
+      function cellHtml(col, lens) {
+        switch (col.key) {
+          case 'description':
+            return '<span style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">' + (lens.description || '') + '</span>';
+          case 'categories':
+            var chips = (lens.categories || []).map(function (c) { return '<span class="category-chip">' + c + '</span>'; }).join('');
+            return '<div class="category-chips">' + chips + '</div>';
+          case 'usedInCount':
+            return '' + lens.usedInCount;
+          case 'lastUpdated':
+            return lens.lastUpdated;
+          default: return '';
+        }
+      }
+
       // ── Render Table Rows ──
       function renderRows() {
-        // Remove existing rows
         var existing = lensList.querySelectorAll('.flm-detailslist-row');
         existing.forEach(function (r) { r.remove(); });
 
@@ -1251,18 +1359,17 @@
           row.setAttribute('data-search', (lens.name + ' ' + lens.description + ' ' + lens.categories.join(' ')).toLowerCase());
           row.setAttribute('data-categories', lens.categories.join(','));
 
-          var chips = lens.categories.map(function (c) {
-            return '<span class="category-chip">' + c + '</span>';
-          }).join('');
-
-          row.innerHTML =
+          var visCols = getVisibleColumns();
+          var html =
             '<div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label></div>' +
-            '<div class="flm-detailslist-cell" style="width: 240px; font-weight: var(--fontWeightSemibold);">' + lens.name + '</div>' +
-            '<div class="flm-detailslist-cell" style="flex: 1; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">' + (lens.description || '') + '</div>' +
-            '<div class="flm-detailslist-cell" style="width: 200px;"><div class="category-chips">' + chips + '</div></div>' +
-            '<div class="flm-detailslist-cell cell-number" style="width: 100px;">' + lens.usedInCount + '</div>' +
-            '<div class="flm-detailslist-cell" style="width: 150px;">' + lens.lastUpdated + '</div>';
+            '<div class="flm-detailslist-cell" style="width: 240px; font-weight: var(--fontWeightSemibold);">' + lens.name + '</div>';
 
+          visCols.forEach(function (col, i) {
+            var isLast = i === visCols.length - 1;
+            html += '<div class="flm-detailslist-cell' + (col.number ? ' cell-number' : '') + '" style="' + colStyle(col, isLast) + '">' + cellHtml(col, lens) + '</div>';
+          });
+
+          row.innerHTML = html;
           lensList.appendChild(row);
         });
 
@@ -1293,22 +1400,50 @@
       var btnTestLens = document.getElementById('btn-test-lens');
       var btnDuplicate = document.getElementById('btn-duplicate');
       var btnDelete = document.getElementById('btn-delete');
-      var checkAll = document.getElementById('check-all');
 
       function updateToolbarState() {
+        var checkAll = document.getElementById('check-all');
         var rowCheckboxes = lensList.querySelectorAll('.flm-detailslist-row[data-lens] .flm-checkbox-input');
         var count = lensList.querySelectorAll('.flm-detailslist-row[data-lens] .flm-checkbox-input:checked').length;
         btnTestLens.disabled = count !== 1;
         btnDuplicate.disabled = count !== 1;
         btnDelete.disabled = count === 0;
-        checkAll.checked = count > 0 && count === rowCheckboxes.length;
-        checkAll.indeterminate = count > 0 && count < rowCheckboxes.length;
+        if (checkAll) {
+          checkAll.checked = count > 0 && count === rowCheckboxes.length;
+          checkAll.indeterminate = count > 0 && count < rowCheckboxes.length;
+        }
       }
 
-      checkAll.addEventListener('change', function () {
-        var checked = checkAll.checked;
-        lensList.querySelectorAll('.flm-detailslist-row[data-lens] .flm-checkbox-input').forEach(function (cb) { cb.checked = checked; });
-        updateToolbarState();
+      // ── View dropdown ──
+      var viewBtn = document.getElementById('view-dropdown-btn');
+      var viewMenu = document.getElementById('view-dropdown-menu');
+
+      function buildViewMenu() {
+        viewMenu.innerHTML = '';
+        COLUMNS.forEach(function (col) {
+          var btn = document.createElement('button');
+          btn.className = 'view-dropdown-item';
+          var checked = visibleColumns[col.key];
+          btn.innerHTML = '<span style="width:16px;text-align:center;">' + (checked ? '&#10003;' : '') + '</span> ' + col.label;
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            visibleColumns[col.key] = !visibleColumns[col.key];
+            renderHeader();
+            renderRows();
+            buildViewMenu();
+          });
+          viewMenu.appendChild(btn);
+        });
+      }
+
+      viewBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        viewMenu.classList.toggle('view-dropdown-menu--open');
+        if (viewMenu.classList.contains('view-dropdown-menu--open')) buildViewMenu();
+      });
+
+      document.addEventListener('click', function () {
+        viewMenu.classList.remove('view-dropdown-menu--open');
       });
 
       // ── Category filter bar ──
@@ -2159,6 +2294,7 @@
       };
 
       // ── Init ──
+      renderHeader();
       renderRows();
       buildFilterBar();
       window.showState('data');
