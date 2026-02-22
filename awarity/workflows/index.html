@@ -6,11 +6,11 @@
   <title>Workflows — Awarity</title>
 
   <!-- Themes & combined library CSS -->
-  <link rel="stylesheet" href="../../dist/theme-awarity-light.css">
-  <link rel="stylesheet" href="../../dist/theme-awarity-dark.css">
-  <link rel="stylesheet" href="../../dist/theme-awarity-amber-light.css">
-  <link rel="stylesheet" href="../../dist/theme-awarity-amber-dark.css">
-  <link rel="stylesheet" href="../../dist/fluentlm.min.css">
+  <link rel="stylesheet" href="../themes/theme-awarity-light.css">
+  <link rel="stylesheet" href="../themes/theme-awarity-dark.css">
+  <link rel="stylesheet" href="../themes/theme-awarity-amber-light.css">
+  <link rel="stylesheet" href="../themes/theme-awarity-amber-dark.css">
+  <link rel="stylesheet" href="../themes/fluentlm.min.css">
 
   <style>
     /* ── App Shell ── */
@@ -1180,7 +1180,7 @@
   </div>
 
   <!-- Combined library JS -->
-  <script src="../../dist/fluentlm.min.js"></script>
+  <script src="../scripts/fluentlm.min.js"></script>
 
   <script>
     // ── Register custom icons for nav ──
@@ -1207,7 +1207,9 @@
     FluentLM.registerTheme('awarity-dark', 'fluent-awarity-dark');
     FluentLM.registerTheme('awarity-amber-light', 'fluent-awarity-amber-light');
     FluentLM.registerTheme('awarity-amber-dark', 'fluent-awarity-amber-dark');
-    FluentLM.setTheme('awarity-dark');
+    // Restore stored theme (init() couldn't because themes weren't registered yet)
+    var _stored = (function () { try { return localStorage.getItem('fluentlm-theme'); } catch (e) { return null; } })();
+    FluentLM.setTheme(_stored && _stored.indexOf('awarity') === 0 ? _stored : 'awarity-dark');
 
     (function () {
 
