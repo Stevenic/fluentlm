@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" class="fluent-awarity-dark">
+<html lang="en" class="fluentlm dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Workflows — Awarity</title>
-
   <!-- Themes & combined library CSS -->
+  <link rel="stylesheet" href="../themes/theme-dark.css">
   <link rel="stylesheet" href="../themes/theme-awarity-light.css">
   <link rel="stylesheet" href="../themes/theme-awarity-dark.css">
   <link rel="stylesheet" href="../themes/theme-awarity-amber-light.css">
@@ -1181,6 +1181,7 @@
 
   <!-- Combined library JS -->
   <script src="../scripts/fluentlm.min.js"></script>
+  <script src="../scripts/awarity-v2.js"></script>
 
   <script>
     // ── Register custom icons for nav ──
@@ -1201,15 +1202,6 @@
     FluentIcons.register('Help',        'M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm7.5-3.5a1.5 1.5 0 0 1 2.87.6c0 .73-.52 1.06-1 1.36l-.13.08c-.4.26-.74.5-.74 1.06a.5.5 0 0 1-1 0c0-1.03.61-1.4 1.1-1.72l.13-.08c.46-.29.64-.44.64-.7a.5.5 0 0 0-1 0 .5.5 0 0 1-1 0zM8 11.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5z');
     FluentIcons.register('Back',        'M10.35 3.15a.5.5 0 0 1 0 .7L6.21 8l4.14 4.15a.5.5 0 0 1-.7.7l-4.5-4.5a.5.5 0 0 1 0-.7l4.5-4.5a.5.5 0 0 1 .7 0z');
     FluentIcons.register('Clock',       'M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13zM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-3.5a.5.5 0 0 1 .5.5v2.79l1.85 1.86a.5.5 0 0 1-.7.7l-2-2A.5.5 0 0 1 7.5 8V5a.5.5 0 0 1 .5-.5z');
-
-    // ── Register themes & init ──
-    FluentLM.registerTheme('awarity-light', 'fluent-awarity-light');
-    FluentLM.registerTheme('awarity-dark', 'fluent-awarity-dark');
-    FluentLM.registerTheme('awarity-amber-light', 'fluent-awarity-amber-light');
-    FluentLM.registerTheme('awarity-amber-dark', 'fluent-awarity-amber-dark');
-    // Restore stored theme (init() couldn't because themes weren't registered yet)
-    var _stored = (function () { try { return localStorage.getItem('fluentlm-theme'); } catch (e) { return null; } })();
-    FluentLM.setTheme(_stored && _stored.indexOf('awarity') === 0 ? _stored : 'awarity-dark');
 
     (function () {
 
@@ -1326,27 +1318,7 @@
       //  THEME TOGGLE
       // ══════════════════════════════════════════════════════════════
 
-      var themeBtn = document.getElementById('themeToggle');
-      var themeNames = {
-        'awarity-light': 'Blue Light',
-        'awarity-dark': 'Blue Dark',
-        'awarity-amber-light': 'Amber Light',
-        'awarity-amber-dark': 'Amber Dark'
-      };
-      var themeCycle = ['awarity-dark', 'awarity-light', 'awarity-amber-dark', 'awarity-amber-light'];
-      function nextTheme(current) {
-        var idx = themeCycle.indexOf(current);
-        return themeCycle[(idx + 1) % themeCycle.length];
-      }
-      function updateThemeLabel() {
-        var next = nextTheme(FluentLM.getTheme());
-        themeBtn.textContent = 'Theme: ' + (themeNames[next] || next);
-      }
-      updateThemeLabel();
-      themeBtn.addEventListener('click', function () {
-        FluentLM.setTheme(nextTheme(FluentLM.getTheme()));
-        updateThemeLabel();
-      });
+      awarity.initThemeToggle();
 
       // ══════════════════════════════════════════════════════════════
       //  MESSAGE HELPER

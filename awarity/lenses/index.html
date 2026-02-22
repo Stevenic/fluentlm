@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en" class="fluent-awarity-dark">
+<html lang="en" class="fluentlm dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lenses — Awarity</title>
-
   <!-- Themes & combined library CSS -->
+  <link rel="stylesheet" href="../themes/theme-dark.css">
   <link rel="stylesheet" href="../themes/theme-awarity-light.css">
   <link rel="stylesheet" href="../themes/theme-awarity-dark.css">
   <link rel="stylesheet" href="../themes/theme-awarity-amber-light.css">
@@ -1056,6 +1056,7 @@
 
   <!-- Combined library JS -->
   <script src="../scripts/fluentlm.min.js"></script>
+  <script src="../scripts/awarity-v2.js"></script>
 
   <script>
     // ── Register custom icons ──
@@ -1069,15 +1070,6 @@
     FluentIcons.register('Copy',         'M5.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h6a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-6zM4 3.5A1.5 1.5 0 0 1 5.5 2h6A1.5 1.5 0 0 1 13 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-6A1.5 1.5 0 0 1 4 12.5v-9zM2 5.5a.5.5 0 0 1 .5.5v7.5A1.5 1.5 0 0 0 4 15h6a.5.5 0 0 1 0 1H4a2.5 2.5 0 0 1-2.5-2.5V6a.5.5 0 0 1 .5-.5z');
     FluentIcons.register('Beaker',       'M6 1.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H9v4.28l3.89 5.83A1.5 1.5 0 0 1 11.64 14H4.36a1.5 1.5 0 0 1-1.25-2.33L7 5.84V2H6.5a.5.5 0 0 1-.5-.5zM8 6.16L4.36 11.67a.5.5 0 0 0 .42.77h6.44a.5.5 0 0 0 .42-.77L8 5.84V2h0v4.16z');
     FluentIcons.register('ViewList',     'M2 3.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0 3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z');
-
-    // ── Register themes & init ──
-    FluentLM.registerTheme('awarity-light', 'fluent-awarity-light');
-    FluentLM.registerTheme('awarity-dark', 'fluent-awarity-dark');
-    FluentLM.registerTheme('awarity-amber-light', 'fluent-awarity-amber-light');
-    FluentLM.registerTheme('awarity-amber-dark', 'fluent-awarity-amber-dark');
-    // Restore stored theme (init() couldn't because themes weren't registered yet)
-    var _stored = (function () { try { return localStorage.getItem('fluentlm-theme'); } catch (e) { return null; } })();
-    FluentLM.setTheme(_stored && _stored.indexOf('awarity') === 0 ? _stored : 'awarity-dark');
 
     (function () {
 
@@ -1272,28 +1264,7 @@
       var editCategories = [];
       var newCategories = [];
 
-      // ── Theme Toggle ──
-      var themeBtn = document.getElementById('themeToggle');
-      var themeNames = {
-        'awarity-light': 'Blue Light',
-        'awarity-dark': 'Blue Dark',
-        'awarity-amber-light': 'Amber Light',
-        'awarity-amber-dark': 'Amber Dark'
-      };
-      var themeCycle = ['awarity-dark', 'awarity-light', 'awarity-amber-dark', 'awarity-amber-light'];
-      function nextTheme(current) {
-        var idx = themeCycle.indexOf(current);
-        return themeCycle[(idx + 1) % themeCycle.length];
-      }
-      function updateThemeLabel() {
-        var next = nextTheme(FluentLM.getTheme());
-        themeBtn.textContent = 'Theme: ' + (themeNames[next] || next);
-      }
-      updateThemeLabel();
-      themeBtn.addEventListener('click', function () {
-        FluentLM.setTheme(nextTheme(FluentLM.getTheme()));
-        updateThemeLabel();
-      });
+      awarity.initThemeToggle();
 
       // ── MessageBar helper ──
       function showMessage(type, text) {
