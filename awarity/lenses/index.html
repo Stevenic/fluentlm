@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html lang="en" class="fluent-awarity-dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lenses — Awarity</title>
+
+  <!-- Themes & combined library CSS -->
+  <link rel="stylesheet" href="../../dist/theme-awarity-light.css">
+  <link rel="stylesheet" href="../../dist/theme-awarity-dark.css">
+  <link rel="stylesheet" href="../../dist/fluentlm.min.css">
+
+  <style>
+    /* ── App Shell ── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
+
+    .app-shell {
+      display: flex;
+      height: 100vh;
+    }
+
+    /* ── Left Nav ── */
+    .app-nav {
+      width: 220px;
+      flex-shrink: 0;
+      background-color: var(--bodyStandoutBackground);
+      border-right: 1px solid var(--bodyFrameDivider);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .app-nav-brand {
+      padding: var(--spacingM);
+      font-size: var(--fontSizeXLarge);
+      font-weight: var(--fontWeightSemibold);
+      line-height: var(--lineHeightXLarge);
+      color: var(--bodyText);
+      border-bottom: 1px solid var(--bodyFrameDivider);
+    }
+
+    .app-nav-link {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+      padding: var(--spacingS2) var(--spacingM);
+      color: var(--bodyText);
+      font-size: var(--fontSizeMedium);
+      text-decoration: none;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+    }
+
+    .app-nav-link:hover {
+      background-color: var(--listItemBackgroundHovered);
+      text-decoration: none;
+    }
+
+    .app-nav-link--active {
+      background-color: var(--listItemBackgroundChecked);
+      font-weight: var(--fontWeightSemibold);
+      border-left-color: var(--themePrimary);
+    }
+
+    .app-nav-spacer { flex: 1; }
+
+    /* ── Main Area ── */
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── CommandBar Zone ── */
+    .app-commandbar {
+      border-bottom: 1px solid var(--bodyDivider);
+    }
+
+    /* ── Breadcrumb Zone ── */
+    .app-breadcrumb {
+      padding: var(--spacingS2) var(--spacingL2);
+      border-bottom: 1px solid var(--bodyDivider);
+      background-color: var(--bodyBackground);
+    }
+
+    /* ── MessageBar Zone ── */
+    .app-messagebar-zone {
+      padding: 0 var(--spacingL2);
+    }
+    .app-messagebar-zone:empty { display: none; }
+    .app-messagebar-zone .flm-messagebar {
+      margin-top: var(--spacingS1);
+      border-radius: var(--roundedCorner4);
+    }
+
+    /* ── Content Area ── */
+    .app-content {
+      flex: 1;
+      padding: var(--spacingL2);
+      overflow-y: auto;
+      background-color: var(--bodyBackground);
+    }
+
+    /* ── Empty State ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      gap: var(--spacingM);
+      color: var(--bodySubtext);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      opacity: 0.4;
+    }
+
+    .empty-state-text {
+      font-size: var(--fontSizeLarge);
+      color: var(--bodySubtext);
+    }
+
+    .empty-state-sub {
+      font-size: var(--fontSizeMedium);
+      color: var(--bodySubtext);
+      opacity: 0.7;
+      max-width: 360px;
+      text-align: center;
+      line-height: var(--lineHeightMedium);
+    }
+
+    /* ── Shimmer loading table ── */
+    .shimmer-table {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingS2);
+    }
+
+    .shimmer-row {
+      display: flex;
+      gap: var(--spacingM);
+      padding: var(--spacingS1) 0;
+    }
+
+    /* ── Number cells right-aligned ── */
+    .cell-number {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Category filter pills ── */
+    #category-filter { margin-bottom: var(--spacingS1); }
+    .filter-pill {
+      border-radius: 16px; padding: 4px 14px;
+      border: 1px solid var(--bodyDivider);
+      background: transparent; color: var(--bodySubtext);
+      font-size: var(--fontSizeSmall); font-family: inherit;
+      cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .filter-pill:hover { border-color: var(--themePrimary); color: var(--themePrimary); }
+    .filter-pill--active { background: var(--themePrimary); color: var(--white); border-color: transparent; }
+
+    /* ── Clickable rows ── */
+    .flm-detailslist-row { cursor: pointer; }
+
+    /* ── Category chips ── */
+    .category-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    .category-chip {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+      background-color: color-mix(in srgb, var(--themePrimary) 15%, transparent);
+      color: var(--themePrimary);
+      cursor: pointer;
+    }
+    .category-chip:hover {
+      background-color: color-mix(in srgb, var(--themePrimary) 30%, transparent);
+    }
+
+    /* ── Panel Sections ── */
+    .panel-section {
+      margin-bottom: var(--spacingL2);
+    }
+
+    .panel-section-title {
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodySubtext);
+      margin-bottom: var(--spacingS1);
+      text-transform: uppercase;
+      font-size: var(--fontSizeTiny);
+      letter-spacing: 0.5px;
+    }
+
+    .panel-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingS2);
+    }
+
+    .panel-actions .flm-button {
+      justify-content: flex-start;
+    }
+
+    /* ── Panel Form ── */
+    .panel-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingM);
+    }
+
+    /* ── Pivot Tabs (inside panel) ── */
+    .pivot-bar {
+      display: flex;
+      border-bottom: 1px solid var(--bodyDivider);
+      background-color: var(--bodyStandoutBackground);
+      margin: 0 calc(-1 * var(--spacingL1));
+      padding: 0 var(--spacingL1);
+    }
+
+    .pivot-tab {
+      padding: var(--spacingS2) var(--spacingL1);
+      font-size: var(--fontSizeMedium);
+      color: var(--bodySubtext);
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      font-family: inherit;
+      transition: color 0.15s;
+    }
+
+    .pivot-tab:hover {
+      color: var(--bodyText);
+    }
+
+    .pivot-tab--active {
+      color: var(--themePrimary);
+      border-bottom-color: var(--themePrimary);
+      font-weight: var(--fontWeightSemibold);
+    }
+
+    .pivot-panel {
+      display: none;
+      padding-top: var(--spacingM);
+    }
+
+    .pivot-panel--active {
+      display: block;
+    }
+
+    /* ── Guided editor fields ── */
+    .guided-field {
+      margin-bottom: var(--spacingM);
+    }
+
+    .guided-field label {
+      display: block;
+      margin-bottom: var(--spacingS2);
+    }
+
+    .guided-field textarea {
+      width: 100%;
+      resize: vertical;
+    }
+
+    /* ── Raw editor ── */
+    .raw-editor {
+      font-family: 'Cascadia Code', 'Consolas', monospace;
+      font-size: var(--fontSizeSmall);
+      line-height: 1.5;
+      min-height: 400px;
+      width: 100%;
+      resize: vertical;
+    }
+
+    /* ── Test tab ── */
+    .test-config {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingM);
+    }
+
+    .test-row {
+      display: flex;
+      gap: var(--spacingM);
+      flex-wrap: wrap;
+      align-items: flex-end;
+    }
+
+    .test-field {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingS2);
+    }
+
+    .test-field--grow {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .test-actions {
+      display: flex;
+      gap: var(--spacingS1);
+      margin-top: var(--spacingS1);
+    }
+
+    .test-results {
+      display: none;
+      margin-top: var(--spacingL1);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+    }
+
+    .test-running {
+      display: none;
+      margin-top: var(--spacingM);
+    }
+
+    .test-phase {
+      font-size: var(--fontSizeMedium);
+      color: var(--bodyText);
+      margin-bottom: var(--spacingS2);
+    }
+
+    .test-elapsed {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+      font-variant-numeric: tabular-nums;
+      margin-top: var(--spacingS2);
+    }
+
+    /* ── Test results pivot (nested) ── */
+    .test-pivot-bar {
+      display: flex;
+      border-bottom: 1px solid var(--bodyDivider);
+      background-color: var(--bodyStandoutBackground);
+      border-radius: var(--roundedCorner4) var(--roundedCorner4) 0 0;
+    }
+
+    .test-pivot-content {
+      padding: var(--spacingM);
+    }
+
+    .test-pivot-panel {
+      display: none;
+    }
+
+    .test-pivot-panel--active {
+      display: block;
+    }
+
+    .test-answer {
+      font-size: var(--fontSizeMedium);
+      line-height: 1.7;
+      color: var(--bodyText);
+    }
+
+    .test-answer p { margin-bottom: var(--spacingM); }
+    .test-answer ul, .test-answer ol { margin: var(--spacingS2) 0 var(--spacingM) var(--spacingL2); }
+    .test-answer li { margin-bottom: var(--spacingS2); }
+
+    .test-sources-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .test-sources-list li {
+      padding: var(--spacingS2) 0;
+      border-bottom: 1px solid var(--bodyDivider);
+      font-size: var(--fontSizeMedium);
+      color: var(--bodyText);
+    }
+
+    .test-sources-list li:last-child { border-bottom: none; }
+
+    /* ── Usage tab ── */
+    .usage-section {
+      margin-bottom: var(--spacingL1);
+    }
+
+    .usage-section-title {
+      font-size: var(--fontSizeMedium);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+      margin-bottom: var(--spacingS2);
+    }
+
+    .usage-empty {
+      font-size: var(--fontSizeMedium);
+      color: var(--bodySubtext);
+      padding: var(--spacingM) 0;
+    }
+
+    .usage-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacingS2) 0;
+      border-bottom: 1px solid var(--bodyDivider);
+      font-size: var(--fontSizeMedium);
+    }
+
+    .usage-item:last-child { border-bottom: none; }
+
+    .usage-item-name { color: var(--bodyText); }
+    .usage-item-date { color: var(--bodySubtext); font-size: var(--fontSizeSmall); }
+
+
+    /* ── New Lens Dialog tile choices ── */
+    .template-tiles {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--spacingS2);
+      margin-top: var(--spacingS2);
+    }
+
+    .template-tile {
+      display: flex;
+      flex-direction: column;
+      padding: var(--spacingM);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      cursor: pointer;
+      background: none;
+      text-align: left;
+      font-family: inherit;
+      color: var(--bodyText);
+    }
+
+    .template-tile:hover {
+      border-color: var(--themePrimary);
+      background-color: color-mix(in srgb, var(--themePrimary) 8%, transparent);
+    }
+
+    .template-tile--selected {
+      border-color: var(--themePrimary);
+      background-color: color-mix(in srgb, var(--themePrimary) 12%, transparent);
+    }
+
+    .template-tile-name {
+      font-weight: var(--fontWeightSemibold);
+      font-size: var(--fontSizeMedium);
+    }
+
+    .template-tile-desc {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+      margin-top: 2px;
+    }
+
+    /* ── Dirty badge ── */
+    .dirty-badge {
+      display: none;
+      margin-bottom: var(--spacingM);
+    }
+
+    .dirty-badge--visible {
+      display: block;
+    }
+
+    /* ── Panel footer actions ── */
+    .panel-footer-actions {
+      display: flex;
+      gap: var(--spacingS1);
+      align-items: center;
+    }
+
+    .panel-footer-right {
+      margin-left: auto;
+      display: flex;
+      gap: var(--spacingS1);
+    }
+
+    /* ── Category picker ── */
+    .category-input-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--inputBorder);
+      border-radius: var(--roundedCorner4);
+      background-color: var(--inputBackground);
+      min-height: 32px;
+      align-items: center;
+      cursor: text;
+    }
+
+    .category-input-wrap:focus-within {
+      border-color: var(--themePrimary);
+    }
+
+    .category-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 1px 6px;
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+      background-color: color-mix(in srgb, var(--themePrimary) 15%, transparent);
+      color: var(--themePrimary);
+    }
+
+    .category-tag-remove {
+      cursor: pointer;
+      font-size: 10px;
+      opacity: 0.7;
+      background: none;
+      border: none;
+      color: inherit;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .category-tag-remove:hover { opacity: 1; }
+
+    .category-input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: var(--fontSizeMedium);
+      color: var(--bodyText);
+      flex: 1;
+      min-width: 80px;
+      font-family: inherit;
+    }
+
+    .category-suggestions {
+      display: none;
+      position: absolute;
+      z-index: 10;
+      background-color: var(--bodyBackground);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      max-height: 160px;
+      overflow-y: auto;
+      margin-top: 2px;
+      min-width: 160px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .category-suggestion {
+      padding: var(--spacingS2) var(--spacingM);
+      font-size: var(--fontSizeMedium);
+      color: var(--bodyText);
+      cursor: pointer;
+    }
+
+    .category-suggestion:hover {
+      background-color: var(--listItemBackgroundHovered);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- ════════════════════════════════════════════════════════════════
+         LEFT NAV
+         ════════════════════════════════════════════════════════════════ -->
+    <nav class="app-nav">
+      <div class="app-nav-brand">Awarity</div>
+
+      <a class="app-nav-link" href="../home/"><i class="flm-icon" data-icon="Home"></i> Home</a>
+      <a class="app-nav-link" href="../catalogs/"><i class="flm-icon" data-icon="Database"></i> Catalogs</a>
+      <a class="app-nav-link" href="../explorer/"><i class="flm-icon" data-icon="Search"></i> Explore</a>
+      <a class="app-nav-link" href="../structure/"><i class="flm-icon" data-icon="Org"></i> Structure</a>
+      <a class="app-nav-link app-nav-link--active" href="#"><i class="flm-icon" data-icon="Filter"></i> Lenses</a>
+      <a class="app-nav-link" href="../workflows/"><i class="flm-icon" data-icon="Flow"></i> Workflows</a>
+      <a class="app-nav-link" href="../runs/"><i class="flm-icon" data-icon="Processing"></i> Runs</a>
+
+      <div class="app-nav-spacer"></div>
+
+      <a class="app-nav-link" href="../settings/"><i class="flm-icon" data-icon="Settings"></i> Settings</a>
+
+      <div style="padding: var(--spacingM);">
+        <button class="flm-button" id="themeToggle" style="width: 100%;">Switch to Light</button>
+      </div>
+    </nav>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         MAIN AREA
+         ════════════════════════════════════════════════════════════════ -->
+    <div class="app-main">
+
+      <!-- CommandBar -->
+      <div class="app-commandbar">
+        <div class="flm-commandbar">
+          <div class="flm-commandbar-items">
+            <button class="flm-button flm-button--primary" data-icon="Add" id="btn-new-lens" style="margin: 4px 8px;">
+              New Lens
+            </button>
+            <button class="flm-commandbar-item" data-icon="Beaker" id="btn-test-lens" disabled>Test Lens</button>
+            <button class="flm-commandbar-item" data-icon="Copy" id="btn-duplicate" disabled>Duplicate</button>
+            <button class="flm-commandbar-item" data-icon="Delete" id="btn-delete" disabled>Delete</button>
+            <span class="flm-commandbar-divider"></span>
+            <button class="flm-commandbar-item" data-icon="Refresh" id="btn-refresh">Refresh</button>
+          </div>
+          <div class="flm-commandbar-far" style="align-items: center; padding-right: 8px;">
+            <div class="flm-searchbox" style="min-width: 220px;">
+              <input class="flm-searchbox-input" type="text" placeholder="Search lenses…" id="search-input">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="app-breadcrumb">
+        <ol class="flm-breadcrumb">
+          <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="../home/">Home</a></li>
+          <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link">Lenses</a></li>
+        </ol>
+      </div>
+
+      <!-- MessageBar Zone -->
+      <div class="app-messagebar-zone" id="messagebar-zone"></div>
+
+      <!-- Content -->
+      <div class="app-content" id="content-area">
+
+        <!-- ── Loading State (Shimmer) ── -->
+        <div id="state-loading" style="display: none;">
+          <div class="shimmer-table">
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 3;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 3;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 3;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 3;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 3;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 3;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 3;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+          </div>
+        </div>
+
+        <!-- ── Empty State ── -->
+        <div id="state-empty" style="display: none;">
+          <div class="empty-state">
+            <i class="flm-icon empty-state-icon" data-icon="Filter"></i>
+            <span class="empty-state-text">No lenses yet</span>
+            <span class="empty-state-sub">Lenses define how Awarity reads and structures results.</span>
+            <button class="flm-button flm-button--primary" data-icon="Add" id="btn-empty-create">
+              <i class="flm-icon" data-icon="Add"></i> Create your first lens
+            </button>
+            <button class="config-running-link" id="btn-browse-starters" style="font-size: var(--fontSizeMedium); color: var(--themePrimary); background: none; border: none; cursor: pointer; font-family: inherit;">Browse starter lenses</button>
+          </div>
+        </div>
+
+        <!-- ── Data State (DetailsList) ── -->
+        <div id="state-data" style="display: block;">
+          <div class="flm-overflowset" id="category-filter">
+            <div class="flm-overflowset-items"></div>
+            <button class="flm-overflowset-overflow" aria-label="More categories">...</button>
+          </div>
+          <div class="flm-detailslist" id="lenses-list">
+            <div class="flm-detailslist-header">
+              <div class="flm-detailslist-check">
+                <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="check-all"><span class="flm-checkbox-mark"></span></label>
+              </div>
+              <div class="flm-detailslist-header-cell" style="width: 240px;">Name</div>
+              <div class="flm-detailslist-header-cell" style="flex: 1;">Description</div>
+              <div class="flm-detailslist-header-cell" style="width: 200px;">Categories</div>
+              <div class="flm-detailslist-header-cell cell-number" style="width: 100px;">Used In</div>
+              <div class="flm-detailslist-header-cell" style="width: 150px;">Last Updated</div>
+            </div>
+
+            <!-- Rows populated by JS -->
+          </div>
+        </div>
+
+      </div><!-- /app-content -->
+    </div><!-- /app-main -->
+  </div><!-- /app-shell -->
+
+  <!-- ════════════════════════════════════════════════════════════════
+       DETAIL PANEL (right slide-over, medium)
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-panel-overlay" id="detail-panel-overlay"></div>
+  <div class="flm-panel flm-panel--medium" id="detail-panel">
+    <div class="flm-panel-header">
+      <h2 class="flm-panel-title" id="detail-panel-title">financial-risk</h2>
+      <span style="font-size: var(--fontSizeSmall); color: var(--bodySubtext); margin-left: var(--spacingS1);" id="detail-panel-subtitle">Last updated Feb 21, 2026</span>
+      <button class="flm-panel-close" data-icon="Cancel" aria-label="Close" id="detail-panel-close"></button>
+    </div>
+    <div class="flm-panel-body">
+
+      <!-- Quick Actions -->
+      <div style="display: flex; gap: var(--spacingS1); margin-bottom: var(--spacingM);">
+        <button class="flm-button" id="btn-use-explore"><i class="flm-icon" data-icon="Search"></i> Use in Explore</button>
+        <button class="flm-button" id="btn-use-workflow"><i class="flm-icon" data-icon="Flow"></i> Use in Workflow</button>
+      </div>
+
+      <!-- Dirty badge -->
+      <div class="dirty-badge" id="dirty-badge">
+        <div class="flm-messagebar flm-messagebar--warning">You have unsaved changes.</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="pivot-bar" id="detail-pivot-bar">
+        <button class="pivot-tab pivot-tab--active" data-tab="edit">Edit</button>
+        <button class="pivot-tab" data-tab="test">Test</button>
+        <button class="pivot-tab" data-tab="usage">Usage</button>
+      </div>
+
+      <!-- ── Tab: Edit ── -->
+      <div class="pivot-panel pivot-panel--active" id="tab-edit">
+        <!-- Mode toggle top-right -->
+        <div style="display: flex; justify-content: flex-end; margin-bottom: var(--spacingM);">
+          <div class="flm-choicegroup" style="display: flex; gap: var(--spacingM); flex-direction: row;">
+            <label class="flm-choicegroup-option">
+              <input type="radio" class="flm-choicegroup-input" name="editor-mode" value="guided" checked>
+              <span class="flm-choicegroup-mark"></span>
+              <span class="flm-choicegroup-label">Guided</span>
+            </label>
+            <label class="flm-choicegroup-option">
+              <input type="radio" class="flm-choicegroup-input" name="editor-mode" value="raw">
+              <span class="flm-choicegroup-mark"></span>
+              <span class="flm-choicegroup-label">Raw</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Guided Mode -->
+        <div id="guided-fields">
+          <div class="panel-form">
+            <div class="flm-textfield flm-textfield--required">
+              <label class="flm-label" for="edit-name">Name</label>
+              <input class="flm-textfield-input" id="edit-name" placeholder="e.g. financial-risk">
+            </div>
+
+            <div class="flm-textfield">
+              <label class="flm-label" for="edit-description">Description</label>
+              <textarea class="flm-textfield-input" id="edit-description" rows="2" style="width: 100%; resize: vertical;"></textarea>
+            </div>
+
+            <div>
+              <label class="flm-label">Categories</label>
+              <div style="position: relative;">
+                <div class="category-input-wrap" id="edit-categories-wrap">
+                  <input class="category-input" id="edit-categories-input" placeholder="Add category…">
+                </div>
+                <div class="category-suggestions" id="edit-categories-suggestions"></div>
+              </div>
+            </div>
+
+            <div class="guided-field">
+              <label class="flm-label" for="edit-purpose">Purpose</label>
+              <textarea class="flm-textfield-input" id="edit-purpose" rows="2" style="width: 100%; resize: vertical;"></textarea>
+            </div>
+            <div class="guided-field">
+              <label class="flm-label" for="edit-relevant">What's Relevant</label>
+              <textarea class="flm-textfield-input" id="edit-relevant" rows="3" style="width: 100%; resize: vertical;"></textarea>
+            </div>
+            <div class="guided-field">
+              <label class="flm-label" for="edit-ignore">What to Ignore</label>
+              <textarea class="flm-textfield-input" id="edit-ignore" rows="2" style="width: 100%; resize: vertical;"></textarea>
+            </div>
+            <div class="guided-field">
+              <label class="flm-label" for="edit-rules">Rules</label>
+              <textarea class="flm-textfield-input" id="edit-rules" rows="2" style="width: 100%; resize: vertical;"></textarea>
+            </div>
+            <div class="guided-field">
+              <label class="flm-label" for="edit-examples">Examples (Optional)</label>
+              <textarea class="flm-textfield-input" id="edit-examples" rows="2" style="width: 100%; resize: vertical;"></textarea>
+            </div>
+            <div class="guided-field">
+              <label class="flm-label" for="edit-output">Output Format</label>
+              <textarea class="flm-textfield-input" id="edit-output" rows="3" style="width: 100%; resize: vertical;"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Raw Mode Editor -->
+        <div id="raw-field" style="display: none;">
+          <textarea class="flm-textfield-input raw-editor" id="edit-raw"></textarea>
+        </div>
+      </div>
+
+      <!-- ── Tab: Test ── -->
+      <div class="pivot-panel" id="tab-test">
+        <div class="test-config">
+          <div class="test-row">
+            <div class="test-field" style="min-width: 180px;">
+              <label class="flm-label">Catalog</label>
+              <div class="flm-dropdown" id="test-catalog">
+                <button class="flm-dropdown-trigger" type="button">
+                  <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select catalog…</span>
+                  <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+                </button>
+                <div class="flm-dropdown-listbox">
+                  <div class="flm-dropdown-option" data-value="sec-filings">sec-filings</div>
+                  <div class="flm-dropdown-option" data-value="legal-contracts">legal-contracts</div>
+                  <div class="flm-dropdown-option" data-value="research-papers">research-papers</div>
+                  <div class="flm-dropdown-option" data-value="compliance-docs">compliance-docs</div>
+                </div>
+              </div>
+            </div>
+            <div class="test-field">
+              <label class="flm-label">Mode</label>
+              <div class="flm-choicegroup" style="display: flex; gap: var(--spacingM); flex-direction: row;">
+                <label class="flm-choicegroup-option">
+                  <input type="radio" class="flm-choicegroup-input" name="test-mode" value="full" checked>
+                  <span class="flm-choicegroup-mark"></span>
+                  <span class="flm-choicegroup-label">Full ECW</span>
+                </label>
+                <label class="flm-choicegroup-option">
+                  <input type="radio" class="flm-choicegroup-input" name="test-mode" value="abstracts">
+                  <span class="flm-choicegroup-mark"></span>
+                  <span class="flm-choicegroup-label">Abstracts</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          <div class="test-row">
+            <div class="test-field" style="min-width: 100px;">
+              <label class="flm-label" for="test-max-docs">Max docs</label>
+              <input class="flm-textfield-input" id="test-max-docs" type="number" value="3" min="1" max="50" style="width: 80px;">
+            </div>
+          </div>
+          <div class="test-field" style="width: 100%;">
+            <label class="flm-label" for="test-question">Question / Goal</label>
+            <textarea class="flm-textfield-input" id="test-question" rows="2" placeholder="What would you like to test?" style="width: 100%; resize: vertical;"></textarea>
+          </div>
+          <div class="test-actions">
+            <button class="flm-button flm-button--primary" id="btn-run-test" disabled>Run Test</button>
+            <button class="flm-button" id="btn-clear-test">Clear</button>
+            <button class="flm-button" id="btn-cancel-test" style="display: none; color: var(--red);">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Running indicator -->
+        <div class="test-running" id="test-running">
+          <div class="test-phase" id="test-phase">Reading documents<span id="test-dots"></span></div>
+          <div class="flm-progress">
+            <div class="flm-progress-track"><div class="flm-progress-bar" id="test-bar" style="width: 0%"></div></div>
+          </div>
+          <div class="test-elapsed" id="test-elapsed">0:00</div>
+        </div>
+
+        <!-- Test results -->
+        <div class="test-results" id="test-results">
+          <div class="test-pivot-bar">
+            <button class="pivot-tab pivot-tab--active" data-test-tab="answer">Answer</button>
+            <button class="pivot-tab" data-test-tab="sources">Sources</button>
+          </div>
+          <div class="test-pivot-content">
+            <div class="test-pivot-panel test-pivot-panel--active" id="test-tab-answer">
+              <div class="test-answer" id="test-answer-body"></div>
+            </div>
+            <div class="test-pivot-panel" id="test-tab-sources">
+              <ul class="test-sources-list" id="test-sources-body"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Tab: Usage ── -->
+      <div class="pivot-panel" id="tab-usage">
+        <div class="usage-section">
+          <div class="usage-section-title">Explore queries using this lens</div>
+          <div id="usage-explore"></div>
+        </div>
+        <div class="usage-section">
+          <div class="usage-section-title">Workflows using this lens</div>
+          <div id="usage-workflows"></div>
+        </div>
+        <div class="usage-section">
+          <div class="usage-section-title">Classification runs using this lens</div>
+          <div id="usage-classifications"></div>
+        </div>
+      </div>
+
+
+    </div>
+    <div class="flm-panel-footer">
+      <div class="panel-footer-actions">
+        <button class="flm-button flm-button--primary" id="btn-save-lens" disabled>Save</button>
+        <button class="flm-button" id="btn-cancel-edit">Cancel</button>
+        <div class="panel-footer-right">
+          <button class="flm-button" id="btn-duplicate-panel"><i class="flm-icon" data-icon="Copy"></i> Duplicate</button>
+          <button class="flm-button" id="btn-delete-panel" style="color: var(--red);"><i class="flm-icon" data-icon="Delete"></i> Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       NEW LENS DIALOG
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-dialog-overlay" id="new-lens-dialog" data-light-dismiss style="z-index: 1002;">
+    <div class="flm-dialog" style="max-width: 520px;">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title">New Lens</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
+      </div>
+      <div class="flm-dialog-body">
+
+        <!-- Step 1: Template -->
+        <div id="new-step-1">
+          <label class="flm-label">Choose a starting point</label>
+          <div class="template-tiles" id="template-tiles">
+            <button class="template-tile template-tile--selected" data-template="blank">
+              <span class="template-tile-name">Blank</span>
+              <span class="template-tile-desc">Start from scratch</span>
+            </button>
+            <button class="template-tile" data-template="executive-summary">
+              <span class="template-tile-name">Executive Summary</span>
+              <span class="template-tile-desc">High-level corpus overview</span>
+            </button>
+            <button class="template-tile" data-template="financial-risk">
+              <span class="template-tile-name">Financial Risk</span>
+              <span class="template-tile-desc">Risk disclosures &amp; signals</span>
+            </button>
+            <button class="template-tile" data-template="legal-compliance">
+              <span class="template-tile-name">Legal Compliance</span>
+              <span class="template-tile-desc">Compliance gaps &amp; obligations</span>
+            </button>
+            <button class="template-tile" data-template="red-flag">
+              <span class="template-tile-name">Red Flag Detection</span>
+              <span class="template-tile-desc">Anomalies &amp; warning signals</span>
+            </button>
+            <button class="template-tile" data-template="schema-extraction">
+              <span class="template-tile-name">Schema Extraction</span>
+              <span class="template-tile-desc">Structured JSON output</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Details -->
+        <div id="new-step-2" style="display: none; margin-top: var(--spacingM);">
+          <div class="panel-form">
+            <div class="flm-textfield flm-textfield--required">
+              <label class="flm-label" for="new-name">Name</label>
+              <input class="flm-textfield-input" id="new-name" placeholder="e.g. financial-risk">
+            </div>
+            <div class="flm-textfield">
+              <label class="flm-label" for="new-description">Description</label>
+              <textarea class="flm-textfield-input" id="new-description" rows="2" style="width: 100%; resize: vertical;"></textarea>
+            </div>
+            <div>
+              <label class="flm-label">Categories</label>
+              <div style="position: relative;">
+                <div class="category-input-wrap" id="new-categories-wrap">
+                  <input class="category-input" id="new-categories-input" placeholder="Add category…">
+                </div>
+                <div class="category-suggestions" id="new-categories-suggestions"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inline message bar -->
+        <div id="new-messagebar" style="display: none; margin-top: var(--spacingM);"></div>
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button" id="btn-new-back" style="display: none;">Back</button>
+        <button class="flm-button flm-button--primary" id="btn-new-next">Next</button>
+        <button class="flm-button" data-dialog-close>Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       DELETE LENS DIALOG
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-dialog-overlay" id="delete-dialog" data-light-dismiss style="z-index: 1002;">
+    <div class="flm-dialog">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title">Delete Lens</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
+      </div>
+      <div class="flm-dialog-body">
+        <p>Delete <strong id="delete-lens-name">financial-risk</strong>? This removes the lens file. Past runs are unaffected.</p>
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button flm-button--primary" style="background-color: var(--red); border-color: var(--red);" id="btn-confirm-delete">Delete</button>
+        <button class="flm-button" data-dialog-close>Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       UNSAVED CHANGES DIALOG
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-dialog-overlay" id="unsaved-dialog" data-light-dismiss style="z-index: 1003;">
+    <div class="flm-dialog">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title">Unsaved Changes</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
+      </div>
+      <div class="flm-dialog-body">
+        <p>You have unsaved changes. What would you like to do?</p>
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button flm-button--primary" id="btn-unsaved-save">Save</button>
+        <button class="flm-button" id="btn-unsaved-discard" style="color: var(--red);">Discard</button>
+        <button class="flm-button" data-dialog-close>Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Combined library JS -->
+  <script src="../../dist/fluentlm.min.js"></script>
+
+  <script>
+    // ── Register custom icons ──
+    FluentIcons.register('Database',     'M8 1C4.13 1 1 2.34 1 4v8c0 1.66 3.13 3 7 3s7-1.34 7-3V4c0-1.66-3.13-3-7-3zM2 6.26C3.41 7.24 5.59 7.8 8 7.8s4.59-.56 6-1.54V8c0 .77-2.42 2-6 2S2 8.77 2 8V6.26zM8 2c3.58 0 6 1.23 6 2s-2.42 2-6 2S2 4.77 2 4s2.42-2 6-2zm0 12c-3.58 0-6-1.23-6-2v-1.74C3.41 11.24 5.59 11.8 8 11.8s4.59-.56 6-1.54V12c0 .77-2.42 2-6 2z');
+    FluentIcons.register('Org',          'M8 1a2 2 0 0 1 2 2v1h2.5a.5.5 0 0 1 .5.5V7h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5h1V5H9v1.5a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5V5H5v2h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5v-4A.5.5 0 0 1 3 7h1V4.5a.5.5 0 0 1 .5-.5H7V3a2 2 0 0 1 1-2z');
+    FluentIcons.register('Flow',         'M2 3.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .35.15L8.71 6H13.5a.5.5 0 0 1 0 1H8.71l-2.86 2.85a.5.5 0 0 1-.35.15h-3a.5.5 0 0 1 0-1h2.79L8 6.5 5.29 4H2.5a.5.5 0 0 1-.5-.5zm0 8a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .35.15L8.71 14H13.5a.5.5 0 0 1 0 1H8.71l-2.86-2.85A.5.5 0 0 0 5.5 12h-3a.5.5 0 0 1-.5-.5z');
+    FluentIcons.register('Processing',   'M8 1.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V2a.5.5 0 0 1 .5-.5zM3.05 3.05a.5.5 0 0 1 .7 0l1.42 1.42a.5.5 0 0 1-.7.7L3.05 3.76a.5.5 0 0 1 0-.7zm9.9 0a.5.5 0 0 1 0 .7l-1.42 1.42a.5.5 0 1 1-.7-.7l1.41-1.42a.5.5 0 0 1 .7 0zM1.5 8a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H2a.5.5 0 0 1-.5-.5zm10 0a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm-6.33 3.17a.5.5 0 0 1 0 .7L3.76 13.3a.5.5 0 0 1-.7-.7l1.41-1.42a.5.5 0 0 1 .7 0zm5.66 0a.5.5 0 0 1 .7 0l1.42 1.42a.5.5 0 0 1-.7.7l-1.42-1.41a.5.5 0 0 1 0-.7zM8 12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5z');
+    FluentIcons.register('TextDocument', 'M4 2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5.41a1 1 0 0 0-.3-.7L9.3 1.28a1 1 0 0 0-.71-.29H4zm1.5 5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zm0 2h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1zm0 2h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1 0-1z');
+    FluentIcons.register('Refresh',      'M1.5 8a6.5 6.5 0 0 1 11.25-4.43V2a.5.5 0 0 1 1 0v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1 0-1h1.87A5.5 5.5 0 1 0 13.5 8a.5.5 0 0 1 1 0A6.5 6.5 0 1 1 1.5 8z');
+    FluentIcons.register('Download',     'M8 1.5a.5.5 0 0 1 .5.5v7.79l2.15-2.14a.5.5 0 0 1 .7.7l-3 3a.5.5 0 0 1-.7 0l-3-3a.5.5 0 1 1 .7-.7L7.5 9.79V2a.5.5 0 0 1 .5-.5zM2.5 12a.5.5 0 0 1 .5.5v1h10v-1a.5.5 0 0 1 1 0v1.5a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-1.5a.5.5 0 0 1 .5-.5z');
+    FluentIcons.register('Copy',         'M5.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h6a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-6zM4 3.5A1.5 1.5 0 0 1 5.5 2h6A1.5 1.5 0 0 1 13 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-6A1.5 1.5 0 0 1 4 12.5v-9zM2 5.5a.5.5 0 0 1 .5.5v7.5A1.5 1.5 0 0 0 4 15h6a.5.5 0 0 1 0 1H4a2.5 2.5 0 0 1-2.5-2.5V6a.5.5 0 0 1 .5-.5z');
+    FluentIcons.register('Beaker',       'M6 1.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H9v4.28l3.89 5.83A1.5 1.5 0 0 1 11.64 14H4.36a1.5 1.5 0 0 1-1.25-2.33L7 5.84V2H6.5a.5.5 0 0 1-.5-.5zM8 6.16L4.36 11.67a.5.5 0 0 0 .42.77h6.44a.5.5 0 0 0 .42-.77L8 5.84V2h0v4.16z');
+
+    // ── Register themes & init ──
+    FluentLM.registerTheme('awarity-light', 'fluent-awarity-light');
+    FluentLM.registerTheme('awarity-dark', 'fluent-awarity-dark');
+    FluentLM.setTheme('awarity-dark');
+
+    (function () {
+
+      // ── Suggested categories ──
+      var SUGGESTED_CATEGORIES = ['finance', 'legal', 'compliance', 'security', 'research', 'triage', 'extraction', 'summary', 'redflags', 'technical'];
+
+      // ── Starter templates ──
+      var TEMPLATES = {
+        'blank': {
+          name: '', description: '', categories: [],
+          guided: { purpose: '', relevant: '', ignore: '', rules: '', examples: '', outputFormat: '' }
+        },
+        'executive-summary': {
+          name: 'executive-summary',
+          description: 'Generate a concise executive summary of the corpus.',
+          categories: ['summary'],
+          guided: {
+            purpose: 'Produce a high-level executive summary synthesizing the entire corpus.',
+            relevant: '- Key findings, conclusions, and recommendations\n- Major themes and patterns\n- Quantitative highlights (dollar amounts, percentages, counts)',
+            ignore: '- Boilerplate headers and footers\n- Table of contents\n- Routine administrative language',
+            outputFormat: 'Return:\n1) Executive summary (200-300 words)\n2) Key themes (bulleted, max 7)\n3) Critical numbers (table: metric, value, source)',
+            rules: '- Cite source documents by filename\n- Prioritize actionable insights\n- Flag contradictions between documents',
+            examples: ''
+          }
+        },
+        'financial-risk': {
+          name: 'financial-risk',
+          description: 'Identify and summarize financial risk disclosures.',
+          categories: ['finance', 'risk', 'triage'],
+          guided: {
+            purpose: 'Extract financial risk signals and summarize key disclosures at the corpus level.',
+            relevant: '- Risk factors, uncertainties, going concern language\n- Liquidity, debt covenants, refinancing, cash flow constraints',
+            ignore: '- Marketing language\n- Boilerplate disclaimers unless novel',
+            outputFormat: 'Return:\n1) Top themes (bulleted)\n2) Outliers (doc + snippet)\n3) Executive summary (<= 200 words)',
+            rules: '- Prefer citations by filename and section\n- If uncertain, label as "Possible risk"',
+            examples: ''
+          }
+        },
+        'legal-compliance': {
+          name: 'legal-compliance',
+          description: 'Identify compliance obligations and gaps across documents.',
+          categories: ['legal', 'compliance'],
+          guided: {
+            purpose: 'Identify regulatory compliance obligations, gaps, and risk areas.',
+            relevant: '- Regulatory references (GDPR, CCPA, SOX, HIPAA, etc.)\n- Compliance deadlines and obligations\n- Audit findings and remediation items',
+            ignore: '- General corporate governance boilerplate\n- Unrelated operational procedures',
+            outputFormat: 'Return:\n1) Compliance obligations (table: regulation, obligation, status, source)\n2) Gaps identified (bulleted with severity)\n3) Recommended actions',
+            rules: '- Always cite the specific regulation section\n- Classify severity as Critical, High, Medium, or Low',
+            examples: ''
+          }
+        },
+        'red-flag': {
+          name: 'red-flag-detection',
+          description: 'Detect anomalies, contradictions, and warning signals.',
+          categories: ['redflags', 'triage'],
+          guided: {
+            purpose: 'Scan for anomalies, contradictions, unusual patterns, and warning signals across the corpus.',
+            relevant: '- Contradictions between documents\n- Unusual financial patterns or outliers\n- Missing expected disclosures\n- Language indicating uncertainty or evasion',
+            ignore: '- Routine variations in formatting\n- Minor numerical rounding differences',
+            outputFormat: 'Return:\n1) Red flags (table: severity, description, source, evidence)\n2) Contradictions (paired citations)\n3) Missing items (expected but absent)',
+            rules: '- Use severity levels: Critical, Warning, Info\n- Always provide direct quotes as evidence\n- Do not speculate — flag for human review',
+            examples: ''
+          }
+        },
+        'schema-extraction': {
+          name: 'schema-extraction',
+          description: 'Extract structured data matching a JSON schema.',
+          categories: ['extraction', 'technical'],
+          guided: {
+            purpose: 'Extract structured data from documents into a consistent JSON format.',
+            relevant: '- All data fields matching the defined schema\n- Supporting context for extracted values',
+            ignore: '- Formatting artifacts\n- Data that does not match schema fields',
+            outputFormat: 'Return a JSON array of extracted records, one per document, conforming to the schema.',
+            rules: '- Strict schema compliance — omit fields rather than guess\n- Include a "_source" field with document filename\n- Use null for missing optional fields',
+            examples: 'Input: "Annual Report 2025 — Acme Corp filed on 2025-03-15 mentions subsidiaries Delta LLC and Gamma Inc."\nOutput: { "_source": "acme-2025.pdf", "title": "Annual Report 2025", "date": "2025-03-15", "entities": ["Delta LLC", "Gamma Inc."] }'
+          }
+        }
+      };
+
+      // ── Mock Lens Data ──
+      var MOCK_LENSES = [
+        {
+          id: 'financial-risk', name: 'financial-risk',
+          description: 'Identify and summarize financial risk disclosures.',
+          categories: ['finance', 'risk', 'triage'],
+          usedInCount: 7, lastUpdated: 'Feb 21, 2026',
+          editorMode: 'guided',
+          guided: TEMPLATES['financial-risk'].guided,
+          raw: '',
+          createdAt: '2026-02-14T11:23:00Z', updatedAt: '2026-02-21T12:41:00Z',
+          usage: {
+            explore: [
+              { name: 'Top risk disclosures across SEC filings', lastUsed: '2 hours ago' },
+              { name: 'Cybersecurity incident analysis', lastUsed: '1 day ago' },
+              { name: 'Liquidity risk assessment Q4', lastUsed: '3 days ago' }
+            ],
+            workflows: [
+              { name: 'Weekly risk digest', lastUsed: '1 day ago' },
+              { name: 'New filing triage', lastUsed: '4 days ago' }
+            ],
+            classifications: [
+              { name: 'risk-type classifier', lastUsed: '2 days ago' },
+              { name: 'severity-level classifier', lastUsed: '5 days ago' }
+            ]
+          }
+        },
+        {
+          id: 'legal-compliance', name: 'legal-compliance',
+          description: 'Identify compliance obligations and gaps across legal documents.',
+          categories: ['legal', 'compliance'],
+          usedInCount: 4, lastUpdated: 'Feb 20, 2026',
+          editorMode: 'guided',
+          guided: TEMPLATES['legal-compliance'].guided,
+          raw: '',
+          createdAt: '2026-02-10T09:15:00Z', updatedAt: '2026-02-20T14:30:00Z',
+          usage: {
+            explore: [{ name: 'GDPR compliance gaps', lastUsed: '2 days ago' }],
+            workflows: [{ name: 'Compliance review pipeline', lastUsed: '3 days ago' }],
+            classifications: [{ name: 'regulation-type', lastUsed: '4 days ago' }, { name: 'compliance-status', lastUsed: '5 days ago' }]
+          }
+        },
+        {
+          id: 'executive-summary', name: 'executive-summary',
+          description: 'Generate a concise executive summary of the corpus.',
+          categories: ['summary'],
+          usedInCount: 12, lastUpdated: 'Feb 19, 2026',
+          editorMode: 'guided',
+          guided: TEMPLATES['executive-summary'].guided,
+          raw: '',
+          createdAt: '2026-02-05T08:00:00Z', updatedAt: '2026-02-19T16:20:00Z',
+          usage: {
+            explore: [
+              { name: 'Q4 earnings summary', lastUsed: '12 hours ago' },
+              { name: 'Board presentation prep', lastUsed: '1 day ago' },
+              { name: 'Research paper digest', lastUsed: '2 days ago' },
+              { name: 'Contract portfolio overview', lastUsed: '3 days ago' }
+            ],
+            workflows: [
+              { name: 'Daily briefing', lastUsed: '12 hours ago' },
+              { name: 'Weekly digest', lastUsed: '2 days ago' }
+            ],
+            classifications: []
+          }
+        },
+        {
+          id: 'red-flag-detection', name: 'red-flag-detection',
+          description: 'Detect anomalies, contradictions, and warning signals.',
+          categories: ['redflags', 'triage'],
+          usedInCount: 3, lastUpdated: 'Feb 18, 2026',
+          editorMode: 'guided',
+          guided: TEMPLATES['red-flag'].guided,
+          raw: '',
+          createdAt: '2026-02-12T10:00:00Z', updatedAt: '2026-02-18T09:45:00Z',
+          usage: {
+            explore: [{ name: 'Red flags in SEC filings', lastUsed: '3 days ago' }],
+            workflows: [{ name: 'New filing triage', lastUsed: '4 days ago' }],
+            classifications: [{ name: 'anomaly-type', lastUsed: '5 days ago' }]
+          }
+        },
+        {
+          id: 'technical-detail', name: 'technical-detail',
+          description: 'Extract detailed technical specifications and implementation notes.',
+          categories: ['technical', 'extraction'],
+          usedInCount: 2, lastUpdated: 'Feb 17, 2026',
+          editorMode: 'raw',
+          guided: { purpose: '', relevant: '', ignore: '', rules: '', examples: '', outputFormat: '' },
+          raw: '---\nawarity: lens/v1\nid: technical-detail\nname: technical-detail\ndescription: Extract detailed technical specifications and implementation notes.\ncategories: [technical, extraction]\ncreatedAt: 2026-02-08T14:00:00Z\nupdatedAt: 2026-02-17T11:30:00Z\n---\n\n# Purpose\nExtract technical specifications, architecture details, and implementation notes from technical documentation.\n\n# What\'s Relevant\n- API specifications, endpoints, data models\n- Architecture decisions and trade-offs\n- Performance benchmarks and requirements\n- Dependencies and version constraints\n\n# What to Ignore\n- Marketing copy and feature announcements\n- User-facing documentation unless it contains specs\n\n# Output Format\nReturn:\n1) Architecture overview (narrative)\n2) Technical specs (table: component, spec, constraint)\n3) Dependencies (table: name, version, purpose)\n4) Open questions / gaps\n\n# Rules\n- Prefer exact version numbers over ranges\n- Note when specs conflict between documents\n- Flag deprecated or EOL dependencies',
+          createdAt: '2026-02-08T14:00:00Z', updatedAt: '2026-02-17T11:30:00Z',
+          usage: {
+            explore: [{ name: 'API endpoint inventory', lastUsed: '4 days ago' }],
+            workflows: [],
+            classifications: [{ name: 'doc-type', lastUsed: '6 days ago' }]
+          }
+        }
+      ];
+
+      // ── Refs ──
+      var detailPanel = document.getElementById('detail-panel');
+      var detailOverlay = document.getElementById('detail-panel-overlay');
+      var detailTitle = document.getElementById('detail-panel-title');
+      var detailSubtitle = document.getElementById('detail-panel-subtitle');
+      var deleteDialog = document.getElementById('delete-dialog');
+      var unsavedDialog = document.getElementById('unsaved-dialog');
+      var newLensDialog = document.getElementById('new-lens-dialog');
+      var messageZone = document.getElementById('messagebar-zone');
+      var lensList = document.getElementById('lenses-list');
+
+      var currentLens = null;
+      var isDirty = false;
+      var currentDeleteIds = [];
+      var pendingCloseAction = null;
+      var editCategories = [];
+      var newCategories = [];
+
+      // ── Theme Toggle ──
+      var themeBtn = document.getElementById('themeToggle');
+      function updateThemeLabel() {
+        themeBtn.textContent = FluentLM.getTheme() === 'awarity-light' ? 'Switch to Dark' : 'Switch to Light';
+      }
+      updateThemeLabel();
+      themeBtn.addEventListener('click', function () {
+        FluentLM.setTheme(FluentLM.getTheme() === 'awarity-light' ? 'awarity-dark' : 'awarity-light');
+        updateThemeLabel();
+      });
+
+      // ── MessageBar helper ──
+      function showMessage(type, text) {
+        messageZone.innerHTML = '<div class="flm-messagebar flm-messagebar--' + type + '">' + text + '</div>';
+        setTimeout(function () { messageZone.innerHTML = ''; }, 5000);
+      }
+
+      // ── Render Table Rows ──
+      function renderRows() {
+        // Remove existing rows
+        var existing = lensList.querySelectorAll('.flm-detailslist-row');
+        existing.forEach(function (r) { r.remove(); });
+
+        MOCK_LENSES.forEach(function (lens) {
+          var row = document.createElement('div');
+          row.className = 'flm-detailslist-row';
+          row.setAttribute('data-lens', lens.id);
+          row.setAttribute('data-search', (lens.name + ' ' + lens.description + ' ' + lens.categories.join(' ')).toLowerCase());
+          row.setAttribute('data-categories', lens.categories.join(','));
+
+          var chips = lens.categories.map(function (c) {
+            return '<span class="category-chip">' + c + '</span>';
+          }).join('');
+
+          row.innerHTML =
+            '<div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label></div>' +
+            '<div class="flm-detailslist-cell" style="width: 240px; font-weight: var(--fontWeightSemibold);">' + lens.name + '</div>' +
+            '<div class="flm-detailslist-cell" style="flex: 1; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">' + (lens.description || '') + '</div>' +
+            '<div class="flm-detailslist-cell" style="width: 200px;"><div class="category-chips">' + chips + '</div></div>' +
+            '<div class="flm-detailslist-cell cell-number" style="width: 100px;">' + lens.usedInCount + '</div>' +
+            '<div class="flm-detailslist-cell" style="width: 150px;">' + lens.lastUpdated + '</div>';
+
+          lensList.appendChild(row);
+        });
+
+        bindRowEvents();
+        if (typeof buildFilterBar === 'function') { buildFilterBar(); applyFilters(); }
+      }
+
+      // ── Row click & checkbox events ──
+      function bindRowEvents() {
+        var rows = lensList.querySelectorAll('.flm-detailslist-row[data-lens]');
+        rows.forEach(function (row) {
+          row.addEventListener('click', function (e) {
+            if (e.target.closest('.flm-detailslist-check')) return;
+            var chip = e.target.closest('.category-chip');
+            if (chip) { setCategory(chip.textContent); return; }
+            var id = row.getAttribute('data-lens');
+            openDetailPanel(id);
+          });
+        });
+
+        var rowCheckboxes = lensList.querySelectorAll('.flm-detailslist-row[data-lens] .flm-checkbox-input');
+        rowCheckboxes.forEach(function (cb) {
+          cb.addEventListener('change', updateToolbarState);
+        });
+      }
+
+      // ── Selection & toolbar state ──
+      var btnTestLens = document.getElementById('btn-test-lens');
+      var btnDuplicate = document.getElementById('btn-duplicate');
+      var btnDelete = document.getElementById('btn-delete');
+      var checkAll = document.getElementById('check-all');
+
+      function updateToolbarState() {
+        var rowCheckboxes = lensList.querySelectorAll('.flm-detailslist-row[data-lens] .flm-checkbox-input');
+        var count = lensList.querySelectorAll('.flm-detailslist-row[data-lens] .flm-checkbox-input:checked').length;
+        btnTestLens.disabled = count !== 1;
+        btnDuplicate.disabled = count !== 1;
+        btnDelete.disabled = count === 0;
+        checkAll.checked = count > 0 && count === rowCheckboxes.length;
+        checkAll.indeterminate = count > 0 && count < rowCheckboxes.length;
+      }
+
+      checkAll.addEventListener('change', function () {
+        var checked = checkAll.checked;
+        lensList.querySelectorAll('.flm-detailslist-row[data-lens] .flm-checkbox-input').forEach(function (cb) { cb.checked = checked; });
+        updateToolbarState();
+      });
+
+      // ── Category filter bar ──
+      var activeCategory = 'All';
+
+      function buildFilterBar() {
+        var cats = {};
+        MOCK_LENSES.forEach(function (l) {
+          l.categories.forEach(function (c) { cats[c] = true; });
+        });
+        var sorted = Object.keys(cats).sort();
+        var items = document.querySelector('#category-filter .flm-overflowset-items');
+        items.innerHTML = '';
+        ['All'].concat(sorted).forEach(function (cat) {
+          var btn = document.createElement('button');
+          btn.className = 'flm-overflowset-item filter-pill' + (cat === activeCategory ? ' filter-pill--active' : '');
+          btn.setAttribute('data-category', cat);
+          btn.textContent = cat;
+          btn.addEventListener('click', function () { setCategory(cat); });
+          items.appendChild(btn);
+        });
+      }
+
+      function setCategory(cat) {
+        activeCategory = cat;
+        document.querySelectorAll('#category-filter .filter-pill').forEach(function (btn) {
+          btn.classList.toggle('filter-pill--active', btn.getAttribute('data-category') === cat);
+        });
+        applyFilters();
+      }
+
+      function applyFilters() {
+        var query = document.getElementById('search-input').value.toLowerCase();
+        lensList.querySelectorAll('.flm-detailslist-row[data-lens]').forEach(function (row) {
+          var searchMatch = row.getAttribute('data-search').indexOf(query) !== -1;
+          var catMatch = activeCategory === 'All' || (',' + row.getAttribute('data-categories') + ',').indexOf(',' + activeCategory + ',') !== -1;
+          row.style.display = (searchMatch && catMatch) ? '' : 'none';
+        });
+      }
+
+      // ── Search filter ──
+      document.getElementById('search-input').addEventListener('input', function () {
+        applyFilters();
+      });
+
+      // ── Panel Helpers ──
+      function openPanel(panel, overlay) {
+        panel.classList.add('flm-panel--open');
+        overlay.classList.add('flm-panel-overlay--visible');
+      }
+
+      function closePanel(panel, overlay) {
+        panel.classList.remove('flm-panel--open');
+        overlay.classList.remove('flm-panel-overlay--visible');
+      }
+
+      // ── Helper: compile guided fields to raw markdown ──
+      function guidedToRaw(lens) {
+        var g = lens.guided || {};
+        var cats = (lens.categories || []).join(', ');
+        var lines = [
+          '---',
+          'awarity: lens/v1',
+          'id: ' + lens.id,
+          'name: ' + lens.name,
+          'description: ' + (lens.description || ''),
+          'categories: [' + cats + ']',
+          'createdAt: ' + (lens.createdAt || new Date().toISOString()),
+          'updatedAt: ' + (lens.updatedAt || new Date().toISOString()),
+          '---',
+          '',
+          '# Purpose',
+          g.purpose || '',
+          '',
+          '# What\'s Relevant',
+          g.relevant || '',
+          '',
+          '# What to Ignore',
+          g.ignore || '',
+          '',
+          '# Rules',
+          g.rules || ''
+        ];
+        if (g.examples) {
+          lines.push('', '# Examples (Optional)', g.examples);
+        }
+        if (g.outputFormat) {
+          lines.push('', '# Output Format', g.outputFormat);
+        }
+        return lines.join('\n').trim();
+      }
+
+      // ── Open Detail Panel ──
+      function openDetailPanel(lensId) {
+        var lens = MOCK_LENSES.find(function (l) { return l.id === lensId; });
+        if (!lens) return;
+
+        currentLens = lens;
+        isDirty = false;
+        updateDirtyBadge();
+
+        detailTitle.textContent = lens.name;
+        detailSubtitle.textContent = 'Last updated ' + lens.lastUpdated;
+
+        // Populate Edit tab
+        document.getElementById('edit-name').value = lens.name;
+        document.getElementById('edit-description').value = lens.description || '';
+
+        // Categories
+        editCategories = lens.categories.slice();
+        renderCategoryTags('edit');
+
+        // Editor mode
+        var modeRadio = document.querySelector('input[name="editor-mode"][value="' + lens.editorMode + '"]');
+        if (modeRadio) modeRadio.checked = true;
+        updateEditorMode(lens.editorMode);
+
+        // Guided fields
+        var g = lens.guided || {};
+        document.getElementById('edit-purpose').value = g.purpose || '';
+        document.getElementById('edit-relevant').value = g.relevant || '';
+        document.getElementById('edit-ignore').value = g.ignore || '';
+        document.getElementById('edit-rules').value = g.rules || '';
+        document.getElementById('edit-examples').value = g.examples || '';
+        document.getElementById('edit-output').value = g.outputFormat || '';
+
+        // Raw — trim to avoid false dirty detection
+        document.getElementById('edit-raw').value = (lens.raw || guidedToRaw(lens)).trim();
+
+        // Usage tab
+        populateUsage(lens);
+
+
+        // Reset to Edit tab
+        switchDetailTab('edit');
+
+        // Reset test state
+        resetTestTab();
+
+        openPanel(detailPanel, detailOverlay);
+
+        // Track dirty changes
+        bindDirtyTracking();
+      }
+
+      // ── Dirty tracking (compare compiled raw against initial) ──
+      var dirtyFields = ['edit-name', 'edit-description', 'edit-purpose', 'edit-relevant', 'edit-ignore', 'edit-rules', 'edit-examples', 'edit-output', 'edit-raw'];
+      var initialRaw = '';
+
+      function captureSnapshot() {
+        // Store the compiled raw as the baseline
+        initialRaw = compileGuidedToRaw();
+      }
+
+      function getCurrentRaw() {
+        var mode = document.querySelector('input[name="editor-mode"]:checked').value;
+        if (mode === 'raw') {
+          return document.getElementById('edit-raw').value.trim();
+        }
+        return compileGuidedToRaw();
+      }
+
+      function checkDirty() {
+        isDirty = getCurrentRaw() !== initialRaw;
+        updateDirtyBadge();
+      }
+
+      function bindDirtyTracking() {
+        captureSnapshot();
+        dirtyFields.forEach(function (id) {
+          var el = document.getElementById(id);
+          if (el) {
+            el.removeEventListener('input', checkDirty);
+            el.addEventListener('input', checkDirty);
+          }
+        });
+      }
+
+      function updateDirtyBadge() {
+        var badge = document.getElementById('dirty-badge');
+        badge.classList.toggle('dirty-badge--visible', isDirty);
+        document.getElementById('btn-save-lens').disabled = !isDirty;
+      }
+
+      // ── Editor mode switch ──
+      function updateEditorMode(mode) {
+        document.getElementById('guided-fields').style.display = mode === 'guided' ? 'block' : 'none';
+        document.getElementById('raw-field').style.display = mode === 'raw' ? 'block' : 'none';
+      }
+
+      // ── Parse raw markdown back into guided fields + metadata ──
+      function parseRawToGuided(raw) {
+        var result = {
+          name: '', description: '', categories: [],
+          purpose: '', relevant: '', ignore: '',
+          rules: '', examples: '', outputFormat: ''
+        };
+
+        // Extract front-matter
+        var fmMatch = raw.match(/^---\s*\n([\s\S]*?)\n---/);
+        if (fmMatch) {
+          var fm = fmMatch[1];
+          var nameMatch = fm.match(/^name:\s*(.*)$/m);
+          var descMatch = fm.match(/^description:\s*(.*)$/m);
+          var catMatch = fm.match(/^categories:\s*\[([^\]]*)\]/m);
+          if (nameMatch) result.name = nameMatch[1].trim();
+          if (descMatch) result.description = descMatch[1].trim();
+          if (catMatch) {
+            result.categories = catMatch[1].split(',').map(function (c) { return c.trim(); }).filter(Boolean);
+          }
+        }
+
+        // Extract sections by heading
+        var sectionMap = {
+          'purpose': /^# Purpose\s*\n([\s\S]*?)(?=\n# |\s*$)/m,
+          'relevant': /^# What's Relevant\s*\n([\s\S]*?)(?=\n# |\s*$)/m,
+          'ignore': /^# What to Ignore\s*\n([\s\S]*?)(?=\n# |\s*$)/m,
+          'rules': /^# Rules\s*\n([\s\S]*?)(?=\n# |\s*$)/m,
+          'examples': /^# Examples(?: \(Optional\))?\s*\n([\s\S]*?)(?=\n# |\s*$)/m,
+          'outputFormat': /^# Output Format\s*\n([\s\S]*?)(?=\n# |\s*$)/m
+        };
+
+        for (var key in sectionMap) {
+          var m = raw.match(sectionMap[key]);
+          if (m) result[key] = m[1].trim();
+        }
+
+        return result;
+      }
+
+      // ── Compile current guided form into raw ──
+      function compileGuidedToRaw() {
+        var temp = {
+          id: currentLens ? currentLens.id : '',
+          name: document.getElementById('edit-name').value,
+          description: document.getElementById('edit-description').value,
+          categories: editCategories.slice(),
+          createdAt: currentLens ? currentLens.createdAt : new Date().toISOString(),
+          updatedAt: currentLens ? currentLens.updatedAt : new Date().toISOString(),
+          guided: {
+            purpose: document.getElementById('edit-purpose').value,
+            relevant: document.getElementById('edit-relevant').value,
+            ignore: document.getElementById('edit-ignore').value,
+            rules: document.getElementById('edit-rules').value,
+            examples: document.getElementById('edit-examples').value,
+            outputFormat: document.getElementById('edit-output').value
+          }
+        };
+        return guidedToRaw(temp);
+      }
+
+      var rawOnEntry = ''; // raw text when we entered raw mode
+
+      document.querySelectorAll('input[name="editor-mode"]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+          if (this.value === 'raw') {
+            // Guided → Raw: compile guided into raw
+            var compiled = compileGuidedToRaw();
+            document.getElementById('edit-raw').value = compiled;
+            rawOnEntry = compiled;
+          } else {
+            // Raw → Guided: parse raw back into guided fields + metadata
+            var rawNow = document.getElementById('edit-raw').value.trim();
+            var parsed = parseRawToGuided(rawNow);
+            document.getElementById('edit-name').value = parsed.name;
+            document.getElementById('edit-description').value = parsed.description;
+            editCategories = parsed.categories;
+            renderCategoryTags('edit');
+            document.getElementById('edit-purpose').value = parsed.purpose;
+            document.getElementById('edit-relevant').value = parsed.relevant;
+            document.getElementById('edit-ignore').value = parsed.ignore;
+            document.getElementById('edit-rules').value = parsed.rules;
+            document.getElementById('edit-examples').value = parsed.examples;
+            document.getElementById('edit-output').value = parsed.outputFormat;
+            // If raw wasn't edited, the round-trip is lossless — re-snapshot
+            if (rawNow === rawOnEntry) {
+              captureSnapshot();
+            }
+          }
+          updateEditorMode(this.value);
+          checkDirty();
+        });
+      });
+
+      // ── Category Picker ──
+      function renderCategoryTags(prefix) {
+        var wrap = document.getElementById(prefix + '-categories-wrap');
+        var input = document.getElementById(prefix + '-categories-input');
+        var cats = prefix === 'edit' ? editCategories : newCategories;
+
+        // Remove existing tags
+        wrap.querySelectorAll('.category-tag').forEach(function (t) { t.remove(); });
+
+        cats.forEach(function (cat) {
+          var tag = document.createElement('span');
+          tag.className = 'category-tag';
+          tag.innerHTML = cat + ' <button class="category-tag-remove" data-cat="' + cat + '" data-prefix="' + prefix + '">&times;</button>';
+          wrap.insertBefore(tag, input);
+        });
+      }
+
+      // Remove category tag
+      document.addEventListener('click', function (e) {
+        if (e.target.classList.contains('category-tag-remove')) {
+          var cat = e.target.getAttribute('data-cat');
+          var prefix = e.target.getAttribute('data-prefix');
+          if (prefix === 'edit') {
+            editCategories = editCategories.filter(function (c) { return c !== cat; });
+            renderCategoryTags('edit');
+            checkDirty();
+          } else {
+            newCategories = newCategories.filter(function (c) { return c !== cat; });
+            renderCategoryTags('new');
+          }
+        }
+      });
+
+      // Category input with suggestions
+      function setupCategoryInput(prefix) {
+        var input = document.getElementById(prefix + '-categories-input');
+        var suggestions = document.getElementById(prefix + '-categories-suggestions');
+
+        input.addEventListener('input', function () {
+          var val = this.value.toLowerCase().trim();
+          var cats = prefix === 'edit' ? editCategories : newCategories;
+          if (!val) { suggestions.style.display = 'none'; return; }
+
+          var matches = SUGGESTED_CATEGORIES.filter(function (s) {
+            return s.indexOf(val) !== -1 && cats.indexOf(s) === -1;
+          });
+
+          if (matches.length === 0) { suggestions.style.display = 'none'; return; }
+
+          suggestions.innerHTML = matches.map(function (m) {
+            return '<div class="category-suggestion" data-value="' + m + '">' + m + '</div>';
+          }).join('');
+          suggestions.style.display = 'block';
+        });
+
+        input.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            var val = this.value.trim().replace(/,/g, '').toLowerCase();
+            if (!val) return;
+            if (prefix === 'edit') {
+              if (editCategories.indexOf(val) === -1) { editCategories.push(val); renderCategoryTags('edit'); checkDirty(); }
+            } else {
+              if (newCategories.indexOf(val) === -1) { newCategories.push(val); renderCategoryTags('new'); }
+            }
+            this.value = '';
+            suggestions.style.display = 'none';
+          }
+        });
+
+        suggestions.addEventListener('click', function (e) {
+          var opt = e.target.closest('.category-suggestion');
+          if (!opt) return;
+          var val = opt.getAttribute('data-value');
+          if (prefix === 'edit') {
+            if (editCategories.indexOf(val) === -1) { editCategories.push(val); renderCategoryTags('edit'); checkDirty(); }
+          } else {
+            if (newCategories.indexOf(val) === -1) { newCategories.push(val); renderCategoryTags('new'); }
+          }
+          input.value = '';
+          suggestions.style.display = 'none';
+        });
+
+        input.addEventListener('blur', function () {
+          setTimeout(function () { suggestions.style.display = 'none'; }, 200);
+        });
+      }
+
+      setupCategoryInput('edit');
+      setupCategoryInput('new');
+
+      // ── Detail Panel Tabs ──
+      function switchDetailTab(tabId) {
+        document.querySelectorAll('#detail-pivot-bar .pivot-tab').forEach(function (t) { t.classList.remove('pivot-tab--active'); });
+        document.querySelectorAll('#detail-panel .pivot-panel').forEach(function (p) { p.classList.remove('pivot-panel--active'); });
+        document.querySelector('#detail-pivot-bar .pivot-tab[data-tab="' + tabId + '"]').classList.add('pivot-tab--active');
+        document.getElementById('tab-' + tabId).classList.add('pivot-panel--active');
+      }
+
+      document.querySelectorAll('#detail-pivot-bar .pivot-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          switchDetailTab(tab.getAttribute('data-tab'));
+        });
+      });
+
+      // ── Populate Usage ──
+      function populateUsage(lens) {
+        var u = lens.usage || {};
+        ['explore', 'workflows', 'classifications'].forEach(function (section) {
+          var el = document.getElementById('usage-' + section);
+          var items = u[section] || [];
+          if (items.length === 0) {
+            el.innerHTML = '<div class="usage-empty">No usage recorded yet.</div>';
+          } else {
+            el.innerHTML = items.map(function (item) {
+              return '<div class="usage-item"><span class="usage-item-name">' + item.name + '</span><span class="usage-item-date">' + item.lastUsed + '</span></div>';
+            }).join('');
+          }
+        });
+      }
+
+
+      // ── Close Detail Panel (with dirty check) ──
+      function tryCloseDetailPanel() {
+        if (isDirty) {
+          pendingCloseAction = 'close';
+          unsavedDialog.classList.add('flm-dialog-overlay--open');
+        } else {
+          closePanel(detailPanel, detailOverlay);
+          currentLens = null;
+        }
+      }
+
+      document.getElementById('detail-panel-close').addEventListener('click', tryCloseDetailPanel);
+      detailOverlay.addEventListener('click', tryCloseDetailPanel);
+
+      // ── Unsaved dialog actions ──
+      document.getElementById('btn-unsaved-save').addEventListener('click', function () {
+        unsavedDialog.classList.remove('flm-dialog-overlay--open');
+        saveLens();
+        closePanel(detailPanel, detailOverlay);
+        currentLens = null;
+      });
+
+      document.getElementById('btn-unsaved-discard').addEventListener('click', function () {
+        unsavedDialog.classList.remove('flm-dialog-overlay--open');
+        isDirty = false;
+        closePanel(detailPanel, detailOverlay);
+        currentLens = null;
+      });
+
+      unsavedDialog.addEventListener('click', function (e) {
+        if (e.target.hasAttribute('data-dialog-close') || e.target === unsavedDialog) {
+          unsavedDialog.classList.remove('flm-dialog-overlay--open');
+        }
+      });
+
+      // ── Save Lens ──
+      function saveLens() {
+        if (!currentLens) return;
+        var mode = document.querySelector('input[name="editor-mode"]:checked').value;
+        var name;
+        if (mode === 'raw') {
+          var parsed = parseRawToGuided(document.getElementById('edit-raw').value);
+          name = parsed.name;
+        } else {
+          name = document.getElementById('edit-name').value.trim();
+        }
+        if (!name) {
+          showMessage('error', 'Lens name is required.');
+          return;
+        }
+
+        // Check uniqueness
+        var duplicate = MOCK_LENSES.find(function (l) {
+          return l.name.toLowerCase() === name.toLowerCase() && l.id !== currentLens.id;
+        });
+        if (duplicate) {
+          showMessage('error', 'A lens named "' + name + '" already exists.');
+          return;
+        }
+
+        if (mode === 'raw') {
+          currentLens.name = parsed.name || name;
+          currentLens.description = parsed.description;
+          currentLens.categories = parsed.categories;
+          currentLens.guided = {
+            purpose: parsed.purpose,
+            relevant: parsed.relevant,
+            ignore: parsed.ignore,
+            rules: parsed.rules,
+            examples: parsed.examples,
+            outputFormat: parsed.outputFormat
+          };
+          currentLens.raw = document.getElementById('edit-raw').value.trim();
+        } else {
+          currentLens.name = name;
+          currentLens.description = document.getElementById('edit-description').value.trim();
+          currentLens.categories = editCategories.slice();
+          currentLens.guided = {
+            purpose: document.getElementById('edit-purpose').value,
+            relevant: document.getElementById('edit-relevant').value,
+            ignore: document.getElementById('edit-ignore').value,
+            rules: document.getElementById('edit-rules').value,
+            examples: document.getElementById('edit-examples').value,
+            outputFormat: document.getElementById('edit-output').value
+          };
+          currentLens.raw = guidedToRaw(currentLens);
+        }
+        currentLens.editorMode = mode;
+        currentLens.lastUpdated = 'Feb 21, 2026';
+        currentLens.updatedAt = new Date().toISOString();
+
+        isDirty = false;
+        updateDirtyBadge();
+        renderRows();
+        showMessage('success', 'Lens "' + name + '" saved.');
+      }
+
+      document.getElementById('btn-save-lens').addEventListener('click', function () {
+        saveLens();
+      });
+
+      document.getElementById('btn-cancel-edit').addEventListener('click', tryCloseDetailPanel);
+
+      // ── Delete (from panel) ──
+      document.getElementById('btn-delete-panel').addEventListener('click', function () {
+        if (!currentLens) return;
+        currentDeleteIds = [currentLens.id];
+        document.getElementById('delete-lens-name').textContent = currentLens.name;
+        deleteDialog.classList.add('flm-dialog-overlay--open');
+      });
+
+      // ── Delete (from commandbar) ──
+      btnDelete.addEventListener('click', function () {
+        var checked = lensList.querySelectorAll('.flm-detailslist-row[data-lens] .flm-checkbox-input:checked');
+        if (checked.length === 0) return;
+        var ids = [];
+        var names = [];
+        checked.forEach(function (cb) {
+          var row = cb.closest('.flm-detailslist-row');
+          ids.push(row.getAttribute('data-lens'));
+          names.push(row.getAttribute('data-lens'));
+        });
+        currentDeleteIds = ids;
+        document.getElementById('delete-lens-name').textContent = names.join(', ');
+        deleteDialog.classList.add('flm-dialog-overlay--open');
+      });
+
+      // ── Confirm delete ──
+      document.getElementById('btn-confirm-delete').addEventListener('click', function () {
+        MOCK_LENSES = MOCK_LENSES.filter(function (l) { return currentDeleteIds.indexOf(l.id) === -1; });
+        deleteDialog.classList.remove('flm-dialog-overlay--open');
+        isDirty = false;
+        closePanel(detailPanel, detailOverlay);
+        currentLens = null;
+        renderRows();
+        updateToolbarState();
+        showMessage('success', 'Lens deleted.');
+      });
+
+      deleteDialog.addEventListener('click', function (e) {
+        if (e.target.hasAttribute('data-dialog-close') || e.target === deleteDialog) {
+          deleteDialog.classList.remove('flm-dialog-overlay--open');
+        }
+      });
+
+      // ── Duplicate (from panel) ──
+      document.getElementById('btn-duplicate-panel').addEventListener('click', function () {
+        if (!currentLens) return;
+        duplicateLens(currentLens.id);
+      });
+
+      // ── Duplicate (from commandbar) ──
+      btnDuplicate.addEventListener('click', function () {
+        var checked = lensList.querySelector('.flm-detailslist-row[data-lens] .flm-checkbox-input:checked');
+        if (!checked) return;
+        var id = checked.closest('.flm-detailslist-row').getAttribute('data-lens');
+        duplicateLens(id);
+      });
+
+      function duplicateLens(sourceId) {
+        var source = MOCK_LENSES.find(function (l) { return l.id === sourceId; });
+        if (!source) return;
+        var baseName = source.id.replace(/\(\d+\)$/, '');
+        var counter = 2;
+        var newId = baseName + '(' + counter + ')';
+        while (MOCK_LENSES.find(function (l) { return l.id === newId; })) {
+          counter++;
+          newId = baseName + '(' + counter + ')';
+        }
+        var dup = JSON.parse(JSON.stringify(source));
+        dup.id = newId;
+        dup.name = newId;
+        dup.usedInCount = 0;
+        dup.lastUpdated = 'Feb 21, 2026';
+        dup.usage = { explore: [], workflows: [], classifications: [] };
+        MOCK_LENSES.push(dup);
+        renderRows();
+        showMessage('success', 'Lens duplicated as "' + newId + '".');
+        openDetailPanel(newId);
+      }
+
+      // ── Test Lens (commandbar) ──
+      btnTestLens.addEventListener('click', function () {
+        var checked = lensList.querySelector('.flm-detailslist-row[data-lens] .flm-checkbox-input:checked');
+        if (!checked) return;
+        var id = checked.closest('.flm-detailslist-row').getAttribute('data-lens');
+        openDetailPanel(id);
+        switchDetailTab('test');
+      });
+
+      // ── Use in Explore / Workflow ──
+      document.getElementById('btn-use-explore').addEventListener('click', function () {
+        showMessage('info', 'Opening Explore with lens "' + (currentLens ? currentLens.name : '') + '"…');
+      });
+      document.getElementById('btn-use-workflow').addEventListener('click', function () {
+        showMessage('info', 'Opening Workflows with lens "' + (currentLens ? currentLens.name : '') + '"…');
+      });
+
+      // ── Test Tab Logic ──
+      var testInterval = null;
+      var testElapsedInterval = null;
+      var testDotsInterval = null;
+      var testElapsedSecs = 0;
+
+      function resetTestTab() {
+        document.getElementById('test-running').style.display = 'none';
+        document.getElementById('test-results').style.display = 'none';
+        document.getElementById('btn-cancel-test').style.display = 'none';
+        document.getElementById('btn-run-test').disabled = true;
+        if (testInterval) { clearInterval(testInterval); testInterval = null; }
+        if (testElapsedInterval) { clearInterval(testElapsedInterval); testElapsedInterval = null; }
+        if (testDotsInterval) { clearInterval(testDotsInterval); testDotsInterval = null; }
+      }
+
+      // Enable run test when both catalog selected and question has text
+      function getDropdownValue(id) {
+        var el = document.getElementById(id);
+        return el ? (el.getAttribute('data-value') || '') : '';
+      }
+      function updateTestRunState() {
+        var hasCatalog = getDropdownValue('test-catalog') !== '';
+        var hasQuestion = document.getElementById('test-question').value.trim() !== '';
+        document.getElementById('btn-run-test').disabled = !(hasCatalog && hasQuestion);
+      }
+      document.getElementById('test-catalog').addEventListener('change', updateTestRunState);
+      document.getElementById('test-question').addEventListener('input', updateTestRunState);
+
+      // Run test
+      document.getElementById('btn-run-test').addEventListener('click', function () {
+        document.getElementById('test-running').style.display = 'block';
+        document.getElementById('test-results').style.display = 'none';
+        document.getElementById('btn-cancel-test').style.display = 'inline-block';
+        this.disabled = true;
+
+        var bar = document.getElementById('test-bar');
+        var phase = document.getElementById('test-phase');
+        var dots = document.getElementById('test-dots');
+        var elapsed = document.getElementById('test-elapsed');
+        var progress = 0;
+
+        bar.style.width = '0%';
+        testElapsedSecs = 0;
+        elapsed.textContent = '0:00';
+
+        var dotStates = ['', '.', '..', '...'];
+        var dotIdx = 0;
+        testDotsInterval = setInterval(function () {
+          dotIdx = (dotIdx + 1) % dotStates.length;
+          dots.textContent = dotStates[dotIdx];
+        }, 800);
+
+        testElapsedInterval = setInterval(function () {
+          testElapsedSecs++;
+          var m = Math.floor(testElapsedSecs / 60);
+          var s = testElapsedSecs % 60;
+          elapsed.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+        }, 1000);
+
+        testInterval = setInterval(function () {
+          progress += 3 + Math.random() * 2;
+          if (progress > 100) progress = 100;
+          bar.style.width = progress + '%';
+
+          if (progress < 70) phase.textContent = 'Reading documents';
+          else phase.textContent = 'Synthesizing answer';
+
+          if (progress >= 100) {
+            clearInterval(testInterval); testInterval = null;
+            clearInterval(testElapsedInterval); testElapsedInterval = null;
+            clearInterval(testDotsInterval); testDotsInterval = null;
+            setTimeout(function () {
+              document.getElementById('test-running').style.display = 'none';
+              document.getElementById('btn-cancel-test').style.display = 'none';
+              showTestResults();
+            }, 500);
+          }
+        }, 1000);
+      });
+
+      // Cancel test
+      document.getElementById('btn-cancel-test').addEventListener('click', function () {
+        resetTestTab();
+        showMessage('info', 'Test cancelled.');
+        updateTestRunState();
+      });
+
+      // Clear test
+      document.getElementById('btn-clear-test').addEventListener('click', function () {
+        resetTestTab();
+        document.getElementById('test-question').value = '';
+      });
+
+      function showTestResults() {
+        document.getElementById('test-results').style.display = 'block';
+        updateTestRunState();
+
+        document.getElementById('test-answer-body').innerHTML =
+          '<p>Based on analysis of 3 documents using the <strong>' + (currentLens ? currentLens.name : '') + '</strong> lens:</p>' +
+          '<p>The selected documents show consistent patterns related to the query. Key findings include structured data points that align with the lens configuration.</p>' +
+          '<ul><li>Finding 1: Primary theme identified across all documents</li><li>Finding 2: Secondary pattern with supporting evidence</li><li>Finding 3: Outlier observation from doc-002.pdf</li></ul>';
+
+        document.getElementById('test-sources-body').innerHTML =
+          '<li>doc-001.pdf</li><li>doc-002.pdf</li><li>doc-003.pdf</li>';
+
+        // Reset to answer tab
+        switchTestTab('answer');
+      }
+
+      // ── Test result pivot tabs ──
+      function switchTestTab(tabId) {
+        document.querySelectorAll('[data-test-tab]').forEach(function (t) { t.classList.remove('pivot-tab--active'); });
+        document.querySelectorAll('.test-pivot-panel').forEach(function (p) { p.classList.remove('test-pivot-panel--active'); });
+        document.querySelector('[data-test-tab="' + tabId + '"]').classList.add('pivot-tab--active');
+        document.getElementById('test-tab-' + tabId).classList.add('test-pivot-panel--active');
+      }
+
+      document.querySelectorAll('[data-test-tab]').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          switchTestTab(tab.getAttribute('data-test-tab'));
+        });
+      });
+
+      // ── New Lens Dialog ──
+      var newStep = 1;
+      var selectedTemplate = 'blank';
+
+      function openNewLensDialog() {
+        newStep = 1;
+        selectedTemplate = 'blank';
+        newCategories = [];
+        document.getElementById('new-step-1').style.display = 'block';
+        document.getElementById('new-step-2').style.display = 'none';
+        document.getElementById('btn-new-back').style.display = 'none';
+        document.getElementById('btn-new-next').textContent = 'Next';
+        document.getElementById('new-name').value = '';
+        document.getElementById('new-description').value = '';
+        document.getElementById('new-messagebar').style.display = 'none';
+        renderCategoryTags('new');
+
+        // Reset tile selection
+        document.querySelectorAll('.template-tile').forEach(function (t) { t.classList.remove('template-tile--selected'); });
+        document.querySelector('.template-tile[data-template="blank"]').classList.add('template-tile--selected');
+
+        newLensDialog.classList.add('flm-dialog-overlay--open');
+      }
+
+      document.getElementById('btn-new-lens').addEventListener('click', openNewLensDialog);
+      document.getElementById('btn-empty-create').addEventListener('click', openNewLensDialog);
+      document.getElementById('btn-browse-starters').addEventListener('click', openNewLensDialog);
+
+      // Template tile selection
+      document.getElementById('template-tiles').addEventListener('click', function (e) {
+        var tile = e.target.closest('.template-tile');
+        if (!tile) return;
+        document.querySelectorAll('.template-tile').forEach(function (t) { t.classList.remove('template-tile--selected'); });
+        tile.classList.add('template-tile--selected');
+        selectedTemplate = tile.getAttribute('data-template');
+      });
+
+      // Next / Create
+      document.getElementById('btn-new-next').addEventListener('click', function () {
+        if (newStep === 1) {
+          newStep = 2;
+          document.getElementById('new-step-1').style.display = 'none';
+          document.getElementById('new-step-2').style.display = 'block';
+          document.getElementById('btn-new-back').style.display = 'inline-block';
+          document.getElementById('btn-new-next').textContent = 'Create';
+
+          // Pre-fill from template
+          var tmpl = TEMPLATES[selectedTemplate] || TEMPLATES['blank'];
+          document.getElementById('new-name').value = tmpl.name || '';
+          document.getElementById('new-description').value = tmpl.description || '';
+          newCategories = (tmpl.categories || []).slice();
+          renderCategoryTags('new');
+        } else {
+          // Create
+          var name = document.getElementById('new-name').value.trim();
+          if (!name) {
+            document.getElementById('new-messagebar').style.display = 'block';
+            document.getElementById('new-messagebar').innerHTML = '<div class="flm-messagebar flm-messagebar--error">Name is required.</div>';
+            return;
+          }
+          // Check uniqueness
+          if (MOCK_LENSES.find(function (l) { return l.name.toLowerCase() === name.toLowerCase(); })) {
+            document.getElementById('new-messagebar').style.display = 'block';
+            document.getElementById('new-messagebar').innerHTML = '<div class="flm-messagebar flm-messagebar--error">A lens named "' + name + '" already exists.</div>';
+            return;
+          }
+
+          var tmpl = TEMPLATES[selectedTemplate] || TEMPLATES['blank'];
+          var newLens = {
+            id: name,
+            name: name,
+            description: document.getElementById('new-description').value.trim(),
+            categories: newCategories.slice(),
+            usedInCount: 0,
+            lastUpdated: 'Feb 21, 2026',
+            editorMode: 'guided',
+            guided: JSON.parse(JSON.stringify(tmpl.guided || TEMPLATES['blank'].guided)),
+            raw: '',
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            usage: { explore: [], workflows: [], classifications: [] }
+          };
+          newLens.raw = guidedToRaw(newLens);
+
+          MOCK_LENSES.push(newLens);
+          newLensDialog.classList.remove('flm-dialog-overlay--open');
+          renderRows();
+          showMessage('success', 'Lens "' + name + '" created.');
+          openDetailPanel(name);
+        }
+      });
+
+      // Back
+      document.getElementById('btn-new-back').addEventListener('click', function () {
+        newStep = 1;
+        document.getElementById('new-step-1').style.display = 'block';
+        document.getElementById('new-step-2').style.display = 'none';
+        document.getElementById('btn-new-back').style.display = 'none';
+        document.getElementById('btn-new-next').textContent = 'Next';
+        document.getElementById('new-messagebar').style.display = 'none';
+      });
+
+      // Close new lens dialog
+      newLensDialog.addEventListener('click', function (e) {
+        if (e.target.hasAttribute('data-dialog-close') || e.target === newLensDialog) {
+          newLensDialog.classList.remove('flm-dialog-overlay--open');
+        }
+      });
+
+      // ── Refresh button ──
+      document.getElementById('btn-refresh').addEventListener('click', function () {
+        showMessage('info', 'Lens list refreshed.');
+      });
+
+      // ── State switcher (for demo) ──
+      window.showState = function (state) {
+        document.getElementById('state-loading').style.display = state === 'loading' ? 'block' : 'none';
+        document.getElementById('state-empty').style.display = state === 'empty' ? 'flex' : 'none';
+        document.getElementById('state-data').style.display = state === 'data' ? 'block' : 'none';
+      };
+
+      // ── Init ──
+      renderRows();
+      buildFilterBar();
+      window.showState('data');
+
+    })();
+  </script>
+</body>
+</html>
