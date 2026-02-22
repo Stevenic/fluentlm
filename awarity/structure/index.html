@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en" class="fluent-awarity-dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Structure — Awarity</title>
+
+  <!-- Themes & combined library CSS -->
+  <link rel="stylesheet" href="../../dist/theme-awarity-light.css">
+  <link rel="stylesheet" href="../../dist/theme-awarity-dark.css">
+  <link rel="stylesheet" href="../../dist/fluentlm.min.css">
+
+  <style>
+    /* ── App Shell ── */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    .app-shell {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── Left Nav ── */
+    .app-nav {
+      width: 220px;
+      flex-shrink: 0;
+      background-color: var(--bodyStandoutBackground);
+      border-right: 1px solid var(--bodyFrameDivider);
+      display: flex;
+      flex-direction: column;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .app-nav-brand {
+      padding: var(--spacingM);
+      font-size: var(--fontSizeXLarge);
+      font-weight: var(--fontWeightSemibold);
+      line-height: var(--lineHeightXLarge);
+      color: var(--bodyText);
+      border-bottom: 1px solid var(--bodyFrameDivider);
+    }
+
+    .app-nav-link {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+      padding: var(--spacingS2) var(--spacingM);
+      color: var(--bodyText);
+      font-size: var(--fontSizeMedium);
+      text-decoration: none;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+    }
+
+    .app-nav-link:hover {
+      background-color: var(--listItemBackgroundHovered);
+      text-decoration: none;
+    }
+
+    .app-nav-link--active {
+      background-color: var(--listItemBackgroundChecked);
+      font-weight: var(--fontWeightSemibold);
+      border-left-color: var(--themePrimary);
+    }
+
+    .app-nav-spacer { flex: 1; }
+
+    /* ── Main Area ── */
+    .app-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── CommandBar Zone ── */
+    .app-commandbar {
+      border-bottom: 1px solid var(--bodyDivider);
+    }
+
+    /* ── Breadcrumb Zone ── */
+    .app-breadcrumb {
+      padding: var(--spacingS2) var(--spacingL2);
+      border-bottom: 1px solid var(--bodyDivider);
+      background-color: var(--bodyBackground);
+    }
+
+    /* ── Content Area ── */
+    .app-content {
+      flex: 1;
+      padding: var(--spacingL2);
+      overflow-y: auto;
+      background-color: var(--bodyBackground);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- ════════════════════════════════════════════════════════════════
+         LEFT NAV
+         ════════════════════════════════════════════════════════════════ -->
+    <nav class="app-nav">
+      <div class="app-nav-brand">Awarity</div>
+
+      <a class="app-nav-link" href="../home/index.html"><svg viewBox="0 0 64 64" width="16" height="16" style="flex-shrink:0;"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyStandoutBackground)"/></svg> Home</a>
+      <a class="app-nav-link" href="../catalogs/index.html"><i class="flm-icon" data-icon="Database"></i> Catalogs</a>
+      <a class="app-nav-link" href="../explorer/index.html"><i class="flm-icon" data-icon="Search"></i> Explore</a>
+      <a class="app-nav-link app-nav-link--active" href="#"><i class="flm-icon" data-icon="Org"></i> Structure</a>
+      <a class="app-nav-link" href="../lenses/index.html"><i class="flm-icon" data-icon="Filter"></i> Lenses</a>
+      <a class="app-nav-link" href="../workflows/index.html"><i class="flm-icon" data-icon="Flow"></i> Workflows</a>
+      <a class="app-nav-link" href="../runs/index.html"><i class="flm-icon" data-icon="Processing"></i> Runs</a>
+
+      <div class="app-nav-spacer"></div>
+
+      <a class="app-nav-link" href="../settings/index.html"><i class="flm-icon" data-icon="Settings"></i> Settings</a>
+
+      <div style="padding: var(--spacingM);">
+        <button class="flm-button" id="themeToggle" style="width: 100%;">Switch to Dark</button>
+      </div>
+    </nav>
+
+    <!-- ════════════════════════════════════════════════════════════════
+         MAIN AREA
+         ════════════════════════════════════════════════════════════════ -->
+    <div class="app-main">
+
+      <!-- CommandBar -->
+      <div class="app-commandbar">
+        <div class="flm-commandbar">
+          <div class="flm-commandbar-items">
+            <button class="flm-commandbar-item" id="btn-ask-awarity"><svg viewBox="0 0 64 64" width="16" height="16" style="flex-shrink:0;vertical-align:middle;margin-right:4px;"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyBackground)"/></svg>Ask Awarity</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Breadcrumb -->
+      <div class="app-breadcrumb">
+        <ol class="flm-breadcrumb">
+          <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="../home/index.html">Home</a></li>
+          <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link">Structure</a></li>
+        </ol>
+      </div>
+
+      <!-- Content -->
+      <div class="app-content">
+      </div>
+
+    </div><!-- /app-main -->
+  </div><!-- /app-shell -->
+
+  <!-- Combined library JS -->
+  <script src="../../dist/fluentlm.min.js"></script>
+
+  <script>
+    // ── Register custom icons for nav ──
+    FluentIcons.register('Database',   'M8 1C4.13 1 1 2.34 1 4v8c0 1.66 3.13 3 7 3s7-1.34 7-3V4c0-1.66-3.13-3-7-3zM2 6.26C3.41 7.24 5.59 7.8 8 7.8s4.59-.56 6-1.54V8c0 .77-2.42 2-6 2S2 8.77 2 8V6.26zM8 2c3.58 0 6 1.23 6 2s-2.42 2-6 2S2 4.77 2 4s2.42-2 6-2zm0 12c-3.58 0-6-1.23-6-2v-1.74C3.41 11.24 5.59 11.8 8 11.8s4.59-.56 6-1.54V12c0 .77-2.42 2-6 2z');
+    FluentIcons.register('Org',        'M8 1a2 2 0 0 1 2 2v1h2.5a.5.5 0 0 1 .5.5V7h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-4a.5.5 0 0 1 .5-.5h1V5H9v1.5a.5.5 0 0 1-.5.5h-1a.5.5 0 0 1-.5-.5V5H5v2h1a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-.5.5H3a.5.5 0 0 1-.5-.5v-4A.5.5 0 0 1 3 7h1V4.5a.5.5 0 0 1 .5-.5H7V3a2 2 0 0 1 1-2z');
+    FluentIcons.register('Flow',       'M2 3.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .35.15L8.71 6H13.5a.5.5 0 0 1 0 1H8.71l-2.86 2.85a.5.5 0 0 1-.35.15h-3a.5.5 0 0 1 0-1h2.79L8 6.5 5.29 4H2.5a.5.5 0 0 1-.5-.5zm0 8a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .35.15L8.71 14H13.5a.5.5 0 0 1 0 1H8.71l-2.86-2.85A.5.5 0 0 0 5.5 12h-3a.5.5 0 0 1-.5-.5z');
+    FluentIcons.register('Processing', 'M8 1.5a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V2a.5.5 0 0 1 .5-.5zM3.05 3.05a.5.5 0 0 1 .7 0l1.42 1.42a.5.5 0 0 1-.7.7L3.05 3.76a.5.5 0 0 1 0-.7zm9.9 0a.5.5 0 0 1 0 .7l-1.42 1.42a.5.5 0 1 1-.7-.7l1.41-1.42a.5.5 0 0 1 .7 0zM1.5 8a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H2a.5.5 0 0 1-.5-.5zm10 0a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5zm-6.33 3.17a.5.5 0 0 1 0 .7L3.76 13.3a.5.5 0 0 1-.7-.7l1.41-1.42a.5.5 0 0 1 .7 0zm5.66 0a.5.5 0 0 1 .7 0l1.42 1.42a.5.5 0 0 1-.7.7l-1.42-1.41a.5.5 0 0 1 0-.7zM8 12a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2a.5.5 0 0 1 .5-.5z');
+
+    // ── Register themes & init ──
+    FluentLM.registerTheme('awarity-light', 'fluent-awarity-light');
+    FluentLM.registerTheme('awarity-dark', 'fluent-awarity-dark');
+    FluentLM.setTheme('awarity-dark');
+
+    // ── Theme Toggle ──
+    var themeBtn = document.getElementById('themeToggle');
+    function updateThemeLabel() {
+      themeBtn.textContent = FluentLM.getTheme() === 'awarity-light' ? 'Switch to Dark' : 'Switch to Light';
+    }
+    updateThemeLabel();
+    themeBtn.addEventListener('click', function () {
+      FluentLM.setTheme(FluentLM.getTheme() === 'awarity-light' ? 'awarity-dark' : 'awarity-light');
+      updateThemeLabel();
+    });
+  </script>
+</body>
+</html>
