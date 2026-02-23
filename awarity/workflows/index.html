@@ -1131,12 +1131,7 @@
                     <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select a catalog…</span>
                     <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
                   </button>
-                  <div class="flm-dropdown-listbox">
-                    <div class="flm-dropdown-option" data-value="sec-filings">sec-filings</div>
-                    <div class="flm-dropdown-option" data-value="legal-contracts">legal-contracts</div>
-                    <div class="flm-dropdown-option" data-value="research-papers">research-papers</div>
-                    <div class="flm-dropdown-option" data-value="compliance-docs">compliance-docs</div>
-                  </div>
+                  <div class="flm-dropdown-listbox"></div>
                 </div>
               </div>
               <label class="flm-checkbox" style="margin-top: var(--spacingS2);">
@@ -1275,6 +1270,100 @@
             }
           });
         }
+      }
+
+      // ══════════════════════════════════════════════════════════════
+      //  CACHED DATA (populated from awarity async APIs)
+      // ══════════════════════════════════════════════════════════════
+
+      var cachedModels = [];
+      var cachedLenses = [];
+      var cachedCatalogs = [];
+
+      Promise.all([
+        awarity.getModels().then(function (m) { cachedModels = m; }),
+        awarity.getLenses().then(function (l) { cachedLenses = l; }),
+        awarity.getCatalogs().then(function (c) { cachedCatalogs = c; })
+      ]).then(function () {
+        // Populate the wizard catalog dropdown
+        populateCatalogDropdown('wiz-catalog');
+        wireDropdowns(document.getElementById('new-workflow-dialog'));
+      });
+
+      function populateCatalogDropdown(id, selected) {
+        var dropdown = document.getElementById(id);
+        if (!dropdown) return;
+        var listbox = dropdown.querySelector('.flm-dropdown-listbox');
+        var title = dropdown.querySelector('.flm-dropdown-title');
+        var html = '';
+        for (var i = 0; i < cachedCatalogs.length; i++) {
+          var isSelected = selected === cachedCatalogs[i].id;
+          html += '<div class="flm-dropdown-option' + (isSelected ? ' flm-dropdown-option--selected' : '') +
+            '" data-value="' + cachedCatalogs[i].id + '">' + cachedCatalogs[i].label + '</div>';
+          if (isSelected && title) {
+            title.textContent = cachedCatalogs[i].label;
+            title.classList.remove('flm-dropdown-title--placeholder');
+            dropdown.setAttribute('data-value', cachedCatalogs[i].id);
+          }
+        }
+        if (listbox) listbox.innerHTML = html;
+      }
+
+      function modelDropdownHtml(id, selected, includeDefault) {
+        var selectedLabel = '';
+        if (!selected && includeDefault) { selectedLabel = '(workflow default)'; }
+        for (var j = 0; j < cachedModels.length; j++) {
+          if (cachedModels[j].id === selected) { selectedLabel = cachedModels[j].label; break; }
+        }
+        var html = '<div class="flm-dropdown" id="' + id + '"' + (selected ? ' data-value="' + selected + '"' : '') + '>' +
+          '<button class="flm-dropdown-trigger" type="button">' +
+            '<span class="flm-dropdown-title' + (selectedLabel ? '' : ' flm-dropdown-title--placeholder') + '">' + (selectedLabel || 'Select model…') + '</span>' +
+            '<span class="flm-dropdown-caret" data-icon="ChevronDown"></span>' +
+          '</button>' +
+          '<div class="flm-dropdown-listbox">';
+        if (includeDefault) {
+          html += '<div class="flm-dropdown-option' + (!selected ? ' flm-dropdown-option--selected' : '') + '" data-value="">(workflow default)</div>';
+        }
+        for (var i = 0; i < cachedModels.length; i++) {
+          html += '<div class="flm-dropdown-option' + (selected === cachedModels[i].id ? ' flm-dropdown-option--selected' : '') + '" data-value="' + cachedModels[i].id + '">' + cachedModels[i].label + '</div>';
+        }
+        html += '</div></div>';
+        return html;
+      }
+
+      function lensDropdownHtml(id, selected, includeNone) {
+        var selectedLabel = '';
+        if (!selected && includeNone) { selectedLabel = '(none)'; }
+        for (var j = 0; j < cachedLenses.length; j++) {
+          if (cachedLenses[j].id === selected) { selectedLabel = cachedLenses[j].label; break; }
+        }
+        var html = '<div class="flm-dropdown" id="' + id + '"' + (selected ? ' data-value="' + selected + '"' : '') + '>' +
+          '<button class="flm-dropdown-trigger" type="button">' +
+            '<span class="flm-dropdown-title' + (selectedLabel ? '' : ' flm-dropdown-title--placeholder') + '">' + (selectedLabel || 'Select lens…') + '</span>' +
+            '<span class="flm-dropdown-caret" data-icon="ChevronDown"></span>' +
+          '</button>' +
+          '<div class="flm-dropdown-listbox">';
+        if (includeNone) {
+          html += '<div class="flm-dropdown-option' + (!selected ? ' flm-dropdown-option--selected' : '') + '" data-value="">(none)</div>';
+        }
+        for (var i = 0; i < cachedLenses.length; i++) {
+          html += '<div class="flm-dropdown-option' + (selected === cachedLenses[i].id ? ' flm-dropdown-option--selected' : '') + '" data-value="' + cachedLenses[i].id + '">' + cachedLenses[i].label + '</div>';
+        }
+        html += '</div></div>';
+        return html;
+      }
+
+      function modeDropdownHtml(id, selected) {
+        var isAbstracts = selected === 'abstracts';
+        return '<div class="flm-dropdown" id="' + id + '" data-value="' + (selected || 'full') + '">' +
+          '<button class="flm-dropdown-trigger" type="button">' +
+            '<span class="flm-dropdown-title">' + (isAbstracts ? 'Abstracts' : 'Full ECW') + '</span>' +
+            '<span class="flm-dropdown-caret" data-icon="ChevronDown"></span>' +
+          '</button>' +
+          '<div class="flm-dropdown-listbox">' +
+            '<div class="flm-dropdown-option' + (isAbstracts ? '' : ' flm-dropdown-option--selected') + '" data-value="full">Full ECW</div>' +
+            '<div class="flm-dropdown-option' + (isAbstracts ? ' flm-dropdown-option--selected' : '') + '" data-value="abstracts">Abstracts</div>' +
+          '</div></div>';
       }
 
       function pathInput(id, value, placeholder, icon) {
@@ -1909,6 +1998,7 @@
 
       var currentTrayMode = null;
       var currentEditIndex = -1;
+      var pendingNewStep = null;
 
       function openTray(mode, stepIndex) {
         currentTrayMode = mode;
@@ -1917,9 +2007,15 @@
         switch (mode) {
           case 'add-step':
             trayTitle.textContent = 'Add Step';
-            trayPrimary.textContent = 'Add';
+            trayPrimary.textContent = 'Next';
             trayBody.innerHTML = buildAddStepForm();
             bindAddStepForm();
+            break;
+          case 'add-step-config':
+            trayTitle.textContent = 'Add Step';
+            trayPrimary.textContent = 'Add';
+            trayBody.innerHTML = buildEditStepForm(pendingNewStep);
+            wireDropdowns(trayBody);
             break;
           case 'edit-step':
             trayTitle.textContent = 'Edit Step';
@@ -1948,7 +2044,7 @@
             break;
         }
 
-        // Show delete button only for editable steps (not input/output)
+        // Show delete button only for editable steps (not add/input/output)
         trayDelete.style.display = (mode === 'edit-step') ? '' : 'none';
 
         trayOverlay.classList.add('builder-tray-overlay--visible');
@@ -1981,6 +2077,7 @@
         trayOverlay.classList.remove('builder-tray-overlay--visible');
         currentTrayMode = null;
         currentEditIndex = -1;
+        pendingNewStep = null;
       }
 
       document.getElementById('tray-close').addEventListener('click', closeTray);
@@ -1996,10 +2093,6 @@
             '<div class="step-type-option-desc">' + st.desc + '</div></div>' +
           '</div>';
         });
-        html += '<div class="flm-textfield" style="margin-top: var(--spacingS1);">' +
-          '<label class="flm-label" for="tray-step-name">Step Name (optional)</label>' +
-          '<input class="flm-textfield-input" id="tray-step-name" placeholder="e.g. high-level">' +
-        '</div>';
         html += '</div>';
         return html;
       }
@@ -2013,36 +2106,72 @@
         });
       }
 
+      // ── Catalog dropdown builder ──
+      function catalogDropdownHtml(id, selected) {
+        var selectedLabel = selected || '';
+        for (var j = 0; j < cachedCatalogs.length; j++) {
+          if (cachedCatalogs[j].id === selected) { selectedLabel = cachedCatalogs[j].label; break; }
+        }
+        var html = '<div class="flm-textfield"><label class="flm-label">Catalog</label>' +
+          '<div class="flm-dropdown" id="' + id + '"' + (selected ? ' data-value="' + selected + '"' : '') + '>' +
+            '<button class="flm-dropdown-trigger" type="button">' +
+              '<span class="flm-dropdown-title' + (selected ? '' : ' flm-dropdown-title--placeholder') + '">' + (selectedLabel || 'Select a catalog…') + '</span>' +
+              '<span class="flm-dropdown-caret" data-icon="ChevronDown"></span>' +
+            '</button>' +
+            '<div class="flm-dropdown-listbox">';
+        for (var i = 0; i < cachedCatalogs.length; i++) {
+          html += '<div class="flm-dropdown-option' + (selected === cachedCatalogs[i].id ? ' flm-dropdown-option--selected' : '') + '" data-value="' + cachedCatalogs[i].id + '">' + cachedCatalogs[i].label + '</div>';
+        }
+        html += '</div></div></div>';
+        return html;
+      }
+
+      // ── Resolve catalog for a step (explicit > previous step > workflow default) ──
+      function resolveStepCatalog(step, stepIndex) {
+        if (step.catalog) return step.catalog;
+        // Walk backwards through earlier steps
+        if (currentWorkflow && currentWorkflow.steps) {
+          for (var i = stepIndex - 1; i >= 0; i--) {
+            if (currentWorkflow.steps[i].catalog) return currentWorkflow.steps[i].catalog;
+          }
+        }
+        // Fall back to workflow input catalog or defaults
+        if (currentWorkflow) {
+          if (currentWorkflow.input && currentWorkflow.input.catalog) return currentWorkflow.input.catalog;
+          if (currentWorkflow.defaults && currentWorkflow.defaults.catalog) return currentWorkflow.defaults.catalog;
+        }
+        return '';
+      }
+
       // ── Edit Step Form ──
       function buildEditStepForm(step) {
+        var catalog = resolveStepCatalog(step, currentEditIndex);
         var html = '<div class="panel-form">';
         html += '<div class="flm-textfield"><label class="flm-label">Type</label>' +
           '<input class="flm-textfield-input" value="' + step.type + '" disabled></div>';
         html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-name">Name</label>' +
           '<input class="flm-textfield-input" id="tray-edit-name" value="' + (step.name || '') + '"></div>';
 
+        // Catalog dropdown (shared across all step types)
+        html += catalogDropdownHtml('tray-edit-catalog', catalog);
+
         // Type-specific fields
-        if (step.type === 'ingest') {
-          html += '<div class="flm-textfield"><label class="flm-label">Catalog</label>' +
-            '<div class="flm-dropdown" id="tray-edit-catalog"' + (step.catalog ? ' data-value="' + step.catalog + '"' : '') + '>' +
-              '<button class="flm-dropdown-trigger" type="button">' +
-                '<span class="flm-dropdown-title' + (step.catalog ? '' : ' flm-dropdown-title--placeholder') + '">' + (step.catalog || 'Select a catalog…') + '</span>' +
-                '<span class="flm-dropdown-caret" data-icon="ChevronDown"></span>' +
-              '</button>' +
-              '<div class="flm-dropdown-listbox">' +
-                '<div class="flm-dropdown-option' + (step.catalog === 'sec-filings' ? ' flm-dropdown-option--selected' : '') + '" data-value="sec-filings">sec-filings</div>' +
-                '<div class="flm-dropdown-option' + (step.catalog === 'legal-contracts' ? ' flm-dropdown-option--selected' : '') + '" data-value="legal-contracts">legal-contracts</div>' +
-                '<div class="flm-dropdown-option' + (step.catalog === 'research-papers' ? ' flm-dropdown-option--selected' : '') + '" data-value="research-papers">research-papers</div>' +
-                '<div class="flm-dropdown-option' + (step.catalog === 'compliance-docs' ? ' flm-dropdown-option--selected' : '') + '" data-value="compliance-docs">compliance-docs</div>' +
-              '</div>' +
-            '</div></div>';
+        if (step.type === 'generateAbstracts') {
+          var gaModel = step.model || (currentWorkflow && currentWorkflow.defaults ? currentWorkflow.defaults.model : '') || '';
+          var gaLens = step.lens || (currentWorkflow && currentWorkflow.defaults ? currentWorkflow.defaults.lens : '') || '';
+          html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-ga-model">Model</label>' +
+            modelDropdownHtml('tray-edit-ga-model', gaModel, true) + '</div>';
+          html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-ga-lens">Lens</label>' +
+            lensDropdownHtml('tray-edit-ga-lens', gaLens, true) + '</div>';
+        } else if (step.type === 'ingest') {
           html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-folder">Source Folder</label>' +
             pathInput('tray-edit-folder', step.folder, '(defaults to run input folder)') + '</div>';
         } else if (step.type === 'classify') {
-          html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-mode">Mode</label>' +
-            '<select class="flm-dropdown" id="tray-edit-mode" style="width: 100%;"><option' + (step.mode === 'abstracts' ? ' selected' : '') + '>abstracts</option><option' + (step.mode === 'full' ? ' selected' : '') + '>full</option></select></div>';
-          html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-labels">Labels File</label>' +
-            pathInput('tray-edit-labels', step.labels, '', 'Document') + '</div>';
+          html += '<div class="flm-textfield"><label class="flm-label">Mode</label>' +
+            modeDropdownHtml('tray-edit-mode', step.mode || 'full') + '</div>';
+          html += '<div class="flm-textfield flm-textfield--required" id="tray-edit-labels-field"><label class="flm-label flm-label--required" for="tray-edit-labels">Labels File</label>' +
+            pathInput('tray-edit-labels', step.labels, '', 'Document') +
+            '<span class="flm-textfield-error" style="display: none;">Labels file is required.</span></div>';
           html += '<label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="tray-edit-multi"' + (step.allowMulti ? ' checked' : '') + '><span class="flm-checkbox-mark"></span><span class="flm-label">Allow multi-label</span></label>';
         } else if (step.type === 'filter') {
           html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-include">Include Labels (comma-separated)</label>' +
@@ -2050,8 +2179,8 @@
         } else if (step.type === 'ask') {
           html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-question">Question</label>' +
             '<textarea class="flm-textfield-input" id="tray-edit-question" rows="4" style="width: 100%; resize: vertical;">' + (step.question || '') + '</textarea></div>';
-          html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-ask-mode">Mode</label>' +
-            '<select class="flm-dropdown" id="tray-edit-ask-mode" style="width: 100%;"><option' + (step.mode === 'full' ? ' selected' : '') + '>full</option><option' + (step.mode === 'abstracts' ? ' selected' : '') + '>abstracts</option></select></div>';
+          html += '<div class="flm-textfield"><label class="flm-label">Mode</label>' +
+            modeDropdownHtml('tray-edit-ask-mode', step.mode || 'full') + '</div>';
           html += '<label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="tray-edit-skip"' + (step.skipInference ? ' checked' : '') + '><span class="flm-checkbox-mark"></span><span class="flm-label">Skip inference</span></label>';
         } else if (step.type === 'extract') {
           html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-schema">Schema File</label>' +
@@ -2074,19 +2203,7 @@
               '<label class="flm-choicegroup-option"><input type="radio" class="flm-choicegroup-input" name="tray-inp-type" value="rss"' + (isRss ? ' checked' : '') + '><span class="flm-choicegroup-mark"></span><span class="flm-choicegroup-label">RSS Feed</span></label>' +
             '</div></div>' +
           '<div id="tray-catalog-fields"' + (isRss ? ' style="display:none"' : '') + '>' +
-            '<div class="flm-textfield"><label class="flm-label">Catalog</label>' +
-              '<div class="flm-dropdown" id="tray-inp-catalog"' + (inp.catalog ? ' data-value="' + inp.catalog + '"' : '') + '>' +
-                '<button class="flm-dropdown-trigger" type="button">' +
-                  '<span class="flm-dropdown-title' + (inp.catalog ? '' : ' flm-dropdown-title--placeholder') + '">' + (inp.catalog || 'Select a catalog…') + '</span>' +
-                  '<span class="flm-dropdown-caret" data-icon="ChevronDown"></span>' +
-                '</button>' +
-                '<div class="flm-dropdown-listbox">' +
-                  '<div class="flm-dropdown-option' + (inp.catalog === 'sec-filings' ? ' flm-dropdown-option--selected' : '') + '" data-value="sec-filings">sec-filings</div>' +
-                  '<div class="flm-dropdown-option' + (inp.catalog === 'legal-contracts' ? ' flm-dropdown-option--selected' : '') + '" data-value="legal-contracts">legal-contracts</div>' +
-                  '<div class="flm-dropdown-option' + (inp.catalog === 'research-papers' ? ' flm-dropdown-option--selected' : '') + '" data-value="research-papers">research-papers</div>' +
-                  '<div class="flm-dropdown-option' + (inp.catalog === 'compliance-docs' ? ' flm-dropdown-option--selected' : '') + '" data-value="compliance-docs">compliance-docs</div>' +
-                '</div>' +
-              '</div></div>' +
+            catalogDropdownHtml('tray-inp-catalog', inp.catalog || '') +
             '<label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="tray-inp-abstracts"' + (inp.ensureAbstracts ? ' checked' : '') + '><span class="flm-checkbox-mark"></span><span class="flm-label">Ensure abstracts before run</span></label>' +
           '</div>' +
           '<div id="tray-rss-fields"' + (isCatalog ? ' style="display:none"' : '') + '>' +
@@ -2125,13 +2242,9 @@
           '<div class="flm-textfield"><label class="flm-label" for="tray-wf-categories">Categories (comma-separated)</label>' +
             '<input class="flm-textfield-input" id="tray-wf-categories" value="' + catsValue + '"></div>' +
           '<div class="flm-textfield"><label class="flm-label" for="tray-wf-model">Default Model</label>' +
-            '<select class="flm-dropdown" id="tray-wf-model" style="width: 100%;">' +
-              '<option value="claude-sonnet"' + ((wf.defaults || {}).model === 'claude-sonnet' ? ' selected' : '') + '>claude-sonnet</option>' +
-              '<option value="claude-haiku"' + ((wf.defaults || {}).model === 'claude-haiku' ? ' selected' : '') + '>claude-haiku</option>' +
-              '<option value="claude-opus"' + ((wf.defaults || {}).model === 'claude-opus' ? ' selected' : '') + '>claude-opus</option>' +
-            '</select></div>' +
+            modelDropdownHtml('tray-wf-model', (wf.defaults || {}).model || '', false) + '</div>' +
           '<div class="flm-textfield"><label class="flm-label" for="tray-wf-lens">Default Lens</label>' +
-            pathInput('tray-wf-lens', (wf.defaults || {}).lens, 'e.g. lenses/financial-risk.lens.md', 'Document') + '</div>' +
+            lensDropdownHtml('tray-wf-lens', (wf.defaults || {}).lens || '', true) + '</div>' +
         '</div>';
       }
 
@@ -2144,40 +2257,53 @@
             var selected = trayBody.querySelector('.step-type-option--selected');
             if (!selected) return;
             var newStep = { type: selected.getAttribute('data-type') };
-            var nameInput = document.getElementById('tray-step-name');
-            if (nameInput && nameInput.value.trim()) newStep.name = nameInput.value.trim();
             // Set defaults
             if (newStep.type === 'ingest') { newStep.catalog = ''; newStep.folder = ''; }
             if (newStep.type === 'classify') { newStep.mode = 'abstracts'; newStep.labels = ''; newStep.allowMulti = false; }
             if (newStep.type === 'filter') { newStep.include = []; }
             if (newStep.type === 'ask') { newStep.question = ''; newStep.mode = 'full'; newStep.skipInference = false; }
             if (newStep.type === 'extract') { newStep.schema = ''; }
-            currentWorkflow.steps.push(newStep);
-            renderPipeline();
-            flashSaved();
-            // Open edit tray for the newly added step
-            var newStepIndex = currentWorkflow.steps.length - 1;
-            closeTray();
-            setTimeout(function () { openTray('edit-step', newStepIndex); }, 50);
+            // Store pending step and show config form
+            pendingNewStep = newStep;
+            currentEditIndex = currentWorkflow.steps.length; // will be the index when added
+            openTray('add-step-config');
             break;
-
-          case 'edit-step':
-            var step = currentWorkflow.steps[currentEditIndex];
-            if (!step) { closeTray(); return; }
+          case 'add-step-config':
+            // Validate and save the pending new step
+            if (!pendingNewStep) { closeTray(); return; }
+            var step = pendingNewStep;
             var editName = document.getElementById('tray-edit-name');
             if (editName) step.name = editName.value.trim();
+            // Catalog (shared across all step types)
+            var catEl = document.getElementById('tray-edit-catalog');
+            if (catEl) step.catalog = catEl.getAttribute('data-value') || '';
             // Type-specific saves
-            if (step.type === 'ingest') {
-              var ingestCatEl = document.getElementById('tray-edit-catalog');
-              if (ingestCatEl) step.catalog = ingestCatEl.getAttribute('data-value') || '';
+            if (step.type === 'generateAbstracts') {
+              var gaModelEl = document.getElementById('tray-edit-ga-model');
+              var gaLensEl = document.getElementById('tray-edit-ga-lens');
+              if (gaModelEl) step.model = gaModelEl.getAttribute('data-value') || '';
+              if (gaLensEl) step.lens = gaLensEl.getAttribute('data-value') || '';
+            } else if (step.type === 'ingest') {
               var folderEl = document.getElementById('tray-edit-folder');
               if (folderEl) step.folder = folderEl.value.trim();
             } else if (step.type === 'classify') {
               var modeEl = document.getElementById('tray-edit-mode');
               var labelsEl = document.getElementById('tray-edit-labels');
               var multiEl = document.getElementById('tray-edit-multi');
-              if (modeEl) step.mode = modeEl.value;
-              if (labelsEl) step.labels = labelsEl.value;
+              var labelsField = document.getElementById('tray-edit-labels-field');
+              if (labelsEl && !labelsEl.value.trim()) {
+                if (labelsField) {
+                  labelsField.classList.add('flm-textfield--error');
+                  labelsField.querySelector('.flm-textfield-error').style.display = '';
+                }
+                return;
+              }
+              if (labelsField) {
+                labelsField.classList.remove('flm-textfield--error');
+                labelsField.querySelector('.flm-textfield-error').style.display = 'none';
+              }
+              if (modeEl) step.mode = modeEl.getAttribute('data-value') || 'full';
+              if (labelsEl) step.labels = labelsEl.value.trim();
               if (multiEl) step.allowMulti = multiEl.checked;
             } else if (step.type === 'filter') {
               var incEl = document.getElementById('tray-edit-include');
@@ -2187,7 +2313,64 @@
               var askModeEl = document.getElementById('tray-edit-ask-mode');
               var skipEl = document.getElementById('tray-edit-skip');
               if (qEl) step.question = qEl.value;
-              if (askModeEl) step.mode = askModeEl.value;
+              if (askModeEl) step.mode = askModeEl.getAttribute('data-value') || 'full';
+              if (skipEl) step.skipInference = skipEl.checked;
+            } else if (step.type === 'extract') {
+              var schEl = document.getElementById('tray-edit-schema');
+              if (schEl) step.schema = schEl.value;
+            }
+            currentWorkflow.steps.push(step);
+            pendingNewStep = null;
+            renderPipeline();
+            flashSaved();
+            closeTray();
+            break;
+
+          case 'edit-step':
+            var step = currentWorkflow.steps[currentEditIndex];
+            if (!step) { closeTray(); return; }
+            var editName = document.getElementById('tray-edit-name');
+            if (editName) step.name = editName.value.trim();
+            // Catalog (shared across all step types)
+            var catEl = document.getElementById('tray-edit-catalog');
+            if (catEl) step.catalog = catEl.getAttribute('data-value') || '';
+            // Type-specific saves
+            if (step.type === 'generateAbstracts') {
+              var gaModelEl = document.getElementById('tray-edit-ga-model');
+              var gaLensEl = document.getElementById('tray-edit-ga-lens');
+              if (gaModelEl) step.model = gaModelEl.getAttribute('data-value') || '';
+              if (gaLensEl) step.lens = gaLensEl.getAttribute('data-value') || '';
+            } else if (step.type === 'ingest') {
+              var folderEl = document.getElementById('tray-edit-folder');
+              if (folderEl) step.folder = folderEl.value.trim();
+            } else if (step.type === 'classify') {
+              var modeEl = document.getElementById('tray-edit-mode');
+              var labelsEl = document.getElementById('tray-edit-labels');
+              var multiEl = document.getElementById('tray-edit-multi');
+              var labelsField = document.getElementById('tray-edit-labels-field');
+              if (labelsEl && !labelsEl.value.trim()) {
+                if (labelsField) {
+                  labelsField.classList.add('flm-textfield--error');
+                  labelsField.querySelector('.flm-textfield-error').style.display = '';
+                }
+                return;
+              }
+              if (labelsField) {
+                labelsField.classList.remove('flm-textfield--error');
+                labelsField.querySelector('.flm-textfield-error').style.display = 'none';
+              }
+              if (modeEl) step.mode = modeEl.getAttribute('data-value') || 'full';
+              if (labelsEl) step.labels = labelsEl.value.trim();
+              if (multiEl) step.allowMulti = multiEl.checked;
+            } else if (step.type === 'filter') {
+              var incEl = document.getElementById('tray-edit-include');
+              if (incEl) step.include = incEl.value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+            } else if (step.type === 'ask') {
+              var qEl = document.getElementById('tray-edit-question');
+              var askModeEl = document.getElementById('tray-edit-ask-mode');
+              var skipEl = document.getElementById('tray-edit-skip');
+              if (qEl) step.question = qEl.value;
+              if (askModeEl) step.mode = askModeEl.getAttribute('data-value') || 'full';
               if (skipEl) step.skipInference = skipEl.checked;
             } else if (step.type === 'extract') {
               var schEl = document.getElementById('tray-edit-schema');
@@ -2253,8 +2436,8 @@
             if (wfDescEl) currentWorkflow.description = wfDescEl.value.trim();
             if (wfCatsEl) currentWorkflow.categories = wfCatsEl.value.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
             if (!currentWorkflow.defaults) currentWorkflow.defaults = {};
-            if (wfModelEl) currentWorkflow.defaults.model = wfModelEl.value;
-            if (wfLensEl) currentWorkflow.defaults.lens = wfLensEl.value.trim() || null;
+            if (wfModelEl) currentWorkflow.defaults.model = wfModelEl.getAttribute('data-value') || '';
+            if (wfLensEl) currentWorkflow.defaults.lens = wfLensEl.getAttribute('data-value') || null;
             flashSaved();
             closeTray();
             break;

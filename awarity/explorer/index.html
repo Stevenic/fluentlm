@@ -760,12 +760,7 @@
                   <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select a catalog…</span>
                   <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
                 </button>
-                <div class="flm-dropdown-listbox">
-                  <div class="flm-dropdown-option" data-value="sec-filings">sec-filings</div>
-                  <div class="flm-dropdown-option" data-value="legal-contracts">legal-contracts</div>
-                  <div class="flm-dropdown-option" data-value="research-papers">research-papers</div>
-                  <div class="flm-dropdown-option" data-value="compliance-docs">compliance-docs</div>
-                </div>
+                <div class="flm-dropdown-listbox"></div>
               </div>
             </div>
 
@@ -792,13 +787,7 @@
                   <span class="flm-dropdown-title">(none)</span>
                   <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
                 </button>
-                <div class="flm-dropdown-listbox">
-                  <div class="flm-dropdown-option flm-dropdown-option--selected" data-value="">(none)</div>
-                  <div class="flm-dropdown-option" data-value="financial-risk">financial-risk</div>
-                  <div class="flm-dropdown-option" data-value="legal-compliance">legal-compliance</div>
-                  <div class="flm-dropdown-option" data-value="executive-summary">executive-summary</div>
-                  <div class="flm-dropdown-option" data-value="technical-detail">technical-detail</div>
-                </div>
+                <div class="flm-dropdown-listbox"></div>
               </div>
             </div>
 
@@ -806,15 +795,10 @@
               <label class="flm-label">Model</label>
               <div class="flm-dropdown" id="sel-model">
                 <button class="flm-dropdown-trigger" type="button">
-                  <span class="flm-dropdown-title">claude-sonnet</span>
+                  <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select model…</span>
                   <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
                 </button>
-                <div class="flm-dropdown-listbox">
-                  <div class="flm-dropdown-option flm-dropdown-option--selected" data-value="claude-sonnet">claude-sonnet</div>
-                  <div class="flm-dropdown-option" data-value="claude-haiku">claude-haiku</div>
-                  <div class="flm-dropdown-option" data-value="gpt-4o">gpt-4o</div>
-                  <div class="flm-dropdown-option" data-value="gpt-4o-mini">gpt-4o-mini</div>
-                </div>
+                <div class="flm-dropdown-listbox"></div>
               </div>
             </div>
 
@@ -1056,6 +1040,44 @@
 
   <script>
     (function () {
+
+      // ── Populate dropdowns from awarity APIs ──
+      function populateDropdown(id, items, selected, noneOption) {
+        var dropdown = document.getElementById(id);
+        if (!dropdown) return;
+        var listbox = dropdown.querySelector('.flm-dropdown-listbox');
+        var title = dropdown.querySelector('.flm-dropdown-title');
+        var html = '';
+        if (noneOption) {
+          var noneSelected = !selected;
+          html += '<div class="flm-dropdown-option' + (noneSelected ? ' flm-dropdown-option--selected' : '') + '" data-value="">' + noneOption + '</div>';
+          if (noneSelected && title) {
+            title.textContent = noneOption;
+            title.classList.remove('flm-dropdown-title--placeholder');
+          }
+        }
+        for (var i = 0; i < items.length; i++) {
+          var isSelected = selected === items[i].id;
+          html += '<div class="flm-dropdown-option' + (isSelected ? ' flm-dropdown-option--selected' : '') +
+            '" data-value="' + items[i].id + '">' + items[i].label + '</div>';
+          if (isSelected && title) {
+            title.textContent = items[i].label;
+            title.classList.remove('flm-dropdown-title--placeholder');
+            dropdown.setAttribute('data-value', items[i].id);
+          }
+        }
+        if (listbox) listbox.innerHTML = html;
+      }
+
+      Promise.all([
+        awarity.getCatalogs(),
+        awarity.getLenses(),
+        awarity.getModels()
+      ]).then(function (results) {
+        populateDropdown('sel-catalog', results[0]);
+        populateDropdown('sel-lens', results[1], '', '(none)');
+        populateDropdown('sel-model', results[2], results[2][0] ? results[2][0].id : '');
+      });
 
       // ── Mock Catalog Data ──
       var CATALOG_DATA = {

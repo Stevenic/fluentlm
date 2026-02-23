@@ -232,11 +232,43 @@
         input.click();
     }
 
+    // ── Model list ──
+    function getModels() {
+        return Promise.resolve([
+            { id: 'claude-sonnet', label: 'Claude Sonnet' },
+            { id: 'claude-haiku',  label: 'Claude Haiku' },
+            { id: 'claude-opus',   label: 'Claude Opus' }
+        ]);
+    }
+
+    // ── Lens list ──
+    function getLenses() {
+        return Promise.resolve([
+            { id: 'lenses/financial-risk.lens.md', label: 'Financial Risk' },
+            { id: 'lenses/triage.lens.md',         label: 'Triage' },
+            { id: 'lenses/compliance.lens.md',      label: 'Compliance' },
+            { id: 'lenses/research-summary.lens.md', label: 'Research Summary' }
+        ]);
+    }
+
+    // ── Catalog list ──
+    function getCatalogs() {
+        return Promise.resolve([
+            { id: 'sec-filings',     label: 'SEC Filings' },
+            { id: 'legal-contracts', label: 'Legal Contracts' },
+            { id: 'research-papers', label: 'Research Papers' },
+            { id: 'compliance-docs', label: 'Compliance Docs' }
+        ]);
+    }
+
     // ── Public API ──
     window.awarity = {
         initThemeToggle: initThemeToggle,
         themes: THEME_LABELS,
         themeCycle: THEME_CYCLE,
-        browse: browse
+        browse: browse,
+        getModels: getModels,
+        getLenses: getLenses,
+        getCatalogs: getCatalogs
     };
 })();

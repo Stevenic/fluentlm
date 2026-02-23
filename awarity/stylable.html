@@ -175,6 +175,25 @@
 
     /* ── Persona row ── */
     .persona-row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-end; }
+
+    /* ── Browse button inside textfield wrapper ── */
+    .flm-textfield-wrapper .flm-browse-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      border: none;
+      border-left: 1px solid var(--inputBorder);
+      background: var(--defaultStateBackground);
+      color: var(--bodySubtext);
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
+    }
+    .flm-textfield-wrapper .flm-browse-btn:hover {
+      background: var(--bodyStandoutBackground);
+      color: var(--bodyText);
+    }
   </style>
 </head>
 <body>
@@ -412,7 +431,7 @@
               <label class="flm-label" for="tf7">With Suffix</label>
               <div class="flm-textfield-wrapper">
                 <input class="flm-textfield-input" id="tf7" placeholder="/path/to/docs">
-                <button class="flm-button flm-button--icon" type="button"><i class="flm-icon" data-icon="FolderOpen"></i></button>
+                <button type="button" class="flm-browse-btn" data-icon="FolderOpen" data-browse-for="tf7" aria-label="Browse"></button>
               </div>
             </div>
             <div class="flm-textfield">
@@ -444,11 +463,7 @@
                 <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select a catalog…</span>
                 <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
               </button>
-              <div class="flm-dropdown-listbox">
-                <div class="flm-dropdown-option" data-value="sec-filings">sec-filings</div>
-                <div class="flm-dropdown-option" data-value="legal-contracts">legal-contracts</div>
-                <div class="flm-dropdown-option" data-value="research-papers">research-papers</div>
-              </div>
+              <div class="flm-dropdown-listbox"></div>
             </div>
             <div class="flm-dropdown" style="pointer-events:none;opacity:0.5;">
               <button class="flm-dropdown-trigger" type="button" disabled>
@@ -464,11 +479,7 @@
                 <input class="flm-combobox-input" placeholder="Type to filter…">
                 <button class="flm-combobox-caret" data-icon="ChevronDown"></button>
               </div>
-              <div class="flm-combobox-listbox">
-                <div class="flm-combobox-option" data-value="claude-sonnet">claude-sonnet</div>
-                <div class="flm-combobox-option" data-value="claude-haiku">claude-haiku</div>
-                <div class="flm-combobox-option" data-value="gpt-4o">gpt-4o</div>
-              </div>
+              <div class="flm-combobox-listbox"></div>
             </div>
           </div>
         </div>
@@ -1309,6 +1320,26 @@
 
   <script>
   (function () {
+    // ── Populate demo dropdowns from awarity APIs ──
+    awarity.getCatalogs().then(function (catalogs) {
+      var listbox = document.querySelector('#demo-dd1 .flm-dropdown-listbox');
+      if (!listbox) return;
+      var html = '';
+      for (var i = 0; i < catalogs.length; i++) {
+        html += '<div class="flm-dropdown-option" data-value="' + catalogs[i].id + '">' + catalogs[i].label + '</div>';
+      }
+      listbox.innerHTML = html;
+    });
+    awarity.getModels().then(function (models) {
+      var listbox = document.querySelector('#demo-combo1 .flm-combobox-listbox');
+      if (!listbox) return;
+      var html = '';
+      for (var i = 0; i < models.length; i++) {
+        html += '<div class="flm-combobox-option" data-value="' + models[i].id + '">' + models[i].label + '</div>';
+      }
+      listbox.innerHTML = html;
+    });
+
     // ── Slide navigation ──
     var slides = document.querySelectorAll('.slide');
     var total = slides.length;

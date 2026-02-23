@@ -135,3 +135,387 @@ function pathInput(id, value, placeholder, icon) {
 ```
 
 Pass `'Document'` as the icon for file pickers, or omit it (defaults to `'FolderOpen'`) for folder pickers.
+
+---
+
+## Model Picker
+
+A dropdown for selecting an LLM model. Uses the FluentLM Dropdown component for consistent styling. The available models come from `awarity.getModels()`, which returns a promise resolving to an array of `{ id, label }` objects.
+
+### HTML
+
+Use a FluentLM Dropdown:
+
+```html
+<div class="flm-textfield">
+  <label class="flm-label">Model</label>
+  <div class="flm-dropdown" id="my-model">
+    <button class="flm-dropdown-trigger" type="button">
+      <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select model…</span>
+      <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+    </button>
+    <div class="flm-dropdown-listbox"></div>
+  </div>
+</div>
+```
+
+### JavaScript
+
+#### Populating the dropdown
+
+Call `awarity.getModels()` to fetch the model list, then build option elements inside the listbox. Pass an optional `selected` value and `includeDefault` flag:
+
+```js
+function populateModelDropdown(dropdownId, selected, includeDefault) {
+  var dropdown = document.getElementById(dropdownId);
+  if (!dropdown) return;
+  awarity.getModels().then(function (models) {
+    var listbox = dropdown.querySelector('.flm-dropdown-listbox');
+    var title = dropdown.querySelector('.flm-dropdown-title');
+    var html = '';
+    if (includeDefault) {
+      var noneSelected = !selected;
+      html += '<div class="flm-dropdown-option' + (noneSelected ? ' flm-dropdown-option--selected' : '') + '" data-value="">(workflow default)</div>';
+      if (noneSelected && title) {
+        title.textContent = '(workflow default)';
+        title.classList.remove('flm-dropdown-title--placeholder');
+      }
+    }
+    for (var i = 0; i < models.length; i++) {
+      var isSelected = selected === models[i].id;
+      html += '<div class="flm-dropdown-option' + (isSelected ? ' flm-dropdown-option--selected' : '') +
+        '" data-value="' + models[i].id + '">' + models[i].label + '</div>';
+      if (isSelected && title) {
+        title.textContent = models[i].label;
+        title.classList.remove('flm-dropdown-title--placeholder');
+        dropdown.setAttribute('data-value', models[i].id);
+      }
+    }
+    if (listbox) listbox.innerHTML = html;
+  });
+}
+
+populateModelDropdown('my-model', 'claude-sonnet');
+```
+
+#### Building as an HTML string (for dynamic forms)
+
+When generating dropdown markup from JS, use this helper with a pre-fetched model list:
+
+```js
+function modelDropdownHtml(id, selected, includeDefault) {
+  var selectedLabel = '';
+  if (!selected && includeDefault) { selectedLabel = '(workflow default)'; }
+  for (var j = 0; j < cachedModels.length; j++) {
+    if (cachedModels[j].id === selected) { selectedLabel = cachedModels[j].label; break; }
+  }
+  var html = '<div class="flm-dropdown" id="' + id + '"' + (selected ? ' data-value="' + selected + '"' : '') + '>' +
+    '<button class="flm-dropdown-trigger" type="button">' +
+      '<span class="flm-dropdown-title' + (selectedLabel ? '' : ' flm-dropdown-title--placeholder') + '">' +
+        (selectedLabel || 'Select model…') + '</span>' +
+      '<span class="flm-dropdown-caret" data-icon="ChevronDown"></span>' +
+    '</button>' +
+    '<div class="flm-dropdown-listbox">';
+  if (includeDefault) {
+    html += '<div class="flm-dropdown-option' + (!selected ? ' flm-dropdown-option--selected' : '') + '" data-value="">(workflow default)</div>';
+  }
+  // cachedModels populated via: awarity.getModels().then(function (m) { cachedModels = m; })
+  for (var i = 0; i < cachedModels.length; i++) {
+    html += '<div class="flm-dropdown-option' + (selected === cachedModels[i].id ? ' flm-dropdown-option--selected' : '') +
+      '" data-value="' + cachedModels[i].id + '">' + cachedModels[i].label + '</div>';
+  }
+  html += '</div></div>';
+  return html;
+}
+```
+
+**Note:** After inserting the HTML, call `wireDropdowns(container)` (from FluentLM) to activate keyboard navigation and click handling on the new dropdown.
+
+#### Reading the selected value
+
+The selected model `id` is stored in the `data-value` attribute on the `.flm-dropdown` root:
+
+```js
+var value = document.getElementById('my-model').getAttribute('data-value');
+```
+
+#### `awarity.getModels()`
+
+Returns `Promise<Array<{ id: string, label: string }>>`.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Model identifier (e.g. `'claude-sonnet'`) — use as the option `data-value` |
+| `label` | `string` | Human-readable name (e.g. `'Claude Sonnet'`) — use as the option text |
+
+Currently returns a hardcoded list. Will be replaced with an API call in the future.
+
+---
+
+## Lens Picker
+
+A dropdown for selecting a lens file. Uses the FluentLM Dropdown component for consistent styling. The available lenses come from `awarity.getLenses()`, which returns a promise resolving to an array of `{ id, label }` objects.
+
+### HTML
+
+Use a FluentLM Dropdown:
+
+```html
+<div class="flm-textfield">
+  <label class="flm-label">Lens</label>
+  <div class="flm-dropdown" id="my-lens">
+    <button class="flm-dropdown-trigger" type="button">
+      <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select lens…</span>
+      <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+    </button>
+    <div class="flm-dropdown-listbox"></div>
+  </div>
+</div>
+```
+
+### JavaScript
+
+#### Populating the dropdown
+
+Call `awarity.getLenses()` to fetch the lens list, then build option elements inside the listbox. Pass an optional `selected` value and `includeNone` flag:
+
+```js
+function populateLensDropdown(dropdownId, selected, includeNone) {
+  var dropdown = document.getElementById(dropdownId);
+  if (!dropdown) return;
+  awarity.getLenses().then(function (lenses) {
+    var listbox = dropdown.querySelector('.flm-dropdown-listbox');
+    var title = dropdown.querySelector('.flm-dropdown-title');
+    var html = '';
+    if (includeNone) {
+      var noneSelected = !selected;
+      html += '<div class="flm-dropdown-option' + (noneSelected ? ' flm-dropdown-option--selected' : '') + '" data-value="">(none)</div>';
+      if (noneSelected && title) {
+        title.textContent = '(none)';
+        title.classList.remove('flm-dropdown-title--placeholder');
+      }
+    }
+    for (var i = 0; i < lenses.length; i++) {
+      var isSelected = selected === lenses[i].id;
+      html += '<div class="flm-dropdown-option' + (isSelected ? ' flm-dropdown-option--selected' : '') +
+        '" data-value="' + lenses[i].id + '">' + lenses[i].label + '</div>';
+      if (isSelected && title) {
+        title.textContent = lenses[i].label;
+        title.classList.remove('flm-dropdown-title--placeholder');
+        dropdown.setAttribute('data-value', lenses[i].id);
+      }
+    }
+    if (listbox) listbox.innerHTML = html;
+  });
+}
+
+populateLensDropdown('my-lens', 'lenses/financial-risk.lens.md', true);
+```
+
+#### Building as an HTML string (for dynamic forms)
+
+When generating dropdown markup from JS, use this helper with a pre-fetched lens list:
+
+```js
+function lensDropdownHtml(id, selected, includeNone) {
+  var selectedLabel = '';
+  if (!selected && includeNone) { selectedLabel = '(none)'; }
+  for (var j = 0; j < cachedLenses.length; j++) {
+    if (cachedLenses[j].id === selected) { selectedLabel = cachedLenses[j].label; break; }
+  }
+  var html = '<div class="flm-dropdown" id="' + id + '"' + (selected ? ' data-value="' + selected + '"' : '') + '>' +
+    '<button class="flm-dropdown-trigger" type="button">' +
+      '<span class="flm-dropdown-title' + (selectedLabel ? '' : ' flm-dropdown-title--placeholder') + '">' +
+        (selectedLabel || 'Select lens…') + '</span>' +
+      '<span class="flm-dropdown-caret" data-icon="ChevronDown"></span>' +
+    '</button>' +
+    '<div class="flm-dropdown-listbox">';
+  if (includeNone) {
+    html += '<div class="flm-dropdown-option' + (!selected ? ' flm-dropdown-option--selected' : '') + '" data-value="">(none)</div>';
+  }
+  // cachedLenses populated via: awarity.getLenses().then(function (l) { cachedLenses = l; })
+  for (var i = 0; i < cachedLenses.length; i++) {
+    html += '<div class="flm-dropdown-option' + (selected === cachedLenses[i].id ? ' flm-dropdown-option--selected' : '') +
+      '" data-value="' + cachedLenses[i].id + '">' + cachedLenses[i].label + '</div>';
+  }
+  html += '</div></div>';
+  return html;
+}
+```
+
+**Note:** After inserting the HTML, call `wireDropdowns(container)` (from FluentLM) to activate keyboard navigation and click handling on the new dropdown.
+
+#### Reading the selected value
+
+The selected lens `id` is stored in the `data-value` attribute on the `.flm-dropdown` root:
+
+```js
+var value = document.getElementById('my-lens').getAttribute('data-value');
+```
+
+#### `awarity.getLenses()`
+
+Returns `Promise<Array<{ id: string, label: string }>>`.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Lens file path (e.g. `'lenses/financial-risk.lens.md'`) — use as the option `data-value` |
+| `label` | `string` | Human-readable name (e.g. `'Financial Risk'`) — use as the option text |
+
+Currently returns a hardcoded list. Will be replaced with an API call in the future.
+
+---
+
+## Mode Dropdown
+
+A dropdown for selecting between the two query modes: **Full ECW** (full document context) and **Abstracts** (cached semantic summaries). Uses the FluentLM Dropdown component for consistent styling.
+
+### HTML
+
+Use a FluentLM Dropdown with two static options:
+
+```html
+<div class="flm-textfield">
+  <label class="flm-label">Mode</label>
+  <div class="flm-dropdown" id="my-mode" data-value="full">
+    <button class="flm-dropdown-trigger" type="button">
+      <span class="flm-dropdown-title">Full ECW</span>
+      <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+    </button>
+    <div class="flm-dropdown-listbox">
+      <div class="flm-dropdown-option flm-dropdown-option--selected" data-value="full">Full ECW</div>
+      <div class="flm-dropdown-option" data-value="abstracts">Abstracts</div>
+    </div>
+  </div>
+</div>
+```
+
+### JavaScript
+
+#### Building as an HTML string (for dynamic forms)
+
+```js
+function modeDropdownHtml(id, selected) {
+  var isAbstracts = selected === 'abstracts';
+  return '<div class="flm-dropdown" id="' + id + '" data-value="' + (selected || 'full') + '">' +
+    '<button class="flm-dropdown-trigger" type="button">' +
+      '<span class="flm-dropdown-title">' + (isAbstracts ? 'Abstracts' : 'Full ECW') + '</span>' +
+      '<span class="flm-dropdown-caret" data-icon="ChevronDown"></span>' +
+    '</button>' +
+    '<div class="flm-dropdown-listbox">' +
+      '<div class="flm-dropdown-option' + (isAbstracts ? '' : ' flm-dropdown-option--selected') + '" data-value="full">Full ECW</div>' +
+      '<div class="flm-dropdown-option' + (isAbstracts ? ' flm-dropdown-option--selected' : '') + '" data-value="abstracts">Abstracts</div>' +
+    '</div></div>';
+}
+```
+
+**Note:** After inserting the HTML, call `wireDropdowns(container)` (from FluentLM) to activate keyboard navigation and click handling on the new dropdown.
+
+#### Reading the selected value
+
+The selected mode is stored in the `data-value` attribute on the `.flm-dropdown` root:
+
+```js
+var value = document.getElementById('my-mode').getAttribute('data-value');
+// Returns 'full' or 'abstracts'
+```
+
+---
+
+## Catalog Picker
+
+A dropdown for selecting a catalog. The available catalogs come from `awarity.getCatalogs()`, which returns a promise resolving to an array of `{ id, label }` objects. Uses the FluentLM Dropdown component (not a `<select>`) for a richer visual style with the standard dropdown trigger, listbox, and option pattern.
+
+### HTML
+
+Use a FluentLM Dropdown:
+
+```html
+<div class="flm-textfield">
+  <label class="flm-label">Catalog</label>
+  <div class="flm-dropdown" id="my-catalog">
+    <button class="flm-dropdown-trigger" type="button">
+      <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select a catalog…</span>
+      <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+    </button>
+    <div class="flm-dropdown-listbox"></div>
+  </div>
+</div>
+```
+
+### JavaScript
+
+#### Populating the dropdown
+
+Call `awarity.getCatalogs()` to fetch the catalog list, then build the option elements inside the listbox. Pass an optional `selected` value:
+
+```js
+function populateCatalogDropdown(dropdownId, selected) {
+  var dropdown = document.getElementById(dropdownId);
+  if (!dropdown) return;
+  awarity.getCatalogs().then(function (catalogs) {
+    var listbox = dropdown.querySelector('.flm-dropdown-listbox');
+    var title = dropdown.querySelector('.flm-dropdown-title');
+    var html = '';
+    for (var i = 0; i < catalogs.length; i++) {
+      var isSelected = selected === catalogs[i].id;
+      html += '<div class="flm-dropdown-option' + (isSelected ? ' flm-dropdown-option--selected' : '') +
+        '" data-value="' + catalogs[i].id + '">' + catalogs[i].label + '</div>';
+      if (isSelected) {
+        title.textContent = catalogs[i].label;
+        title.classList.remove('flm-dropdown-title--placeholder');
+        dropdown.setAttribute('data-value', catalogs[i].id);
+      }
+    }
+    listbox.innerHTML = html;
+  });
+}
+
+populateCatalogDropdown('my-catalog', 'sec-filings');
+```
+
+#### Building as an HTML string (for dynamic forms)
+
+When generating dropdown markup from JS, use this helper with a pre-fetched catalog list:
+
+```js
+function catalogDropdownHtml(id, selected) {
+  var html = '<div class="flm-dropdown" id="' + id + '"' +
+    (selected ? ' data-value="' + selected + '"' : '') + '>' +
+    '<button class="flm-dropdown-trigger" type="button">' +
+      '<span class="flm-dropdown-title' + (selected ? '' : ' flm-dropdown-title--placeholder') + '">' +
+        (selected || 'Select a catalog…') + '</span>' +
+      '<span class="flm-dropdown-caret" data-icon="ChevronDown"></span>' +
+    '</button>' +
+    '<div class="flm-dropdown-listbox">';
+  // cachedCatalogs populated via: awarity.getCatalogs().then(function (c) { cachedCatalogs = c; })
+  for (var i = 0; i < cachedCatalogs.length; i++) {
+    html += '<div class="flm-dropdown-option' +
+      (selected === cachedCatalogs[i].id ? ' flm-dropdown-option--selected' : '') +
+      '" data-value="' + cachedCatalogs[i].id + '">' + cachedCatalogs[i].label + '</div>';
+  }
+  html += '</div></div>';
+  return html;
+}
+```
+
+**Note:** After inserting the HTML, call `wireDropdowns(container)` (from FluentLM) to activate keyboard navigation and click handling on the new dropdown.
+
+#### Reading the selected value
+
+The selected catalog `id` is stored in the `data-value` attribute on the `.flm-dropdown` root:
+
+```js
+var value = document.getElementById('my-catalog').getAttribute('data-value');
+```
+
+#### `awarity.getCatalogs()`
+
+Returns `Promise<Array<{ id: string, label: string }>>`.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `string` | Catalog identifier (e.g. `'sec-filings'`) — use as the option `data-value` |
+| `label` | `string` | Human-readable name (e.g. `'SEC Filings'`) — use as the option text |
+
+Currently returns a hardcoded list. Will be replaced with an API call in the future.

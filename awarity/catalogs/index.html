@@ -501,6 +501,25 @@
       text-align: right;
       font-variant-numeric: tabular-nums;
     }
+
+    /* ── Browse button inside textfield wrapper ── */
+    .flm-textfield-wrapper .flm-browse-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      border: none;
+      border-left: 1px solid var(--inputBorder);
+      background: var(--defaultStateBackground);
+      color: var(--bodySubtext);
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
+    }
+    .flm-textfield-wrapper .flm-browse-btn:hover {
+      background: var(--bodyStandoutBackground);
+      color: var(--bodyText);
+    }
   </style>
 </head>
 <body>
@@ -812,9 +831,8 @@
               <label class="flm-label" for="new-path">Path</label>
               <div class="flm-textfield-wrapper">
                 <input class="flm-textfield-input" id="new-path" placeholder="/path/to/documents">
-                <button class="flm-button flm-button--icon" type="button" id="btn-browse" aria-label="Browse" data-tooltip="Browse for folder" style="flex-shrink: 0; border: none; background: transparent;"><i class="flm-icon" data-icon="FolderOpen"></i></button>
+                <button type="button" class="flm-browse-btn" data-icon="FolderOpen" data-browse-for="new-path" aria-label="Browse"></button>
               </div>
-              <input type="file" id="file-picker" webkitdirectory style="display: none;">
             </div>
 
             <label class="flm-checkbox" style="margin-top: var(--spacingS2);">
@@ -1413,16 +1431,15 @@
       document.getElementById('btn-new-catalog').addEventListener('click', openNewCatalogDialog);
       document.getElementById('btn-empty-create').addEventListener('click', openNewCatalogDialog);
 
-      // Browse for folder
-      var filePicker = document.getElementById('file-picker');
-      document.getElementById('btn-browse').addEventListener('click', function () {
-        filePicker.click();
-      });
-      filePicker.addEventListener('change', function () {
-        if (filePicker.files.length > 0) {
-          var path = filePicker.files[0].webkitRelativePath.split('/')[0];
-          document.getElementById('new-path').value = path;
-        }
+      // Browse for folder (delegated, uses awarity.browse from awarity-v2.js)
+      document.getElementById('new-catalog-dialog').addEventListener('click', function (e) {
+        var btn = e.target.closest('.flm-browse-btn');
+        if (!btn) return;
+        var targetId = btn.getAttribute('data-browse-for');
+        var input = targetId ? document.getElementById(targetId) : null;
+        if (!input) return;
+        var isFolder = btn.getAttribute('data-icon') === 'FolderOpen';
+        awarity.browse(input, { mode: isFolder ? 'folder' : 'file' });
       });
 
       // Next / Create

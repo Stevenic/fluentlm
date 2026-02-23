@@ -842,12 +842,7 @@
                   <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select catalog…</span>
                   <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
                 </button>
-                <div class="flm-dropdown-listbox">
-                  <div class="flm-dropdown-option" data-value="sec-filings">sec-filings</div>
-                  <div class="flm-dropdown-option" data-value="legal-contracts">legal-contracts</div>
-                  <div class="flm-dropdown-option" data-value="research-papers">research-papers</div>
-                  <div class="flm-dropdown-option" data-value="compliance-docs">compliance-docs</div>
-                </div>
+                <div class="flm-dropdown-listbox"></div>
               </div>
             </div>
             <div class="test-field">
@@ -1060,6 +1055,18 @@
 
   <script>
     (function () {
+
+      // ── Populate catalog dropdown from awarity API ──
+      awarity.getCatalogs().then(function (catalogs) {
+        var dropdown = document.getElementById('test-catalog');
+        if (!dropdown) return;
+        var listbox = dropdown.querySelector('.flm-dropdown-listbox');
+        var html = '';
+        for (var i = 0; i < catalogs.length; i++) {
+          html += '<div class="flm-dropdown-option" data-value="' + catalogs[i].id + '">' + catalogs[i].label + '</div>';
+        }
+        if (listbox) listbox.innerHTML = html;
+      });
 
       // ── Suggested categories ──
       var SUGGESTED_CATEGORIES = ['finance', 'legal', 'compliance', 'security', 'research', 'triage', 'extraction', 'summary', 'redflags', 'technical'];
