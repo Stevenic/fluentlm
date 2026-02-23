@@ -568,6 +568,7 @@
       border-top: 1px solid var(--bodyDivider);
       display: flex;
       gap: var(--spacingS1);
+      justify-content: flex-end;
     }
 
     /* ── Step type picker (inside tray) ── */
@@ -1075,8 +1076,8 @@
     </div>
     <div class="tray-footer" id="tray-footer">
       <button class="flm-button" id="tray-delete" style="color: var(--red); border-color: var(--red); display: none; margin-right: auto;" data-icon="Delete">Delete Step</button>
-      <button class="flm-button flm-button--primary" id="tray-primary">Add</button>
       <button class="flm-button" id="tray-cancel">Cancel</button>
+      <button class="flm-button flm-button--primary" id="tray-primary">Add</button>
     </div>
   </div>
 
@@ -1192,9 +1193,9 @@
         </div>
       </div>
       <div class="flm-dialog-footer">
-        <button class="flm-button" id="wiz-back" style="display: none;">Back</button>
-        <button class="flm-button flm-button--primary" id="wiz-next">Next</button>
+        <button class="flm-button" id="wiz-back" style="display: none; margin-right: auto;">Back</button>
         <button class="flm-button" data-dialog-close>Cancel</button>
+        <button class="flm-button flm-button--primary" id="wiz-next">Next</button>
       </div>
     </div>
   </div>
@@ -1212,8 +1213,8 @@
         <p>Are you sure you want to delete <strong id="delete-workflow-name"></strong>? This will remove the workflow definition and all run history. This action cannot be undone.</p>
       </div>
       <div class="flm-dialog-footer">
-        <button class="flm-button flm-button--primary" style="background-color: var(--red); border-color: var(--red);" id="btn-confirm-delete">Delete</button>
         <button class="flm-button" data-dialog-close>Cancel</button>
+        <button class="flm-button flm-button--primary" style="background-color: var(--red); border-color: var(--red);" id="btn-confirm-delete">Delete</button>
       </div>
     </div>
   </div>
@@ -2181,6 +2182,9 @@
             '<textarea class="flm-textfield-input" id="tray-edit-question" rows="4" style="width: 100%; resize: vertical;">' + (step.question || '') + '</textarea></div>';
           html += '<div class="flm-textfield"><label class="flm-label">Mode</label>' +
             modeDropdownHtml('tray-edit-ask-mode', step.mode || 'full') + '</div>';
+          var askModel = step.model || '';
+          html += '<div class="flm-textfield"><label class="flm-label">Model</label>' +
+            modelDropdownHtml('tray-edit-ask-model', askModel, true) + '</div>';
           html += '<label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="tray-edit-skip"' + (step.skipInference ? ' checked' : '') + '><span class="flm-checkbox-mark"></span><span class="flm-label">Skip inference</span></label>';
         } else if (step.type === 'extract') {
           html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-schema">Schema File</label>' +
@@ -2311,9 +2315,11 @@
             } else if (step.type === 'ask') {
               var qEl = document.getElementById('tray-edit-question');
               var askModeEl = document.getElementById('tray-edit-ask-mode');
+              var askModelEl = document.getElementById('tray-edit-ask-model');
               var skipEl = document.getElementById('tray-edit-skip');
               if (qEl) step.question = qEl.value;
               if (askModeEl) step.mode = askModeEl.getAttribute('data-value') || 'full';
+              if (askModelEl) step.model = askModelEl.getAttribute('data-value') || '';
               if (skipEl) step.skipInference = skipEl.checked;
             } else if (step.type === 'extract') {
               var schEl = document.getElementById('tray-edit-schema');
@@ -2368,9 +2374,11 @@
             } else if (step.type === 'ask') {
               var qEl = document.getElementById('tray-edit-question');
               var askModeEl = document.getElementById('tray-edit-ask-mode');
+              var askModelEl = document.getElementById('tray-edit-ask-model');
               var skipEl = document.getElementById('tray-edit-skip');
               if (qEl) step.question = qEl.value;
               if (askModeEl) step.mode = askModeEl.getAttribute('data-value') || 'full';
+              if (askModelEl) step.model = askModelEl.getAttribute('data-value') || '';
               if (skipEl) step.skipInference = skipEl.checked;
             } else if (step.type === 'extract') {
               var schEl = document.getElementById('tray-edit-schema');
