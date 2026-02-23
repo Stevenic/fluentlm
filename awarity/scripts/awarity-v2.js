@@ -93,10 +93,150 @@
         });
     }
 
+    // ── IndexedDB helpers for file picker persistence ──
+    var DB_NAME = 'awarity-filepicker';
+    var STORE_NAME = 'handles';
+    var HANDLE_KEY = 'lastDir';
+
+    function openDB() {
+        return new Promise(function (resolve, reject) {
+            var req = indexedDB.open(DB_NAME, 1);
+            req.onupgradeneeded = function () {
+                var db = req.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME);
+                }
+            };
+            req.onsuccess = function () { resolve(req.result); };
+            req.onerror = function () { reject(req.error); };
+        });
+    }
+
+    function getHandle() {
+        return openDB().then(function (db) {
+            return new Promise(function (resolve, reject) {
+                var tx = db.transaction(STORE_NAME, 'readonly');
+                var store = tx.objectStore(STORE_NAME);
+                var req = store.get(HANDLE_KEY);
+                req.onsuccess = function () { resolve(req.result || null); };
+                req.onerror = function () { reject(req.error); };
+            });
+        }).catch(function () { return null; });
+    }
+
+    function setHandle(handle) {
+        return openDB().then(function (db) {
+            return new Promise(function (resolve, reject) {
+                var tx = db.transaction(STORE_NAME, 'readwrite');
+                var store = tx.objectStore(STORE_NAME);
+                var req = store.put(handle, HANDLE_KEY);
+                req.onsuccess = function () { resolve(); };
+                req.onerror = function () { reject(req.error); };
+            });
+        }).catch(function () { /* silently ignore storage errors */ });
+    }
+
+    // ── File picker with File System Access API + fallback ──
+    var _fallbackInput = null;
+
+    function _ensureFallbackInput() {
+        if (!_fallbackInput) {
+            _fallbackInput = document.createElement('input');
+            _fallbackInput.type = 'file';
+            _fallbackInput.style.display = 'none';
+            document.body.appendChild(_fallbackInput);
+        }
+        return _fallbackInput;
+    }
+
+    /**
+     * Open a native file/folder picker.
+     * @param {HTMLInputElement} targetInput — the text input to populate
+     * @param {Object} [opts]
+     * @param {string} [opts.mode='file'] — 'file' or 'folder'
+     * @param {Array}  [opts.types]       — file type filters for showOpenFilePicker
+     */
+    function browse(targetInput, opts) {
+        opts = opts || {};
+        var mode = opts.mode || 'file';
+        var hasAPI = (mode === 'folder')
+            ? typeof window.showDirectoryPicker === 'function'
+            : typeof window.showOpenFilePicker === 'function';
+
+        if (hasAPI) {
+            _browseNative(targetInput, mode, opts);
+        } else {
+            _browseFallback(targetInput, mode);
+        }
+    }
+
+    function _browseNative(targetInput, mode, opts) {
+        getHandle().then(function (startIn) {
+            var pickerOpts = {};
+            if (startIn) pickerOpts.startIn = startIn;
+
+            var p;
+            if (mode === 'folder') {
+                pickerOpts.mode = 'read';
+                p = window.showDirectoryPicker(pickerOpts).then(function (dirHandle) {
+                    setHandle(dirHandle);
+                    targetInput.value = dirHandle.name;
+                    targetInput.focus();
+                });
+            } else {
+                if (opts.types) pickerOpts.types = opts.types;
+                p = window.showOpenFilePicker(pickerOpts).then(function (handles) {
+                    var fileHandle = handles[0];
+                    targetInput.value = fileHandle.name;
+                    targetInput.focus();
+                    // Try to persist parent directory
+                    return getHandle().then(function (existing) {
+                        // If we already have a dir handle, keep it;
+                        // otherwise there's no way to get parent from a file handle
+                        return existing;
+                    });
+                });
+            }
+
+            return p;
+        }).catch(function (err) {
+            // User cancelled or API error — ignore AbortError
+            if (err && err.name !== 'AbortError') {
+                console.warn('awarity.browse:', err);
+            }
+        });
+    }
+
+    function _browseFallback(targetInput, mode) {
+        var input = _ensureFallbackInput();
+        if (mode === 'folder') {
+            input.setAttribute('webkitdirectory', '');
+        } else {
+            input.removeAttribute('webkitdirectory');
+        }
+        input.value = '';
+
+        // One-shot handler
+        var handler = function () {
+            input.removeEventListener('change', handler);
+            if (!input.files.length) return;
+            var file = input.files[0];
+            var path = file.webkitRelativePath || file.name;
+            if (input.hasAttribute('webkitdirectory') && path.indexOf('/') !== -1) {
+                path = path.substring(0, path.indexOf('/'));
+            }
+            targetInput.value = path;
+            targetInput.focus();
+        };
+        input.addEventListener('change', handler);
+        input.click();
+    }
+
     // ── Public API ──
     window.awarity = {
         initThemeToggle: initThemeToggle,
         themes: THEME_LABELS,
-        themeCycle: THEME_CYCLE
+        themeCycle: THEME_CYCLE,
+        browse: browse
     };
 })();

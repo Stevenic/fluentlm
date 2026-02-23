@@ -603,6 +603,24 @@
       color: var(--bodySubtext);
     }
 
+    .flm-textfield-wrapper .flm-browse-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      border: none;
+      border-left: 1px solid var(--inputBorder);
+      background: var(--defaultStateBackground);
+      color: var(--bodySubtext);
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
+    }
+    .flm-textfield-wrapper .flm-browse-btn:hover {
+      background: var(--bodyStandoutBackground);
+      color: var(--bodyText);
+    }
+
     /* ════════════════════════════════════════════════════════════════
        EXECUTION MODE
        ════════════════════════════════════════════════════════════════ */
@@ -1056,6 +1074,7 @@
       <!-- Dynamic form content -->
     </div>
     <div class="tray-footer" id="tray-footer">
+      <button class="flm-button" id="tray-delete" style="color: var(--red); border-color: var(--red); display: none; margin-right: auto;" data-icon="Delete">Delete Step</button>
       <button class="flm-button flm-button--primary" id="tray-primary">Add</button>
       <button class="flm-button" id="tray-cancel">Cancel</button>
     </div>
@@ -1070,7 +1089,7 @@
         <h2 class="flm-dialog-title" id="wizard-title">New Workflow</h2>
         <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
       </div>
-      <div class="flm-dialog-body">
+      <div class="flm-dialog-body" style="overflow: visible;">
 
         <!-- Step 1: Basic Info -->
         <div id="wizard-step-1">
@@ -1097,23 +1116,45 @@
                   <span class="flm-choicegroup-mark"></span>
                   <span class="flm-choicegroup-label">Catalog</span>
                 </label>
+                <label class="flm-choicegroup-option">
+                  <input type="radio" class="flm-choicegroup-input" name="wiz-input-type" value="rss">
+                  <span class="flm-choicegroup-mark"></span>
+                  <span class="flm-choicegroup-label">RSS Feed</span>
+                </label>
               </div>
             </div>
-            <div class="flm-textfield flm-textfield--required">
-              <label class="flm-label" for="wiz-catalog">Catalog</label>
-              <select class="flm-dropdown" id="wiz-catalog" style="width: 100%;">
-                <option value="">Select a catalog…</option>
-                <option value="sec-filings">sec-filings</option>
-                <option value="legal-contracts">legal-contracts</option>
-                <option value="research-papers">research-papers</option>
-                <option value="compliance-docs">compliance-docs</option>
-              </select>
+            <div id="wiz-catalog-fields">
+              <div class="flm-textfield flm-textfield--required">
+                <label class="flm-label">Catalog</label>
+                <div class="flm-dropdown" id="wiz-catalog">
+                  <button class="flm-dropdown-trigger" type="button">
+                    <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select a catalog…</span>
+                    <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+                  </button>
+                  <div class="flm-dropdown-listbox">
+                    <div class="flm-dropdown-option" data-value="sec-filings">sec-filings</div>
+                    <div class="flm-dropdown-option" data-value="legal-contracts">legal-contracts</div>
+                    <div class="flm-dropdown-option" data-value="research-papers">research-papers</div>
+                    <div class="flm-dropdown-option" data-value="compliance-docs">compliance-docs</div>
+                  </div>
+                </div>
+              </div>
+              <label class="flm-checkbox" style="margin-top: var(--spacingS2);">
+                <input type="checkbox" class="flm-checkbox-input" id="wiz-ensure-abstracts">
+                <span class="flm-checkbox-mark"></span>
+                <span class="flm-label">Ensure abstracts are generated before run</span>
+              </label>
             </div>
-            <label class="flm-checkbox" style="margin-top: var(--spacingS2);">
-              <input type="checkbox" class="flm-checkbox-input" id="wiz-ensure-abstracts">
-              <span class="flm-checkbox-mark"></span>
-              <span class="flm-label">Ensure abstracts are generated before run</span>
-            </label>
+            <div id="wiz-rss-fields" style="display: none;">
+              <div class="flm-textfield flm-textfield--required">
+                <label class="flm-label" for="wiz-rss-url">Feed URL</label>
+                <input class="flm-textfield-input" id="wiz-rss-url" type="url" placeholder="https://example.com/feed.xml">
+              </div>
+              <div class="flm-textfield" style="margin-top: var(--spacingS2);">
+                <label class="flm-label" for="wiz-rss-max-items">Max Items</label>
+                <input class="flm-textfield-input" id="wiz-rss-max-items" type="number" min="1" max="500" placeholder="50">
+              </div>
+            </div>
           </div>
         </div>
 
@@ -1137,7 +1178,10 @@
             </div>
             <div class="flm-textfield" id="wiz-custom-output-wrap" style="display: none;">
               <label class="flm-label" for="wiz-custom-output">Custom Output Path</label>
-              <input class="flm-textfield-input" id="wiz-custom-output" placeholder="/path/to/output">
+              <div class="flm-textfield-wrapper">
+                <input class="flm-textfield-input" id="wiz-custom-output" placeholder="/path/to/output">
+                <button type="button" class="flm-browse-btn" data-icon="FolderOpen" data-browse-for="wiz-custom-output" aria-label="Browse"></button>
+              </div>
             </div>
           </div>
         </div>
@@ -1187,10 +1231,66 @@
     (function () {
 
       // ══════════════════════════════════════════════════════════════
+      //  DROPDOWN HELPERS
+      // ══════════════════════════════════════════════════════════════
+
+      function getDropdownValue(id) {
+        var el = document.getElementById(id);
+        return el ? (el.getAttribute('data-value') || '') : '';
+      }
+
+      function resetDropdown(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.removeAttribute('data-value');
+        var titleEl = el.querySelector('.flm-dropdown-title');
+        if (titleEl) {
+          titleEl.textContent = 'Select a catalog…';
+          titleEl.classList.add('flm-dropdown-title--placeholder');
+        }
+        var opts = el.querySelectorAll('.flm-dropdown-option--selected');
+        for (var i = 0; i < opts.length; i++) {
+          opts[i].classList.remove('flm-dropdown-option--selected');
+        }
+      }
+
+      function wireDropdowns(root) {
+        if (typeof FluentLM !== 'undefined') {
+          FluentLM.refresh(root);
+        }
+      }
+
+      function bindInputTypeRadios(radioName, catalogFieldsId, rssFieldsId) {
+        var radios = document.querySelectorAll('input[name="' + radioName + '"]');
+        for (var i = 0; i < radios.length; i++) {
+          radios[i].addEventListener('change', function () {
+            var catalogFields = document.getElementById(catalogFieldsId);
+            var rssFields = document.getElementById(rssFieldsId);
+            if (this.value === 'rss') {
+              if (catalogFields) catalogFields.style.display = 'none';
+              if (rssFields) rssFields.style.display = '';
+            } else {
+              if (catalogFields) catalogFields.style.display = '';
+              if (rssFields) rssFields.style.display = 'none';
+            }
+          });
+        }
+      }
+
+      function pathInput(id, value, placeholder, icon) {
+        icon = icon || 'FolderOpen';
+        return '<div class="flm-textfield-wrapper">' +
+          '<input class="flm-textfield-input" id="' + id + '" value="' + (value || '') + '"' + (placeholder ? ' placeholder="' + placeholder + '"' : '') + '>' +
+          '<button type="button" class="flm-browse-btn" data-icon="' + icon + '" data-browse-for="' + id + '" aria-label="Browse"></button>' +
+        '</div>';
+      }
+
+      // ══════════════════════════════════════════════════════════════
       //  STEP TYPE DEFINITIONS
       // ══════════════════════════════════════════════════════════════
 
       var STEP_TYPES = [
+        { type: 'ingest',            label: 'Ingest Documents',   desc: 'Ingest documents from a folder into the catalog.' },
         { type: 'generateAbstracts', label: 'Generate Abstracts', desc: 'Create cached semantic summaries for documents.' },
         { type: 'classify',          label: 'Classify',           desc: 'Assign documents to predefined labels.' },
         { type: 'filter',            label: 'Filter',             desc: 'Reduce scope to a subset of documents.' },
@@ -1263,6 +1363,20 @@
           lastRun: null,
           lastStatus: 'never',
           defaults: { catalog: 'sec-filings', mode: 'full', lens: 'lenses/triage.lens.md', model: 'claude-sonnet' }
+        },
+        {
+          name: 'industry-news-digest',
+          description: 'Monitor industry RSS feeds and summarize key developments.',
+          categories: ['news', 'summary', 'monitoring'],
+          steps: [
+            { type: 'classify', name: 'topic', mode: 'full', labels: 'structures/labels/industry-topic.labels.txt', allowMulti: true },
+            { type: 'ask', name: 'digest', question: 'Summarize the most important industry developments from the feed.', mode: 'full', skipInference: false }
+          ],
+          input: { type: 'rss', url: 'https://feeds.example.com/industry-news.xml', maxItems: 25 },
+          output: { root: 'default', primary: [{ step: 'digest', output: 'answer' }] },
+          lastRun: 'Feb 21, 2026 8:00 AM',
+          lastStatus: 'complete',
+          defaults: { catalog: null, mode: 'full', lens: null, model: 'claude-sonnet' }
         }
       ];
 
@@ -1291,6 +1405,7 @@
       var trayBody = document.getElementById('tray-body');
       var trayPrimary = document.getElementById('tray-primary');
       var trayCancel = document.getElementById('tray-cancel');
+      var trayDelete = document.getElementById('tray-delete');
       var messageZone = document.getElementById('messagebar-zone');
       var wizardDialog = document.getElementById('new-workflow-dialog');
       var deleteDialog = document.getElementById('delete-dialog');
@@ -1661,8 +1776,14 @@
       function renderInputCard(wf) {
         var inp = wf.input || {};
         var summary = '';
-        summary += summaryRow('Catalog', inp.catalog || '—');
-        summary += summaryRow('Abstracts', inp.ensureAbstracts ? 'Ensure before run' : 'No');
+        if (inp.type === 'rss') {
+          summary += summaryRow('Feed URL', inp.url ? truncate(inp.url, 40) : '—');
+          summary += summaryRow('Max Items', inp.maxItems || '50');
+          summary += summaryRow('Output', 'run input folder');
+        } else {
+          summary += summaryRow('Catalog', inp.catalog || '—');
+          summary += summaryRow('Abstracts', inp.ensureAbstracts ? 'Ensure before run' : 'No');
+        }
         return '<div class="step-card" data-card="input">' +
           '<div class="step-card-header">' +
             '<span class="step-type-badge step-type-badge--input">INPUT</span>' +
@@ -1692,6 +1813,11 @@
 
       function buildStepSummary(step) {
         var parts = '';
+        if (step.type === 'ingest') {
+          parts += summaryRow('Catalog', step.catalog || '—');
+          parts += summaryRow('Folder', step.folder || '(run input folder)');
+          return parts;
+        }
         if (step.mode) parts += summaryRow('Mode', step.mode);
         if (step.labels) parts += summaryRow('Labels', step.labels.split('/').pop());
         if (step.allowMulti !== undefined) parts += summaryRow('Multi-label', step.allowMulti ? 'Yes' : 'No');
@@ -1800,11 +1926,14 @@
             trayPrimary.textContent = 'Save';
             var step = currentWorkflow.steps[stepIndex];
             trayBody.innerHTML = buildEditStepForm(step);
+            wireDropdowns(trayBody);
             break;
           case 'edit-input':
             trayTitle.textContent = 'Edit Input';
             trayPrimary.textContent = 'Save';
             trayBody.innerHTML = buildEditInputForm();
+            wireDropdowns(trayBody);
+            bindInputTypeRadios('tray-inp-type', 'tray-catalog-fields', 'tray-rss-fields');
             break;
           case 'edit-output':
             trayTitle.textContent = 'Edit Output';
@@ -1815,12 +1944,37 @@
             trayTitle.textContent = 'Edit Workflow';
             trayPrimary.textContent = 'Save';
             trayBody.innerHTML = buildEditWorkflowForm();
+            wireDropdowns(trayBody);
             break;
         }
+
+        // Show delete button only for editable steps (not input/output)
+        trayDelete.style.display = (mode === 'edit-step') ? '' : 'none';
 
         trayOverlay.classList.add('builder-tray-overlay--visible');
         tray.classList.add('builder-tray--open');
       }
+
+      // Delegated browse button handler (uses awarity.browse from awarity-v2.js)
+      function handleBrowse(e) {
+        var btn = e.target.closest('.flm-browse-btn');
+        if (!btn) return;
+        var targetId = btn.getAttribute('data-browse-for');
+        var input = targetId ? document.getElementById(targetId) : null;
+        if (!input) return;
+        var isFolder = btn.getAttribute('data-icon') === 'FolderOpen';
+        awarity.browse(input, { mode: isFolder ? 'folder' : 'file' });
+      }
+      trayBody.addEventListener('click', handleBrowse);
+
+      // Delete step from tray
+      trayDelete.addEventListener('click', function () {
+        if (currentTrayMode !== 'edit-step' || currentEditIndex < 0 || !currentWorkflow) return;
+        currentWorkflow.steps.splice(currentEditIndex, 1);
+        renderPipeline();
+        flashSaved();
+        closeTray();
+      });
 
       function closeTray() {
         tray.classList.remove('builder-tray--open');
@@ -1868,11 +2022,27 @@
           '<input class="flm-textfield-input" id="tray-edit-name" value="' + (step.name || '') + '"></div>';
 
         // Type-specific fields
-        if (step.type === 'classify') {
+        if (step.type === 'ingest') {
+          html += '<div class="flm-textfield"><label class="flm-label">Catalog</label>' +
+            '<div class="flm-dropdown" id="tray-edit-catalog"' + (step.catalog ? ' data-value="' + step.catalog + '"' : '') + '>' +
+              '<button class="flm-dropdown-trigger" type="button">' +
+                '<span class="flm-dropdown-title' + (step.catalog ? '' : ' flm-dropdown-title--placeholder') + '">' + (step.catalog || 'Select a catalog…') + '</span>' +
+                '<span class="flm-dropdown-caret" data-icon="ChevronDown"></span>' +
+              '</button>' +
+              '<div class="flm-dropdown-listbox">' +
+                '<div class="flm-dropdown-option' + (step.catalog === 'sec-filings' ? ' flm-dropdown-option--selected' : '') + '" data-value="sec-filings">sec-filings</div>' +
+                '<div class="flm-dropdown-option' + (step.catalog === 'legal-contracts' ? ' flm-dropdown-option--selected' : '') + '" data-value="legal-contracts">legal-contracts</div>' +
+                '<div class="flm-dropdown-option' + (step.catalog === 'research-papers' ? ' flm-dropdown-option--selected' : '') + '" data-value="research-papers">research-papers</div>' +
+                '<div class="flm-dropdown-option' + (step.catalog === 'compliance-docs' ? ' flm-dropdown-option--selected' : '') + '" data-value="compliance-docs">compliance-docs</div>' +
+              '</div>' +
+            '</div></div>';
+          html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-folder">Source Folder</label>' +
+            pathInput('tray-edit-folder', step.folder, '(defaults to run input folder)') + '</div>';
+        } else if (step.type === 'classify') {
           html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-mode">Mode</label>' +
             '<select class="flm-dropdown" id="tray-edit-mode" style="width: 100%;"><option' + (step.mode === 'abstracts' ? ' selected' : '') + '>abstracts</option><option' + (step.mode === 'full' ? ' selected' : '') + '>full</option></select></div>';
           html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-labels">Labels File</label>' +
-            '<input class="flm-textfield-input" id="tray-edit-labels" value="' + (step.labels || '') + '"></div>';
+            pathInput('tray-edit-labels', step.labels, '', 'Document') + '</div>';
           html += '<label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="tray-edit-multi"' + (step.allowMulti ? ' checked' : '') + '><span class="flm-checkbox-mark"></span><span class="flm-label">Allow multi-label</span></label>';
         } else if (step.type === 'filter') {
           html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-include">Include Labels (comma-separated)</label>' +
@@ -1885,7 +2055,7 @@
           html += '<label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="tray-edit-skip"' + (step.skipInference ? ' checked' : '') + '><span class="flm-checkbox-mark"></span><span class="flm-label">Skip inference</span></label>';
         } else if (step.type === 'extract') {
           html += '<div class="flm-textfield"><label class="flm-label" for="tray-edit-schema">Schema File</label>' +
-            '<input class="flm-textfield-input" id="tray-edit-schema" value="' + (step.schema || '') + '"></div>';
+            pathInput('tray-edit-schema', step.schema, '', 'Document') + '</div>';
         }
 
         html += '</div>';
@@ -1895,15 +2065,36 @@
       // ── Edit Input Form ──
       function buildEditInputForm() {
         var inp = currentWorkflow ? currentWorkflow.input : {};
+        var isCatalog = inp.type !== 'rss';
+        var isRss = inp.type === 'rss';
         return '<div class="panel-form">' +
-          '<div class="flm-textfield"><label class="flm-label" for="tray-inp-catalog">Catalog</label>' +
-            '<select class="flm-dropdown" id="tray-inp-catalog" style="width: 100%;">' +
-              '<option value="sec-filings"' + (inp.catalog === 'sec-filings' ? ' selected' : '') + '>sec-filings</option>' +
-              '<option value="legal-contracts"' + (inp.catalog === 'legal-contracts' ? ' selected' : '') + '>legal-contracts</option>' +
-              '<option value="research-papers"' + (inp.catalog === 'research-papers' ? ' selected' : '') + '>research-papers</option>' +
-              '<option value="compliance-docs"' + (inp.catalog === 'compliance-docs' ? ' selected' : '') + '>compliance-docs</option>' +
-            '</select></div>' +
-          '<label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="tray-inp-abstracts"' + (inp.ensureAbstracts ? ' checked' : '') + '><span class="flm-checkbox-mark"></span><span class="flm-label">Ensure abstracts before run</span></label>' +
+          '<div><label class="flm-label">Input Type</label>' +
+            '<div class="flm-choicegroup" style="margin-top: var(--spacingS2);">' +
+              '<label class="flm-choicegroup-option"><input type="radio" class="flm-choicegroup-input" name="tray-inp-type" value="catalog"' + (isCatalog ? ' checked' : '') + '><span class="flm-choicegroup-mark"></span><span class="flm-choicegroup-label">Catalog</span></label>' +
+              '<label class="flm-choicegroup-option"><input type="radio" class="flm-choicegroup-input" name="tray-inp-type" value="rss"' + (isRss ? ' checked' : '') + '><span class="flm-choicegroup-mark"></span><span class="flm-choicegroup-label">RSS Feed</span></label>' +
+            '</div></div>' +
+          '<div id="tray-catalog-fields"' + (isRss ? ' style="display:none"' : '') + '>' +
+            '<div class="flm-textfield"><label class="flm-label">Catalog</label>' +
+              '<div class="flm-dropdown" id="tray-inp-catalog"' + (inp.catalog ? ' data-value="' + inp.catalog + '"' : '') + '>' +
+                '<button class="flm-dropdown-trigger" type="button">' +
+                  '<span class="flm-dropdown-title' + (inp.catalog ? '' : ' flm-dropdown-title--placeholder') + '">' + (inp.catalog || 'Select a catalog…') + '</span>' +
+                  '<span class="flm-dropdown-caret" data-icon="ChevronDown"></span>' +
+                '</button>' +
+                '<div class="flm-dropdown-listbox">' +
+                  '<div class="flm-dropdown-option' + (inp.catalog === 'sec-filings' ? ' flm-dropdown-option--selected' : '') + '" data-value="sec-filings">sec-filings</div>' +
+                  '<div class="flm-dropdown-option' + (inp.catalog === 'legal-contracts' ? ' flm-dropdown-option--selected' : '') + '" data-value="legal-contracts">legal-contracts</div>' +
+                  '<div class="flm-dropdown-option' + (inp.catalog === 'research-papers' ? ' flm-dropdown-option--selected' : '') + '" data-value="research-papers">research-papers</div>' +
+                  '<div class="flm-dropdown-option' + (inp.catalog === 'compliance-docs' ? ' flm-dropdown-option--selected' : '') + '" data-value="compliance-docs">compliance-docs</div>' +
+                '</div>' +
+              '</div></div>' +
+            '<label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="tray-inp-abstracts"' + (inp.ensureAbstracts ? ' checked' : '') + '><span class="flm-checkbox-mark"></span><span class="flm-label">Ensure abstracts before run</span></label>' +
+          '</div>' +
+          '<div id="tray-rss-fields"' + (isCatalog ? ' style="display:none"' : '') + '>' +
+            '<div class="flm-textfield flm-textfield--required"><label class="flm-label" for="tray-inp-rss-url">Feed URL</label>' +
+              '<input class="flm-textfield-input" id="tray-inp-rss-url" type="url" placeholder="https://example.com/feed.xml" value="' + (inp.url || '') + '"></div>' +
+            '<div class="flm-textfield" style="margin-top: var(--spacingS2);"><label class="flm-label" for="tray-inp-rss-max">Max Items</label>' +
+              '<input class="flm-textfield-input" id="tray-inp-rss-max" type="number" min="1" max="500" placeholder="50" value="' + (inp.maxItems || '') + '"></div>' +
+          '</div>' +
         '</div>';
       }
 
@@ -1940,7 +2131,7 @@
               '<option value="claude-opus"' + ((wf.defaults || {}).model === 'claude-opus' ? ' selected' : '') + '>claude-opus</option>' +
             '</select></div>' +
           '<div class="flm-textfield"><label class="flm-label" for="tray-wf-lens">Default Lens</label>' +
-            '<input class="flm-textfield-input" id="tray-wf-lens" value="' + ((wf.defaults || {}).lens || '') + '" placeholder="e.g. lenses/financial-risk.lens.md"></div>' +
+            pathInput('tray-wf-lens', (wf.defaults || {}).lens, 'e.g. lenses/financial-risk.lens.md', 'Document') + '</div>' +
         '</div>';
       }
 
@@ -1956,6 +2147,7 @@
             var nameInput = document.getElementById('tray-step-name');
             if (nameInput && nameInput.value.trim()) newStep.name = nameInput.value.trim();
             // Set defaults
+            if (newStep.type === 'ingest') { newStep.catalog = ''; newStep.folder = ''; }
             if (newStep.type === 'classify') { newStep.mode = 'abstracts'; newStep.labels = ''; newStep.allowMulti = false; }
             if (newStep.type === 'filter') { newStep.include = []; }
             if (newStep.type === 'ask') { newStep.question = ''; newStep.mode = 'full'; newStep.skipInference = false; }
@@ -1963,7 +2155,10 @@
             currentWorkflow.steps.push(newStep);
             renderPipeline();
             flashSaved();
+            // Open edit tray for the newly added step
+            var newStepIndex = currentWorkflow.steps.length - 1;
             closeTray();
+            setTimeout(function () { openTray('edit-step', newStepIndex); }, 50);
             break;
 
           case 'edit-step':
@@ -1972,7 +2167,12 @@
             var editName = document.getElementById('tray-edit-name');
             if (editName) step.name = editName.value.trim();
             // Type-specific saves
-            if (step.type === 'classify') {
+            if (step.type === 'ingest') {
+              var ingestCatEl = document.getElementById('tray-edit-catalog');
+              if (ingestCatEl) step.catalog = ingestCatEl.getAttribute('data-value') || '';
+              var folderEl = document.getElementById('tray-edit-folder');
+              if (folderEl) step.folder = folderEl.value.trim();
+            } else if (step.type === 'classify') {
               var modeEl = document.getElementById('tray-edit-mode');
               var labelsEl = document.getElementById('tray-edit-labels');
               var multiEl = document.getElementById('tray-edit-multi');
@@ -1999,11 +2199,26 @@
             break;
 
           case 'edit-input':
-            var catEl = document.getElementById('tray-inp-catalog');
-            var absEl = document.getElementById('tray-inp-abstracts');
-            if (catEl) currentWorkflow.input.catalog = catEl.value;
-            if (absEl) currentWorkflow.input.ensureAbstracts = absEl.checked;
-            if (currentWorkflow.defaults) currentWorkflow.defaults.catalog = currentWorkflow.input.catalog;
+            var inputTypeEl = document.querySelector('input[name="tray-inp-type"]:checked');
+            var selectedInputType = inputTypeEl ? inputTypeEl.value : 'catalog';
+            currentWorkflow.input.type = selectedInputType;
+            if (selectedInputType === 'rss') {
+              var urlEl = document.getElementById('tray-inp-rss-url');
+              var maxEl = document.getElementById('tray-inp-rss-max');
+              currentWorkflow.input.url = urlEl ? urlEl.value.trim() : '';
+              currentWorkflow.input.maxItems = maxEl && maxEl.value ? parseInt(maxEl.value, 10) : null;
+              delete currentWorkflow.input.catalog;
+              delete currentWorkflow.input.ensureAbstracts;
+              if (currentWorkflow.defaults) currentWorkflow.defaults.catalog = null;
+            } else {
+              var catEl = document.getElementById('tray-inp-catalog');
+              var absEl = document.getElementById('tray-inp-abstracts');
+              if (catEl) currentWorkflow.input.catalog = catEl.getAttribute('data-value') || '';
+              if (absEl) currentWorkflow.input.ensureAbstracts = absEl.checked;
+              delete currentWorkflow.input.url;
+              delete currentWorkflow.input.maxItems;
+              if (currentWorkflow.defaults) currentWorkflow.defaults.catalog = currentWorkflow.input.catalog;
+            }
             renderPipeline();
             flashSaved();
             closeTray();
@@ -2066,7 +2281,7 @@
         html += '<div class="exec-step" data-exec="input">' +
           '<div class="exec-step-icon exec-step-icon--complete"><i class="flm-icon" data-icon="CheckMark"></i></div>' +
           '<div class="exec-step-body">' +
-            '<div class="exec-step-name">Input: ' + (wf.input.catalog || '—') + '</div>' +
+            '<div class="exec-step-name">Input: ' + (wf.input.type === 'rss' ? (wf.input.url || '—') : (wf.input.catalog || '—')) + '</div>' +
             '<div class="exec-step-status">Ready</div>' +
           '</div></div>';
 
@@ -2332,8 +2547,13 @@
         updateWizardStep();
         document.getElementById('wiz-name').value = '';
         document.getElementById('wiz-description').value = '';
-        document.getElementById('wiz-catalog').value = '';
+        document.querySelector('input[name="wiz-input-type"][value="catalog"]').checked = true;
+        document.getElementById('wiz-catalog-fields').style.display = '';
+        document.getElementById('wiz-rss-fields').style.display = 'none';
+        resetDropdown('wiz-catalog');
         document.getElementById('wiz-ensure-abstracts').checked = false;
+        document.getElementById('wiz-rss-url').value = '';
+        document.getElementById('wiz-rss-max-items').value = '';
         document.querySelector('input[name="wiz-output-root"][value="default"]').checked = true;
         document.getElementById('wiz-custom-output-wrap').style.display = 'none';
         document.getElementById('wiz-custom-output').value = '';
@@ -2357,6 +2577,7 @@
 
       document.getElementById('btn-new-workflow').addEventListener('click', openWizard);
       document.getElementById('btn-empty-create').addEventListener('click', openWizard);
+      bindInputTypeRadios('wiz-input-type', 'wiz-catalog-fields', 'wiz-rss-fields');
 
       document.getElementById('wiz-next').addEventListener('click', function () {
         if (wizStep === 1) {
@@ -2374,37 +2595,57 @@
           wizStep = 2;
           updateWizardStep();
         } else if (wizStep === 2) {
-          var catalog = document.getElementById('wiz-catalog').value;
-          if (!catalog) {
-            document.getElementById('wizard-messagebar').style.display = 'block';
-            document.getElementById('wizard-messagebar').innerHTML = '<div class="flm-messagebar flm-messagebar--error">Please select a catalog.</div>';
-            return;
+          var wizInputType = document.querySelector('input[name="wiz-input-type"]:checked').value;
+          if (wizInputType === 'rss') {
+            var rssUrl = document.getElementById('wiz-rss-url').value.trim();
+            if (!rssUrl) {
+              document.getElementById('wizard-messagebar').style.display = 'block';
+              document.getElementById('wizard-messagebar').innerHTML = '<div class="flm-messagebar flm-messagebar--error">Please enter a feed URL.</div>';
+              return;
+            }
+          } else {
+            var catalog = getDropdownValue('wiz-catalog');
+            if (!catalog) {
+              document.getElementById('wizard-messagebar').style.display = 'block';
+              document.getElementById('wizard-messagebar').innerHTML = '<div class="flm-messagebar flm-messagebar--error">Please select a catalog.</div>';
+              return;
+            }
           }
           wizStep = 3;
           updateWizardStep();
         } else {
           // Create workflow
+          var wizCreateType = document.querySelector('input[name="wiz-input-type"]:checked').value;
+          var newInput;
+          var newDefaults;
+          if (wizCreateType === 'rss') {
+            var wizMaxItems = document.getElementById('wiz-rss-max-items').value;
+            newInput = {
+              type: 'rss',
+              url: document.getElementById('wiz-rss-url').value.trim(),
+              maxItems: wizMaxItems ? parseInt(wizMaxItems, 10) : null
+            };
+            newDefaults = { catalog: null, mode: 'full', lens: null, model: 'claude-sonnet' };
+          } else {
+            newInput = {
+              type: 'catalog',
+              catalog: getDropdownValue('wiz-catalog'),
+              ensureAbstracts: document.getElementById('wiz-ensure-abstracts').checked
+            };
+            newDefaults = { catalog: getDropdownValue('wiz-catalog'), mode: 'full', lens: null, model: 'claude-sonnet' };
+          }
           var newWf = {
             name: document.getElementById('wiz-name').value.trim(),
             description: document.getElementById('wiz-description').value.trim(),
             steps: [],
-            input: {
-              type: 'catalog',
-              catalog: document.getElementById('wiz-catalog').value,
-              ensureAbstracts: document.getElementById('wiz-ensure-abstracts').checked
-            },
+            input: newInput,
             output: {
               root: document.querySelector('input[name="wiz-output-root"]:checked').value,
               primary: []
             },
             lastRun: null,
             lastStatus: 'never',
-            defaults: {
-              catalog: document.getElementById('wiz-catalog').value,
-              mode: 'full',
-              lens: null,
-              model: 'claude-sonnet'
-            }
+            defaults: newDefaults
           };
 
           MOCK_WORKFLOWS.push(newWf);
@@ -2429,8 +2670,13 @@
         });
       });
 
-      // Close wizard
+      // Wizard browse + close handler
       wizardDialog.addEventListener('click', function (e) {
+        var btn = e.target.closest('.flm-browse-btn');
+        if (btn) {
+          handleBrowse(e);
+          return;
+        }
         if (e.target.hasAttribute('data-dialog-close') || e.target === wizardDialog) {
           wizardDialog.classList.remove('flm-dialog-overlay--open');
         }
