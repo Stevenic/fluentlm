@@ -15,10 +15,11 @@
   <style>
     /* ── App Shell ── */
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
 
     .app-shell {
       display: flex;
-      min-height: 100vh;
+      height: 100vh;
     }
 
     /* ── Left Nav ── */
@@ -89,12 +90,302 @@
       background-color: var(--bodyBackground);
     }
 
+    /* ── MessageBar Zone ── */
+    .app-messagebar-zone {
+      padding: 0 var(--spacingL2);
+    }
+    .app-messagebar-zone:empty { display: none; }
+    .app-messagebar-zone .flm-messagebar {
+      margin-top: var(--spacingS1);
+      border-radius: var(--roundedCorner4);
+    }
+
     /* ── Content Area ── */
     .app-content {
       flex: 1;
       padding: var(--spacingL2);
       overflow-y: auto;
       background-color: var(--bodyBackground);
+    }
+
+    /* ── Empty State ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      gap: var(--spacingM);
+      color: var(--bodySubtext);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      opacity: 0.4;
+    }
+
+    .empty-state-text {
+      font-size: var(--fontSizeLarge);
+      color: var(--bodySubtext);
+    }
+
+    .empty-state-sub {
+      font-size: var(--fontSizeMedium);
+      color: var(--bodySubtext);
+      opacity: 0.7;
+      max-width: 360px;
+      text-align: center;
+      line-height: var(--lineHeightMedium);
+    }
+
+    /* ── Shimmer loading table ── */
+    .shimmer-table {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingS2);
+    }
+
+    .shimmer-row {
+      display: flex;
+      gap: var(--spacingM);
+      padding: var(--spacingS1) 0;
+    }
+
+    /* ── Number cells right-aligned ── */
+    .cell-number {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Horizontal scroll for table ── */
+    #runs-list {
+      overflow-x: auto;
+    }
+    #runs-list .flm-detailslist-header,
+    #runs-list .flm-detailslist-row {
+      min-width: max-content;
+    }
+
+    /* ── Filter bar layout ── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+      margin-bottom: var(--spacingS1);
+    }
+    .filter-bar #category-filter { flex: 1; margin-bottom: 0; }
+
+    /* ── View dropdown ── */
+    .view-dropdown-wrapper { position: relative; }
+    .view-dropdown-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 16px;
+      border: 1px solid var(--bodyDivider);
+      background: transparent; color: var(--bodySubtext);
+      font-size: var(--fontSizeSmall); font-family: inherit;
+      cursor: pointer;
+    }
+    .view-dropdown-btn:hover { border-color: var(--themePrimary); color: var(--themePrimary); }
+    .view-dropdown-menu {
+      display: none; position: absolute; right: 0; top: calc(100% + 4px);
+      min-width: 180px; background: var(--bodyBackground);
+      border: 1px solid var(--bodyDivider); border-radius: var(--roundedCorner4);
+      box-shadow: var(--elevation8); z-index: 10; padding: 4px 0;
+    }
+    .view-dropdown-menu--open { display: block; }
+    .view-dropdown-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 12px; font-size: var(--fontSizeSmall);
+      color: var(--bodyText); cursor: pointer; width: 100%;
+      background: none; border: none; font-family: inherit; text-align: left;
+    }
+    .view-dropdown-item:hover { background: var(--listItemBackgroundHovered); }
+
+    /* ── Category filter pills ── */
+    #category-filter { margin-bottom: var(--spacingS1); }
+    .filter-pill {
+      border-radius: 16px; padding: 4px 14px;
+      border: 1px solid var(--bodyDivider);
+      background: transparent; color: var(--bodySubtext);
+      font-size: var(--fontSizeSmall); font-family: inherit;
+      cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .filter-pill:hover { border-color: var(--themePrimary); color: var(--themePrimary); }
+    .filter-pill--active { background: var(--themePrimary); color: var(--white); border-color: transparent; }
+
+    /* ── Clickable rows ── */
+    .flm-detailslist-row { cursor: pointer; }
+
+    /* ── Status badges ── */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 1px 8px;
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+    }
+
+    .status-badge--completed {
+      background-color: color-mix(in srgb, var(--green) 15%, transparent);
+      color: var(--green);
+    }
+
+    .status-badge--running {
+      background-color: color-mix(in srgb, var(--themePrimary) 15%, transparent);
+      color: var(--themePrimary);
+    }
+
+    .status-badge--failed {
+      background-color: color-mix(in srgb, var(--red) 15%, transparent);
+      color: var(--red);
+    }
+
+    .status-badge--cancelled {
+      background-color: color-mix(in srgb, var(--neutralTertiary) 20%, transparent);
+      color: var(--bodySubtext);
+    }
+
+    .status-badge--queued {
+      background-color: color-mix(in srgb, var(--yellow) 15%, transparent);
+      color: var(--orange);
+    }
+
+    /* ── Type chip ── */
+    .type-chip {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+      background-color: color-mix(in srgb, var(--themePrimary) 15%, transparent);
+      color: var(--themePrimary);
+    }
+
+    /* ── Panel Sections ── */
+    .panel-section {
+      margin-bottom: var(--spacingL2);
+    }
+
+    .panel-section-title {
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodySubtext);
+      margin-bottom: var(--spacingS1);
+      text-transform: uppercase;
+      font-size: var(--fontSizeTiny);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Pivot Tabs (inside panel) ── */
+    .pivot-bar {
+      display: flex;
+      border-bottom: 1px solid var(--bodyDivider);
+      background-color: var(--bodyStandoutBackground);
+      margin: 0 calc(-1 * var(--spacingL1));
+      padding: 0 var(--spacingL1);
+    }
+
+    .pivot-tab {
+      padding: var(--spacingS2) var(--spacingL1);
+      font-size: var(--fontSizeMedium);
+      color: var(--bodySubtext);
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      font-family: inherit;
+      transition: color 0.15s;
+    }
+
+    .pivot-tab:hover {
+      color: var(--bodyText);
+    }
+
+    .pivot-tab--active {
+      color: var(--themePrimary);
+      border-bottom-color: var(--themePrimary);
+      font-weight: var(--fontWeightSemibold);
+    }
+
+    .pivot-panel {
+      display: none;
+      padding-top: var(--spacingM);
+    }
+
+    .pivot-panel--active {
+      display: block;
+    }
+
+    /* ── Detail info grid ── */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: var(--spacingS2) var(--spacingM);
+      font-size: var(--fontSizeMedium);
+    }
+
+    .detail-grid-label {
+      color: var(--bodySubtext);
+      font-weight: var(--fontWeightSemibold);
+    }
+
+    .detail-grid-value {
+      color: var(--bodyText);
+    }
+
+    /* ── Log entries ── */
+    .log-entry {
+      display: flex;
+      gap: var(--spacingS1);
+      padding: var(--spacingS2) 0;
+      border-bottom: 1px solid var(--bodyDivider);
+      font-size: var(--fontSizeSmall);
+    }
+
+    .log-entry:last-child { border-bottom: none; }
+
+    .log-timestamp {
+      color: var(--bodySubtext);
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+      width: 80px;
+    }
+
+    .log-message {
+      color: var(--bodyText);
+    }
+
+    /* ── Output section ── */
+    .output-block {
+      font-family: var(--fontFamilyMonospace);
+      font-size: var(--fontSizeSmall);
+      line-height: 1.5;
+      background-color: var(--bodyStandoutBackground);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      padding: var(--spacingM);
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 400px;
+      overflow-y: auto;
+      color: var(--bodyText);
+    }
+
+    /* ── Panel footer actions ── */
+    .panel-footer-actions {
+      display: flex;
+      gap: var(--spacingS1);
+      align-items: center;
+    }
+
+    .panel-footer-right {
+      margin-left: auto;
+      display: flex;
+      gap: var(--spacingS1);
+    }
+
+    /* ── Duration cell ── */
+    .cell-duration {
+      font-variant-numeric: tabular-nums;
     }
   </style>
 </head>
@@ -120,7 +411,7 @@
       <a class="app-nav-link" href="../settings/index.html"><i class="flm-icon" data-icon="Settings"></i> Settings</a>
 
       <div style="padding: var(--spacingM);">
-        <button class="flm-button" id="themeToggle" style="width: 100%;">Switch to Dark</button>
+        <button class="flm-button" id="themeToggle" style="width: 100%;">Switch to Light</button>
       </div>
     </nav>
 
@@ -133,7 +424,18 @@
       <div class="app-commandbar">
         <div class="flm-commandbar">
           <div class="flm-commandbar-items">
+            <button class="flm-commandbar-item" data-icon="View" id="btn-view-run" disabled>View Details</button>
+            <button class="flm-commandbar-item" data-icon="PlaybackRate1x" id="btn-rerun" disabled>Re-run</button>
+            <button class="flm-commandbar-item" data-icon="Cancel" id="btn-cancel-run" disabled>Cancel</button>
+            <span class="flm-commandbar-divider"></span>
+            <button class="flm-commandbar-item" data-icon="Refresh" id="btn-refresh">Refresh</button>
+            <span class="flm-commandbar-divider"></span>
             <button class="flm-commandbar-item" id="btn-ask-awarity"><svg viewBox="0 0 64 64" width="16" height="16" style="flex-shrink:0;vertical-align:middle;margin-right:4px;"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyBackground)"/></svg>Ask Awarity</button>
+          </div>
+          <div class="flm-commandbar-far" style="align-items: center; padding-right: 8px;">
+            <div class="flm-searchbox" style="min-width: 220px;">
+              <input class="flm-searchbox-input" type="text" placeholder="Search runs…" id="search-input">
+            </div>
           </div>
         </div>
       </div>
@@ -146,19 +448,685 @@
         </ol>
       </div>
 
-      <!-- Content -->
-      <div class="app-content">
-      </div>
+      <!-- MessageBar Zone -->
+      <div class="app-messagebar-zone" id="messagebar-zone"></div>
 
+      <!-- Content -->
+      <div class="app-content" id="content-area">
+
+        <!-- ── Loading State (Shimmer) ── -->
+        <div id="state-loading" style="display: none;">
+          <div class="shimmer-table">
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+          </div>
+        </div>
+
+        <!-- ── Empty State ── -->
+        <div id="state-empty" style="display: none;">
+          <div class="empty-state">
+            <i class="flm-icon empty-state-icon" data-icon="Processing"></i>
+            <span class="empty-state-text">No runs yet</span>
+            <span class="empty-state-sub">Runs are created when you execute a classification, query, or workflow. Start by exploring a catalog or running a workflow.</span>
+            <button class="flm-button flm-button--primary" data-icon="Search" onclick="window.location.href='../explorer/index.html'">
+              Go to Explore
+            </button>
+          </div>
+        </div>
+
+        <!-- ── Data State (DetailsList) ── -->
+        <div id="state-data" style="display: block;">
+          <div class="filter-bar">
+            <div class="flm-overflowset" id="category-filter">
+              <div class="flm-overflowset-items"></div>
+            </div>
+            <div class="view-dropdown-wrapper">
+              <button class="view-dropdown-btn" id="view-dropdown-btn">
+                <i class="flm-icon" data-icon="ViewList"></i> Columns
+              </button>
+              <div class="view-dropdown-menu" id="view-dropdown-menu"></div>
+            </div>
+          </div>
+          <div class="flm-detailslist" id="runs-list">
+            <div class="flm-detailslist-header" id="runs-header"></div>
+            <!-- Rows populated by JS -->
+          </div>
+        </div>
+
+      </div><!-- /app-content -->
     </div><!-- /app-main -->
   </div><!-- /app-shell -->
+
+  <!-- ════════════════════════════════════════════════════════════════
+       DETAIL PANEL (right slide-over, medium)
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-panel-overlay" id="detail-panel-overlay"></div>
+  <div class="flm-panel flm-panel--medium" id="detail-panel">
+    <div class="flm-panel-header">
+      <h2 class="flm-panel-title" id="detail-panel-title">Run Details</h2>
+      <span style="font-size: var(--fontSizeSmall); color: var(--bodySubtext); margin-left: var(--spacingS1);" id="detail-panel-subtitle"></span>
+      <button class="flm-panel-close" data-icon="Cancel" aria-label="Close" id="detail-panel-close"></button>
+    </div>
+    <div class="flm-panel-body">
+
+      <!-- Tabs -->
+      <div class="pivot-bar" id="detail-pivot-bar">
+        <button class="pivot-tab pivot-tab--active" data-tab="overview">Overview</button>
+        <button class="pivot-tab" data-tab="output">Output</button>
+        <button class="pivot-tab" data-tab="log">Log</button>
+      </div>
+
+      <!-- ── Tab: Overview ── -->
+      <div class="pivot-panel pivot-panel--active" id="tab-overview">
+        <div class="detail-grid" id="detail-overview-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- ── Tab: Output ── -->
+      <div class="pivot-panel" id="tab-output">
+        <div id="detail-output-content"></div>
+      </div>
+
+      <!-- ── Tab: Log ── -->
+      <div class="pivot-panel" id="tab-log">
+        <div id="detail-log-content"></div>
+      </div>
+
+    </div>
+    <div class="flm-panel-footer">
+      <div class="panel-footer-actions">
+        <button class="flm-button flm-button--primary" id="btn-panel-rerun"><i class="flm-icon" data-icon="PlaybackRate1x"></i> Re-run</button>
+        <button class="flm-button" id="btn-panel-cancel" style="display: none; color: var(--red);"><i class="flm-icon" data-icon="Cancel"></i> Cancel Run</button>
+        <div class="panel-footer-right">
+          <button class="flm-button" id="btn-panel-download"><i class="flm-icon" data-icon="Download"></i> Download</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Combined library JS -->
   <script src="../scripts/fluentlm.min.js"></script>
   <script src="../scripts/awarity-v2.js"></script>
 
   <script>
-    awarity.initThemeToggle();
+    (function () {
+
+      // ── Mock run data ──
+      var MOCK_RUNS = [
+        {
+          id: 'run-001', name: 'Daily briefing — Feb 22',
+          type: 'Workflow', status: 'completed',
+          source: 'Daily briefing', lens: 'executive-summary',
+          catalog: 'SEC Filings Q4', docsProcessed: 12,
+          started: '2026-02-22T08:00:00Z', finished: '2026-02-22T08:02:34Z',
+          duration: '2m 34s', triggeredBy: 'Schedule',
+          log: [
+            { time: '08:00:00', msg: 'Run started — triggered by schedule' },
+            { time: '08:00:01', msg: 'Loading workflow "Daily briefing"' },
+            { time: '08:00:03', msg: 'Step 1/3: Classify — processing 12 documents' },
+            { time: '08:01:12', msg: 'Step 1/3: Classify — complete (12/12)' },
+            { time: '08:01:13', msg: 'Step 2/3: Query — running executive-summary lens' },
+            { time: '08:02:05', msg: 'Step 2/3: Query — complete' },
+            { time: '08:02:06', msg: 'Step 3/3: Notify — sending email digest' },
+            { time: '08:02:34', msg: 'Run completed successfully' }
+          ],
+          output: 'Executive Summary — SEC Filings Q4 2025\n\nKey Findings:\n1. Revenue grew 12% YoY to $4.2B, driven by cloud services segment\n2. Operating margins improved 180bps to 28.3%\n3. Three risk factors flagged: supply chain exposure, regulatory changes in EU markets, and FX headwinds\n\nRecommendations:\n- Monitor EU regulatory timeline (Q2 2026 deadline)\n- Review hedging strategy given 15% EUR/USD exposure\n- Schedule deep-dive on supply chain concentration risk'
+        },
+        {
+          id: 'run-002', name: 'Anomaly scan — contracts',
+          type: 'Classification', status: 'completed',
+          source: 'anomaly-type', lens: 'red-flag-detection',
+          catalog: 'Contract Portfolio', docsProcessed: 47,
+          started: '2026-02-22T06:30:00Z', finished: '2026-02-22T06:38:15Z',
+          duration: '8m 15s', triggeredBy: 'Manual',
+          log: [
+            { time: '06:30:00', msg: 'Run started — triggered manually by jdoe@acme.com' },
+            { time: '06:30:02', msg: 'Loading classification "anomaly-type"' },
+            { time: '06:30:04', msg: 'Applying lens "red-flag-detection"' },
+            { time: '06:30:05', msg: 'Processing 47 documents from "Contract Portfolio"' },
+            { time: '06:34:22', msg: 'Batch 1/2 complete (25/47)' },
+            { time: '06:38:12', msg: 'Batch 2/2 complete (47/47)' },
+            { time: '06:38:15', msg: 'Classification complete — 5 anomalies detected' }
+          ],
+          output: 'Classification Results: anomaly-type\n\nDocuments processed: 47\nAnomalies detected: 5\n\n  contract-2847.pdf  — Unusual termination clause (severity: high)\n  contract-3021.pdf  — Missing liability cap (severity: high)\n  contract-1156.pdf  — Non-standard payment terms (severity: medium)\n  contract-0892.pdf  — Conflicting jurisdiction clauses (severity: medium)\n  contract-2103.pdf  — Expired insurance requirement (severity: low)'
+        },
+        {
+          id: 'run-003', name: 'Research paper digest',
+          type: 'Query', status: 'running',
+          source: 'Ad-hoc query', lens: 'executive-summary',
+          catalog: 'Research Papers 2026', docsProcessed: 8,
+          started: '2026-02-22T09:45:00Z', finished: null,
+          duration: '1m 22s…', triggeredBy: 'Manual',
+          log: [
+            { time: '09:45:00', msg: 'Run started — triggered from Explore' },
+            { time: '09:45:01', msg: 'Applying lens "executive-summary"' },
+            { time: '09:45:03', msg: 'Retrieving documents from "Research Papers 2026"' },
+            { time: '09:45:18', msg: 'Retrieved 8 documents, beginning analysis' },
+            { time: '09:46:02', msg: 'Reading documents (6/8 complete)' }
+          ],
+          output: ''
+        },
+        {
+          id: 'run-004', name: 'Weekly compliance check',
+          type: 'Workflow', status: 'failed',
+          source: 'Weekly compliance', lens: 'legal-compliance',
+          catalog: 'Regulatory Filings', docsProcessed: 3,
+          started: '2026-02-21T22:00:00Z', finished: '2026-02-21T22:01:47Z',
+          duration: '1m 47s', triggeredBy: 'Schedule',
+          log: [
+            { time: '22:00:00', msg: 'Run started — triggered by schedule' },
+            { time: '22:00:01', msg: 'Loading workflow "Weekly compliance"' },
+            { time: '22:00:03', msg: 'Step 1/2: Query — running legal-compliance lens' },
+            { time: '22:00:45', msg: 'Step 1/2: Query — processing 3 documents' },
+            { time: '22:01:30', msg: 'Error: Rate limit exceeded (429) — retrying in 10s' },
+            { time: '22:01:42', msg: 'Error: Rate limit exceeded (429) — max retries reached' },
+            { time: '22:01:47', msg: 'Run failed: API rate limit exceeded after 3 retries' }
+          ],
+          output: 'Error: Run failed at step 1/2 (Query)\nReason: API rate limit exceeded (HTTP 429) after 3 retries\nPartial results: 1 of 3 documents processed before failure'
+        },
+        {
+          id: 'run-005', name: 'SEC filing triage',
+          type: 'Classification', status: 'completed',
+          source: 'doc-type', lens: 'red-flag-detection',
+          catalog: 'SEC Filings Q4', docsProcessed: 34,
+          started: '2026-02-21T14:20:00Z', finished: '2026-02-21T14:26:08Z',
+          duration: '6m 08s', triggeredBy: 'Manual',
+          log: [
+            { time: '14:20:00', msg: 'Run started — triggered manually by mchen@acme.com' },
+            { time: '14:20:02', msg: 'Loading classification "doc-type"' },
+            { time: '14:20:03', msg: 'Processing 34 documents from "SEC Filings Q4"' },
+            { time: '14:23:15', msg: 'Batch 1/2 complete (20/34)' },
+            { time: '14:26:05', msg: 'Batch 2/2 complete (34/34)' },
+            { time: '14:26:08', msg: 'Classification complete — 6 categories assigned' }
+          ],
+          output: 'Classification Results: doc-type\n\nDocuments processed: 34\nCategories assigned: 6\n\n  10-K Annual Report      — 8 documents\n  10-Q Quarterly Report   — 12 documents\n  8-K Current Report      — 6 documents\n  DEF 14A Proxy Statement — 3 documents\n  S-1 Registration        — 2 documents\n  Other                   — 3 documents'
+        },
+        {
+          id: 'run-006', name: 'Contract review — batch 3',
+          type: 'Query', status: 'cancelled',
+          source: 'Ad-hoc query', lens: 'legal-compliance',
+          catalog: 'Contract Portfolio', docsProcessed: 0,
+          started: '2026-02-21T11:05:00Z', finished: '2026-02-21T11:05:22Z',
+          duration: '22s', triggeredBy: 'Manual',
+          log: [
+            { time: '11:05:00', msg: 'Run started — triggered from Explore' },
+            { time: '11:05:01', msg: 'Applying lens "legal-compliance"' },
+            { time: '11:05:03', msg: 'Retrieving documents from "Contract Portfolio"' },
+            { time: '11:05:22', msg: 'Run cancelled by user' }
+          ],
+          output: ''
+        },
+        {
+          id: 'run-007', name: 'New filing triage',
+          type: 'Workflow', status: 'completed',
+          source: 'New filing triage', lens: 'red-flag-detection',
+          catalog: 'SEC Filings Q4', docsProcessed: 5,
+          started: '2026-02-21T09:00:00Z', finished: '2026-02-21T09:03:41Z',
+          duration: '3m 41s', triggeredBy: 'Schedule',
+          log: [
+            { time: '09:00:00', msg: 'Run started — triggered by schedule' },
+            { time: '09:00:01', msg: 'Loading workflow "New filing triage"' },
+            { time: '09:00:03', msg: 'Step 1/2: Classify — processing 5 new documents' },
+            { time: '09:02:10', msg: 'Step 1/2: Classify — complete (5/5)' },
+            { time: '09:02:11', msg: 'Step 2/2: Flag — applying red-flag-detection lens' },
+            { time: '09:03:38', msg: 'Step 2/2: Flag — 1 red flag detected' },
+            { time: '09:03:41', msg: 'Run completed successfully' }
+          ],
+          output: 'Triage Results — 5 new filings\n\n  ACME-10K-2025.pdf    — 10-K Annual Report (no flags)\n  BETA-8K-20260220.pdf — 8-K Current Report (1 red flag: going concern language)\n  GAMMA-10Q-Q4.pdf     — 10-Q Quarterly Report (no flags)\n  DELTA-DEF14A.pdf     — Proxy Statement (no flags)\n  ACME-S1-2026.pdf     — S-1 Registration (no flags)\n\nRed flags: 1\nSent notification to: risk-alerts@acme.com'
+        },
+        {
+          id: 'run-008', name: 'Technical spec extraction',
+          type: 'Query', status: 'queued',
+          source: 'Ad-hoc query', lens: 'technical-detail',
+          catalog: 'Engineering Docs', docsProcessed: 0,
+          started: null, finished: null,
+          duration: '—', triggeredBy: 'Manual',
+          log: [
+            { time: '09:50:00', msg: 'Run queued — waiting for available capacity' }
+          ],
+          output: ''
+        }
+      ];
+
+      // ── Refs ──
+      var detailPanel = document.getElementById('detail-panel');
+      var detailOverlay = document.getElementById('detail-panel-overlay');
+      var detailTitle = document.getElementById('detail-panel-title');
+      var detailSubtitle = document.getElementById('detail-panel-subtitle');
+      var messageZone = document.getElementById('messagebar-zone');
+      var runsList = document.getElementById('runs-list');
+
+      var currentRun = null;
+
+      awarity.initThemeToggle();
+
+      // ── MessageBar helper ──
+      function showMessage(type, text) {
+        messageZone.innerHTML = '<div class="flm-messagebar flm-messagebar--' + type + '">' + text + '</div>';
+        setTimeout(function () { messageZone.innerHTML = ''; }, 5000);
+      }
+
+      // ── Column definitions ──
+      var COLUMNS = [
+        { key: 'type',           label: 'Type',           minWidth: 110, number: false },
+        { key: 'status',         label: 'Status',         minWidth: 100, number: false },
+        { key: 'source',         label: 'Source',         minWidth: 140, number: false },
+        { key: 'catalog',        label: 'Catalog',        minWidth: 130, number: false },
+        { key: 'docsProcessed',  label: 'Docs',           minWidth: 60,  number: true },
+        { key: 'duration',       label: 'Duration',       minWidth: 80,  number: false },
+        { key: 'started',        label: 'Started',        minWidth: 140, number: false },
+        { key: 'triggeredBy',    label: 'Triggered By',   minWidth: 90,  number: false }
+      ];
+
+      var _measureCtx = document.createElement('canvas').getContext('2d');
+      var _cs = getComputedStyle(document.documentElement);
+      _measureCtx.font = '600 ' + (_cs.getPropertyValue('--fontSizeSmall').trim() || '12px') + ' ' + (_cs.getPropertyValue('--fontFamily').trim() || '"Segoe UI", sans-serif');
+      function colWidth(col) {
+        var labelW = Math.ceil(_measureCtx.measureText(col.label).width) + 28;
+        return Math.max(col.minWidth, labelW);
+      }
+
+      // Default visible columns
+      var visibleColumns = { type: true, status: true, source: true, catalog: true, docsProcessed: true, duration: true, started: true };
+
+      function getVisibleColumns() {
+        return COLUMNS.filter(function (col) { return visibleColumns[col.key]; });
+      }
+
+      // ── Render Header ──
+      var runsHeader = document.getElementById('runs-header');
+
+      function colStyle(col, isLast) {
+        if (col.key === 'source') return 'min-width: ' + colWidth(col) + 'px; flex: 1;';
+        var w = colWidth(col) + 'px';
+        return isLast ? 'min-width: ' + w + '; flex: 1;' : 'width: ' + w + ';';
+      }
+
+      function renderHeader() {
+        var visCols = getVisibleColumns();
+        runsHeader.innerHTML =
+          '<div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="check-all"><span class="flm-checkbox-mark"></span></label></div>' +
+          '<div class="flm-detailslist-header-cell" style="width: 220px;">Name</div>';
+        visCols.forEach(function (col, i) {
+          var isLast = i === visCols.length - 1;
+          runsHeader.innerHTML += '<div class="flm-detailslist-header-cell' + (col.number ? ' cell-number' : '') + '" style="' + colStyle(col, isLast) + '">' + col.label + '</div>';
+        });
+        var checkAll = document.getElementById('check-all');
+        checkAll.addEventListener('change', function () {
+          var checked = checkAll.checked;
+          runsList.querySelectorAll('.flm-detailslist-row[data-run] .flm-checkbox-input').forEach(function (cb) { cb.checked = checked; });
+          updateToolbarState();
+        });
+      }
+
+      // ── Format dates ──
+      function formatDate(iso) {
+        if (!iso) return '—';
+        var d = new Date(iso);
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        var h = d.getHours();
+        var m = d.getMinutes();
+        var ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        return months[d.getMonth()] + ' ' + d.getDate() + ', ' + (m < 10 ? '0' : '') + m + ' ' + ampm;
+      }
+
+      function formatDateFull(iso) {
+        if (!iso) return '—';
+        var d = new Date(iso);
+        var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        var h = d.getHours();
+        var m = d.getMinutes();
+        var s = d.getSeconds();
+        var ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        return months[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear() + ' ' + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s + ' ' + ampm;
+      }
+
+      // ── Status badge HTML ──
+      function statusBadgeHtml(status) {
+        var label = status.charAt(0).toUpperCase() + status.slice(1);
+        return '<span class="status-badge status-badge--' + status + '">' + label + '</span>';
+      }
+
+      // ── Type chip HTML ──
+      function typeChipHtml(type) {
+        return '<span class="type-chip">' + type + '</span>';
+      }
+
+      function cellHtml(col, run) {
+        switch (col.key) {
+          case 'type':
+            return typeChipHtml(run.type);
+          case 'status':
+            return statusBadgeHtml(run.status);
+          case 'source':
+            return '<span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + run.source + '</span>';
+          case 'catalog':
+            return run.catalog;
+          case 'docsProcessed':
+            return '' + run.docsProcessed;
+          case 'duration':
+            return '<span class="cell-duration">' + run.duration + '</span>';
+          case 'started':
+            return formatDate(run.started);
+          case 'triggeredBy':
+            return run.triggeredBy;
+          default: return '';
+        }
+      }
+
+      // ── Render Table Rows ──
+      function renderRows() {
+        var existing = runsList.querySelectorAll('.flm-detailslist-row');
+        existing.forEach(function (r) { r.remove(); });
+
+        MOCK_RUNS.forEach(function (run) {
+          var row = document.createElement('div');
+          row.className = 'flm-detailslist-row';
+          row.setAttribute('data-run', run.id);
+          row.setAttribute('data-search', (run.name + ' ' + run.type + ' ' + run.status + ' ' + run.source + ' ' + run.catalog + ' ' + run.triggeredBy).toLowerCase());
+          row.setAttribute('data-type', run.type);
+          row.setAttribute('data-status', run.status);
+
+          var visCols = getVisibleColumns();
+          var html =
+            '<div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label></div>' +
+            '<div class="flm-detailslist-cell" style="width: 220px; font-weight: var(--fontWeightSemibold);">' + run.name + '</div>';
+
+          visCols.forEach(function (col, i) {
+            var isLast = i === visCols.length - 1;
+            html += '<div class="flm-detailslist-cell' + (col.number ? ' cell-number' : '') + '" style="' + colStyle(col, isLast) + '">' + cellHtml(col, run) + '</div>';
+          });
+
+          row.innerHTML = html;
+          runsList.appendChild(row);
+        });
+
+        bindRowEvents();
+        applyFilters();
+      }
+
+      // ── Row click & checkbox events ──
+      function bindRowEvents() {
+        var rows = runsList.querySelectorAll('.flm-detailslist-row[data-run]');
+        rows.forEach(function (row) {
+          row.addEventListener('click', function (e) {
+            if (e.target.closest('.flm-detailslist-check')) return;
+            var id = row.getAttribute('data-run');
+            openDetailPanel(id);
+          });
+        });
+
+        var rowCheckboxes = runsList.querySelectorAll('.flm-detailslist-row[data-run] .flm-checkbox-input');
+        rowCheckboxes.forEach(function (cb) {
+          cb.addEventListener('change', updateToolbarState);
+        });
+      }
+
+      // ── Selection & toolbar state ──
+      var btnViewRun = document.getElementById('btn-view-run');
+      var btnRerun = document.getElementById('btn-rerun');
+      var btnCancelRun = document.getElementById('btn-cancel-run');
+
+      function getSelectedRuns() {
+        var ids = [];
+        runsList.querySelectorAll('.flm-detailslist-row[data-run] .flm-checkbox-input:checked').forEach(function (cb) {
+          var row = cb.closest('.flm-detailslist-row');
+          ids.push(row.getAttribute('data-run'));
+        });
+        return ids;
+      }
+
+      function updateToolbarState() {
+        var checkAll = document.getElementById('check-all');
+        var rowCheckboxes = runsList.querySelectorAll('.flm-detailslist-row[data-run] .flm-checkbox-input');
+        var selected = getSelectedRuns();
+        var count = selected.length;
+        btnViewRun.disabled = count !== 1;
+        btnRerun.disabled = count !== 1;
+        // Cancel only enabled if exactly 1 running/queued run selected
+        var canCancel = false;
+        if (count === 1) {
+          var run = MOCK_RUNS.find(function (r) { return r.id === selected[0]; });
+          canCancel = run && (run.status === 'running' || run.status === 'queued');
+        }
+        btnCancelRun.disabled = !canCancel;
+        if (checkAll) {
+          checkAll.checked = count > 0 && count === rowCheckboxes.length;
+          checkAll.indeterminate = count > 0 && count < rowCheckboxes.length;
+        }
+      }
+
+      // ── View dropdown (column picker) ──
+      var viewBtn = document.getElementById('view-dropdown-btn');
+      var viewMenu = document.getElementById('view-dropdown-menu');
+
+      function buildViewMenu() {
+        viewMenu.innerHTML = '';
+        COLUMNS.forEach(function (col) {
+          var btn = document.createElement('button');
+          btn.className = 'view-dropdown-item';
+          var checked = visibleColumns[col.key];
+          btn.innerHTML = '<span style="width:16px;text-align:center;">' + (checked ? '&#10003;' : '') + '</span> ' + col.label;
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            visibleColumns[col.key] = !visibleColumns[col.key];
+            renderHeader();
+            renderRows();
+            buildViewMenu();
+          });
+          viewMenu.appendChild(btn);
+        });
+      }
+
+      viewBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        viewMenu.classList.toggle('view-dropdown-menu--open');
+        if (viewMenu.classList.contains('view-dropdown-menu--open')) buildViewMenu();
+      });
+
+      document.addEventListener('click', function () {
+        viewMenu.classList.remove('view-dropdown-menu--open');
+      });
+
+      // ── Category filter bar (status-based) ──
+      var CATEGORIES = ['All', 'Active', 'Completed', 'Failed'];
+      var CATEGORY_TO_STATUSES = {
+        'Active': ['running', 'queued'],
+        'Completed': ['completed'],
+        'Failed': ['failed']
+      };
+      var activeCategory = 'All';
+
+      function buildFilterBar() {
+        var items = document.querySelector('#category-filter .flm-overflowset-items');
+        items.innerHTML = '';
+        CATEGORIES.forEach(function (cat) {
+          var btn = document.createElement('button');
+          btn.className = 'flm-overflowset-item filter-pill' + (cat === activeCategory ? ' filter-pill--active' : '');
+          btn.setAttribute('data-category', cat);
+          // Show count next to each category
+          var count = 0;
+          if (cat === 'All') {
+            count = MOCK_RUNS.length;
+          } else {
+            var statuses = CATEGORY_TO_STATUSES[cat];
+            count = MOCK_RUNS.filter(function (r) { return statuses.indexOf(r.status) !== -1; }).length;
+          }
+          btn.textContent = cat + ' (' + count + ')';
+          btn.addEventListener('click', function () { setCategory(cat); });
+          items.appendChild(btn);
+        });
+      }
+
+      function setCategory(cat) {
+        activeCategory = cat;
+        document.querySelectorAll('#category-filter .filter-pill').forEach(function (btn) {
+          btn.classList.toggle('filter-pill--active', btn.getAttribute('data-category') === cat);
+        });
+        applyFilters();
+      }
+
+      function applyFilters() {
+        var query = document.getElementById('search-input').value.toLowerCase();
+        var statusFilter = CATEGORY_TO_STATUSES[activeCategory] || null;
+        runsList.querySelectorAll('.flm-detailslist-row[data-run]').forEach(function (row) {
+          var searchMatch = row.getAttribute('data-search').indexOf(query) !== -1;
+          var catMatch = !statusFilter || statusFilter.indexOf(row.getAttribute('data-status')) !== -1;
+          row.style.display = (searchMatch && catMatch) ? '' : 'none';
+        });
+      }
+
+      // ── Search filter ──
+      document.getElementById('search-input').addEventListener('input', function () {
+        applyFilters();
+      });
+
+      // ── Panel Helpers ──
+      function openPanel(panel, overlay) {
+        panel.classList.add('flm-panel--open');
+        overlay.classList.add('flm-panel-overlay--visible');
+      }
+
+      function closePanel(panel, overlay) {
+        panel.classList.remove('flm-panel--open');
+        overlay.classList.remove('flm-panel-overlay--visible');
+      }
+
+      // ── Pivot tab switching ──
+      function switchDetailTab(tabName) {
+        document.querySelectorAll('#detail-pivot-bar .pivot-tab').forEach(function (t) {
+          t.classList.toggle('pivot-tab--active', t.getAttribute('data-tab') === tabName);
+        });
+        document.querySelectorAll('#detail-panel .pivot-panel').forEach(function (p) {
+          p.classList.toggle('pivot-panel--active', p.id === 'tab-' + tabName);
+        });
+      }
+
+      document.querySelectorAll('#detail-pivot-bar .pivot-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          switchDetailTab(tab.getAttribute('data-tab'));
+        });
+      });
+
+      // ── Open Detail Panel ──
+      function openDetailPanel(runId) {
+        var run = MOCK_RUNS.find(function (r) { return r.id === runId; });
+        if (!run) return;
+
+        currentRun = run;
+        detailTitle.textContent = run.name;
+        detailSubtitle.textContent = statusBadgeHtml(run.status);
+        detailSubtitle.innerHTML = statusBadgeHtml(run.status);
+
+        // Overview tab
+        var grid = document.getElementById('detail-overview-grid');
+        grid.innerHTML =
+          '<span class="detail-grid-label">Type</span><span class="detail-grid-value">' + typeChipHtml(run.type) + '</span>' +
+          '<span class="detail-grid-label">Status</span><span class="detail-grid-value">' + statusBadgeHtml(run.status) + '</span>' +
+          '<span class="detail-grid-label">Source</span><span class="detail-grid-value">' + run.source + '</span>' +
+          '<span class="detail-grid-label">Lens</span><span class="detail-grid-value">' + (run.lens || '—') + '</span>' +
+          '<span class="detail-grid-label">Catalog</span><span class="detail-grid-value">' + run.catalog + '</span>' +
+          '<span class="detail-grid-label">Docs Processed</span><span class="detail-grid-value">' + run.docsProcessed + '</span>' +
+          '<span class="detail-grid-label">Duration</span><span class="detail-grid-value">' + run.duration + '</span>' +
+          '<span class="detail-grid-label">Started</span><span class="detail-grid-value">' + formatDateFull(run.started) + '</span>' +
+          '<span class="detail-grid-label">Finished</span><span class="detail-grid-value">' + formatDateFull(run.finished) + '</span>' +
+          '<span class="detail-grid-label">Triggered By</span><span class="detail-grid-value">' + run.triggeredBy + '</span>';
+
+        // Output tab
+        var outputContent = document.getElementById('detail-output-content');
+        if (run.output) {
+          outputContent.innerHTML = '<div class="output-block">' + run.output.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</div>';
+        } else {
+          outputContent.innerHTML = '<span class="flm-text flm-text--secondary">No output available' + (run.status === 'running' ? ' — run is still in progress.' : '.') + '</span>';
+        }
+
+        // Log tab
+        var logContent = document.getElementById('detail-log-content');
+        if (run.log && run.log.length) {
+          var logHtml = '';
+          run.log.forEach(function (entry) {
+            logHtml += '<div class="log-entry"><span class="log-timestamp">' + entry.time + '</span><span class="log-message">' + entry.msg + '</span></div>';
+          });
+          logContent.innerHTML = logHtml;
+        } else {
+          logContent.innerHTML = '<span class="flm-text flm-text--secondary">No log entries.</span>';
+        }
+
+        // Footer buttons
+        var btnPanelCancel = document.getElementById('btn-panel-cancel');
+        if (run.status === 'running' || run.status === 'queued') {
+          btnPanelCancel.style.display = '';
+        } else {
+          btnPanelCancel.style.display = 'none';
+        }
+
+        // Reset to Overview tab
+        switchDetailTab('overview');
+
+        openPanel(detailPanel, detailOverlay);
+      }
+
+      // ── Close panel ──
+      document.getElementById('detail-panel-close').addEventListener('click', function () {
+        closePanel(detailPanel, detailOverlay);
+      });
+      detailOverlay.addEventListener('click', function () {
+        closePanel(detailPanel, detailOverlay);
+      });
+
+      // ── Toolbar buttons ──
+      btnViewRun.addEventListener('click', function () {
+        var selected = getSelectedRuns();
+        if (selected.length === 1) openDetailPanel(selected[0]);
+      });
+
+      btnRerun.addEventListener('click', function () {
+        var selected = getSelectedRuns();
+        if (selected.length === 1) {
+          var run = MOCK_RUNS.find(function (r) { return r.id === selected[0]; });
+          if (run) showMessage('info', 'Re-running "' + run.name + '"…');
+        }
+      });
+
+      btnCancelRun.addEventListener('click', function () {
+        var selected = getSelectedRuns();
+        if (selected.length === 1) {
+          var run = MOCK_RUNS.find(function (r) { return r.id === selected[0]; });
+          if (run) showMessage('warning', 'Cancelled run "' + run.name + '".');
+        }
+      });
+
+      document.getElementById('btn-panel-rerun').addEventListener('click', function () {
+        if (currentRun) showMessage('info', 'Re-running "' + currentRun.name + '"…');
+      });
+
+      document.getElementById('btn-panel-cancel').addEventListener('click', function () {
+        if (currentRun) showMessage('warning', 'Cancelled run "' + currentRun.name + '".');
+      });
+
+      document.getElementById('btn-panel-download').addEventListener('click', function () {
+        if (currentRun) showMessage('info', 'Downloading output for "' + currentRun.name + '"…');
+      });
+
+      // ── Refresh ──
+      document.getElementById('btn-refresh').addEventListener('click', function () {
+        showMessage('info', 'Refreshing runs…');
+      });
+
+      // ── Initialize ──
+      renderHeader();
+      renderRows();
+      buildFilterBar();
+
+    })();
   </script>
 </body>
 </html>

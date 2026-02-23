@@ -274,6 +274,9 @@
       background-color: var(--bodyStandoutBackground);
       margin: 0 calc(-1 * var(--spacingL1));
       padding: 0 var(--spacingL1);
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
 
     .pivot-tab {
@@ -301,10 +304,13 @@
     .pivot-panel {
       display: none;
       padding-top: var(--spacingM);
+      overflow-y: auto;
     }
 
     .pivot-panel--active {
       display: block;
+      flex: 1;
+      min-height: 0;
     }
 
     /* ── Guided editor fields ── */
@@ -517,11 +523,29 @@
       display: block;
     }
 
+    /* ── Panel layout: fixed header + footer, scrollable body ── */
+    .flm-panel {
+      display: flex;
+      flex-direction: column;
+    }
+    .flm-panel-body {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .flm-panel-header,
+    .flm-panel-footer {
+      flex-shrink: 0;
+    }
+
     /* ── Panel footer actions ── */
     .panel-footer-actions {
       display: flex;
       gap: var(--spacingS1);
       align-items: center;
+      width: 100%;
     }
 
     .panel-footer-right {
@@ -845,19 +869,17 @@
                 <div class="flm-dropdown-listbox"></div>
               </div>
             </div>
-            <div class="test-field">
+            <div class="test-field" style="min-width: 140px;">
               <label class="flm-label">Mode</label>
-              <div class="flm-choicegroup" style="display: flex; gap: var(--spacingM); flex-direction: row;">
-                <label class="flm-choicegroup-option">
-                  <input type="radio" class="flm-choicegroup-input" name="test-mode" value="full" checked>
-                  <span class="flm-choicegroup-mark"></span>
-                  <span class="flm-choicegroup-label">Full ECW</span>
-                </label>
-                <label class="flm-choicegroup-option">
-                  <input type="radio" class="flm-choicegroup-input" name="test-mode" value="abstracts">
-                  <span class="flm-choicegroup-mark"></span>
-                  <span class="flm-choicegroup-label">Abstracts</span>
-                </label>
+              <div class="flm-dropdown" id="test-mode" data-value="full">
+                <button class="flm-dropdown-trigger" type="button">
+                  <span class="flm-dropdown-title">Full ECW</span>
+                  <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+                </button>
+                <div class="flm-dropdown-listbox">
+                  <div class="flm-dropdown-option flm-dropdown-option--selected" data-value="full">Full ECW</div>
+                  <div class="flm-dropdown-option" data-value="abstracts">Abstracts</div>
+                </div>
               </div>
             </div>
           </div>
@@ -924,11 +946,10 @@
     </div>
     <div class="flm-panel-footer">
       <div class="panel-footer-actions">
-        <button class="flm-button flm-button--primary" id="btn-save-lens" disabled>Save</button>
-        <button class="flm-button" id="btn-cancel-edit">Cancel</button>
+        <button class="flm-button" id="btn-delete-panel" style="color: var(--red);"><i class="flm-icon" data-icon="Delete"></i> Delete</button>
         <div class="panel-footer-right">
-          <button class="flm-button" id="btn-duplicate-panel"><i class="flm-icon" data-icon="Copy"></i> Duplicate</button>
-          <button class="flm-button" id="btn-delete-panel" style="color: var(--red);"><i class="flm-icon" data-icon="Delete"></i> Delete</button>
+          <button class="flm-button" id="btn-cancel-edit">Cancel</button>
+          <button class="flm-button flm-button--primary" id="btn-save-lens" disabled>Save</button>
         </div>
       </div>
     </div>
@@ -1056,16 +1077,54 @@
   <script>
     (function () {
 
-      // ── Populate catalog dropdown from awarity API ──
-      awarity.getCatalogs().then(function (catalogs) {
-        var dropdown = document.getElementById('test-catalog');
+      // ── Cached data + dropdown helpers (parts.md pattern) ──
+      var cachedCatalogs = [];
+
+      function wireDropdowns(root) {
+        if (typeof FluentLM !== 'undefined' && FluentLM.refresh) FluentLM.refresh(root);
+      }
+
+      function getDropdownValue(id) {
+        var el = document.getElementById(id);
+        return el ? (el.getAttribute('data-value') || '') : '';
+      }
+
+      function populateCatalogDropdown(id, selected) {
+        var dropdown = document.getElementById(id);
         if (!dropdown) return;
         var listbox = dropdown.querySelector('.flm-dropdown-listbox');
+        var title = dropdown.querySelector('.flm-dropdown-title');
         var html = '';
-        for (var i = 0; i < catalogs.length; i++) {
-          html += '<div class="flm-dropdown-option" data-value="' + catalogs[i].id + '">' + catalogs[i].label + '</div>';
+        for (var i = 0; i < cachedCatalogs.length; i++) {
+          var isSelected = selected === cachedCatalogs[i].id;
+          html += '<div class="flm-dropdown-option' + (isSelected ? ' flm-dropdown-option--selected' : '') +
+            '" data-value="' + cachedCatalogs[i].id + '">' + cachedCatalogs[i].label + '</div>';
+          if (isSelected && title) {
+            title.textContent = cachedCatalogs[i].label;
+            title.classList.remove('flm-dropdown-title--placeholder');
+            dropdown.setAttribute('data-value', cachedCatalogs[i].id);
+          }
         }
         if (listbox) listbox.innerHTML = html;
+      }
+
+      function modeDropdownHtml(id, selected) {
+        var isAbstracts = selected === 'abstracts';
+        return '<div class="flm-dropdown" id="' + id + '" data-value="' + (selected || 'full') + '">' +
+          '<button class="flm-dropdown-trigger" type="button">' +
+            '<span class="flm-dropdown-title">' + (isAbstracts ? 'Abstracts' : 'Full ECW') + '</span>' +
+            '<span class="flm-dropdown-caret" data-icon="ChevronDown"></span>' +
+          '</button>' +
+          '<div class="flm-dropdown-listbox">' +
+            '<div class="flm-dropdown-option' + (isAbstracts ? '' : ' flm-dropdown-option--selected') + '" data-value="full">Full ECW</div>' +
+            '<div class="flm-dropdown-option' + (isAbstracts ? ' flm-dropdown-option--selected' : '') + '" data-value="abstracts">Abstracts</div>' +
+          '</div></div>';
+      }
+
+      awarity.getCatalogs().then(function (c) {
+        cachedCatalogs = c;
+        populateCatalogDropdown('test-catalog');
+        wireDropdowns(document.getElementById('detail-panel'));
       });
 
       // ── Suggested categories ──
@@ -1981,11 +2040,6 @@
         }
       });
 
-      // ── Duplicate (from panel) ──
-      document.getElementById('btn-duplicate-panel').addEventListener('click', function () {
-        if (!currentLens) return;
-        duplicateLens(currentLens.id);
-      });
 
       // ── Duplicate (from commandbar) ──
       btnDuplicate.addEventListener('click', function () {

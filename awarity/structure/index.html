@@ -15,10 +15,11 @@
   <style>
     /* ── App Shell ── */
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; overflow: hidden; }
 
     .app-shell {
       display: flex;
-      min-height: 100vh;
+      height: 100vh;
     }
 
     /* ── Left Nav ── */
@@ -89,12 +90,545 @@
       background-color: var(--bodyBackground);
     }
 
+    /* ── MessageBar Zone ── */
+    .app-messagebar-zone {
+      padding: 0 var(--spacingL2);
+    }
+    .app-messagebar-zone:empty { display: none; }
+    .app-messagebar-zone .flm-messagebar {
+      margin-top: var(--spacingS1);
+      border-radius: var(--roundedCorner4);
+    }
+
     /* ── Content Area ── */
     .app-content {
       flex: 1;
       padding: var(--spacingL2);
       overflow-y: auto;
       background-color: var(--bodyBackground);
+    }
+
+    /* ── Empty State ── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 400px;
+      gap: var(--spacingM);
+      color: var(--bodySubtext);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      opacity: 0.4;
+    }
+
+    .empty-state-text {
+      font-size: var(--fontSizeLarge);
+      color: var(--bodySubtext);
+    }
+
+    .empty-state-sub {
+      font-size: var(--fontSizeMedium);
+      color: var(--bodySubtext);
+      opacity: 0.7;
+      max-width: 360px;
+      text-align: center;
+      line-height: var(--lineHeightMedium);
+    }
+
+    /* ── Shimmer loading table ── */
+    .shimmer-table {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingS2);
+    }
+
+    .shimmer-row {
+      display: flex;
+      gap: var(--spacingM);
+      padding: var(--spacingS1) 0;
+    }
+
+    /* ── Number cells right-aligned ── */
+    .cell-number {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Horizontal scroll for table ── */
+    #classifications-list {
+      overflow-x: auto;
+    }
+    #classifications-list .flm-detailslist-header,
+    #classifications-list .flm-detailslist-row {
+      min-width: max-content;
+    }
+
+    /* ── Filter bar layout ── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--spacingS1);
+      margin-bottom: var(--spacingS1);
+    }
+    .filter-bar #category-filter { flex: 1; margin-bottom: 0; }
+
+    /* ── View dropdown ── */
+    .view-dropdown-wrapper { position: relative; }
+    .view-dropdown-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 12px; border-radius: 16px;
+      border: 1px solid var(--bodyDivider);
+      background: transparent; color: var(--bodySubtext);
+      font-size: var(--fontSizeSmall); font-family: inherit;
+      cursor: pointer;
+    }
+    .view-dropdown-btn:hover { border-color: var(--themePrimary); color: var(--themePrimary); }
+    .view-dropdown-menu {
+      display: none; position: absolute; right: 0; top: calc(100% + 4px);
+      min-width: 180px; background: var(--bodyBackground);
+      border: 1px solid var(--bodyDivider); border-radius: var(--roundedCorner4);
+      box-shadow: var(--elevation8); z-index: 10; padding: 4px 0;
+    }
+    .view-dropdown-menu--open { display: block; }
+    .view-dropdown-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 12px; font-size: var(--fontSizeSmall);
+      color: var(--bodyText); cursor: pointer; width: 100%;
+      background: none; border: none; font-family: inherit; text-align: left;
+    }
+    .view-dropdown-item:hover { background: var(--listItemBackgroundHovered); }
+
+    /* ── Category filter pills ── */
+    #category-filter { margin-bottom: var(--spacingS1); }
+    .filter-pill {
+      border-radius: 16px; padding: 4px 14px;
+      border: 1px solid var(--bodyDivider);
+      background: transparent; color: var(--bodySubtext);
+      font-size: var(--fontSizeSmall); font-family: inherit;
+      cursor: pointer; transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+    .filter-pill:hover { border-color: var(--themePrimary); color: var(--themePrimary); }
+    .filter-pill--active { background: var(--themePrimary); color: var(--white); border-color: transparent; }
+
+    /* ── Clickable rows ── */
+    .flm-detailslist-row { cursor: pointer; }
+
+    /* ── Category chips ── */
+    .category-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+    .category-chip {
+      display: inline-block; padding: 1px 8px;
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+      background-color: color-mix(in srgb, var(--themePrimary) 15%, transparent);
+      color: var(--themePrimary);
+      cursor: pointer;
+    }
+    .category-chip:hover {
+      background-color: color-mix(in srgb, var(--themePrimary) 30%, transparent);
+    }
+
+    /* ── Label chips (inside detail panel) ── */
+    .label-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .label-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 16px;
+      font-size: var(--fontSizeSmall);
+      border: 1px solid var(--bodyDivider);
+      background-color: var(--bodyStandoutBackground);
+      color: var(--bodyText);
+    }
+
+    .label-chip-count {
+      font-size: var(--fontSizeTiny);
+      color: var(--bodySubtext);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ── Mode badge ── */
+    .mode-badge {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+    }
+
+    .mode-badge--multi {
+      background-color: color-mix(in srgb, var(--purple) 15%, transparent);
+      color: var(--purple);
+    }
+
+    .mode-badge--single {
+      background-color: color-mix(in srgb, var(--teal) 15%, transparent);
+      color: var(--teal);
+    }
+
+    /* ── Panel Sections ── */
+    .panel-section {
+      margin-bottom: var(--spacingL2);
+    }
+
+    .panel-section-title {
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodySubtext);
+      margin-bottom: var(--spacingS1);
+      text-transform: uppercase;
+      font-size: var(--fontSizeTiny);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Pivot Tabs (inside panel) ── */
+    .pivot-bar {
+      display: flex;
+      border-bottom: 1px solid var(--bodyDivider);
+      background-color: var(--bodyStandoutBackground);
+      margin: 0 calc(-1 * var(--spacingL1));
+      padding: 0 var(--spacingL1);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .pivot-tab {
+      padding: var(--spacingS2) var(--spacingL1);
+      font-size: var(--fontSizeMedium);
+      color: var(--bodySubtext);
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      font-family: inherit;
+      transition: color 0.15s;
+    }
+
+    .pivot-tab:hover {
+      color: var(--bodyText);
+    }
+
+    .pivot-tab--active {
+      color: var(--themePrimary);
+      border-bottom-color: var(--themePrimary);
+      font-weight: var(--fontWeightSemibold);
+    }
+
+    .pivot-panel {
+      display: none;
+      padding-top: var(--spacingM);
+      overflow-y: auto;
+    }
+
+    .pivot-panel--active {
+      display: block;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* ── Detail info grid ── */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: var(--spacingS2) var(--spacingM);
+      font-size: var(--fontSizeMedium);
+    }
+
+    .detail-grid-label {
+      color: var(--bodySubtext);
+      font-weight: var(--fontWeightSemibold);
+    }
+
+    .detail-grid-value {
+      color: var(--bodyText);
+    }
+
+    /* ── Results table (inside panel) ── */
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--fontSizeSmall);
+    }
+
+    .results-table th {
+      text-align: left;
+      padding: var(--spacingS2) var(--spacingS1);
+      border-bottom: 2px solid var(--bodyDivider);
+      color: var(--bodySubtext);
+      font-weight: var(--fontWeightSemibold);
+    }
+
+    .results-table td {
+      padding: var(--spacingS2) var(--spacingS1);
+      border-bottom: 1px solid var(--bodyDivider);
+      color: var(--bodyText);
+    }
+
+    .results-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* ── Panel form ── */
+    .panel-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingM);
+    }
+
+    /* ── Panel layout: fixed header + footer, scrollable body ── */
+    .flm-panel {
+      display: flex;
+      flex-direction: column;
+    }
+    .flm-panel-body {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .flm-panel-header,
+    .flm-panel-footer {
+      flex-shrink: 0;
+    }
+
+    /* ── Panel footer actions ── */
+    .panel-footer-actions {
+      display: flex;
+      gap: var(--spacingS1);
+      align-items: center;
+      width: 100%;
+    }
+
+    .panel-footer-right {
+      margin-left: auto;
+      display: flex;
+      gap: var(--spacingS1);
+    }
+
+    /* ── Dirty badge ── */
+    .dirty-badge {
+      display: none;
+      margin-bottom: var(--spacingM);
+    }
+
+    .dirty-badge--visible {
+      display: block;
+    }
+
+    /* ── Run history items ── */
+    .run-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacingS2) 0;
+      border-bottom: 1px solid var(--bodyDivider);
+      font-size: var(--fontSizeMedium);
+    }
+
+    .run-item:last-child { border-bottom: none; }
+
+    .run-item-left {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .run-item-name { color: var(--bodyText); }
+
+    .run-item-meta {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+    }
+
+    .run-item-status {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+    }
+
+    .run-item-status--completed {
+      background-color: color-mix(in srgb, var(--green) 15%, transparent);
+      color: var(--green);
+    }
+
+    .run-item-status--failed {
+      background-color: color-mix(in srgb, var(--red) 15%, transparent);
+      color: var(--red);
+    }
+
+    /* ── Label input (editor) ── */
+    .label-editor-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacingS2);
+    }
+
+    .label-editor-row {
+      display: flex;
+      gap: var(--spacingS1);
+      align-items: center;
+    }
+
+    .label-editor-row .flm-textfield-input {
+      flex: 1;
+    }
+
+    .label-editor-remove {
+      background: none;
+      border: none;
+      color: var(--bodySubtext);
+      cursor: pointer;
+      padding: 4px;
+      font-size: var(--fontSizeMedium);
+    }
+
+    .label-editor-remove:hover {
+      color: var(--red);
+    }
+
+    /* ── Category picker ── */
+    .category-input-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      padding: 4px;
+      border: 1px solid var(--inputBorder);
+      border-radius: var(--roundedCorner4);
+      background-color: var(--inputBackground);
+      min-height: 32px;
+      align-items: center;
+      cursor: text;
+    }
+
+    .category-input-wrap:focus-within {
+      border-color: var(--themePrimary);
+    }
+
+    .category-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 1px 6px;
+      border-radius: var(--roundedCorner4);
+      font-size: var(--fontSizeSmall);
+      background-color: color-mix(in srgb, var(--themePrimary) 15%, transparent);
+      color: var(--themePrimary);
+    }
+
+    .category-tag-remove {
+      cursor: pointer;
+      font-size: 10px;
+      opacity: 0.7;
+      background: none;
+      border: none;
+      color: inherit;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .category-tag-remove:hover { opacity: 1; }
+
+    .category-input {
+      border: none;
+      outline: none;
+      background: transparent;
+      font-size: var(--fontSizeMedium);
+      color: var(--bodyText);
+      flex: 1;
+      min-width: 80px;
+      font-family: inherit;
+    }
+
+    .category-suggestions {
+      display: none;
+      position: absolute;
+      z-index: 10;
+      background-color: var(--bodyBackground);
+      border: 1px solid var(--bodyDivider);
+      border-radius: var(--roundedCorner4);
+      max-height: 160px;
+      overflow-y: auto;
+      margin-top: 2px;
+      min-width: 160px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .category-suggestion {
+      padding: var(--spacingS2) var(--spacingM);
+      font-size: var(--fontSizeMedium);
+      color: var(--bodyText);
+      cursor: pointer;
+    }
+
+    .category-suggestion:hover {
+      background-color: var(--listItemBackgroundHovered);
+    }
+
+    /* ── Distribution bar ── */
+    .distribution-bar {
+      display: flex;
+      height: 8px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: var(--spacingS2);
+    }
+
+    .distribution-segment {
+      height: 100%;
+      transition: width 0.3s;
+    }
+
+    .distribution-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacingS1) var(--spacingM);
+      margin-top: var(--spacingS1);
+      font-size: var(--fontSizeSmall);
+    }
+
+    .distribution-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--bodyText);
+    }
+
+    .distribution-legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .distribution-legend-count {
+      color: var(--bodySubtext);
+    }
+
+    /* ── Browse button inside textfield wrapper ── */
+    .flm-textfield-wrapper .flm-browse-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      border: none;
+      border-left: 1px solid var(--inputBorder);
+      background: var(--defaultStateBackground);
+      color: var(--bodySubtext);
+      cursor: pointer;
+      flex-shrink: 0;
+      padding: 0;
+    }
+    .flm-textfield-wrapper .flm-browse-btn:hover {
+      background: var(--bodyStandoutBackground);
+      color: var(--bodyText);
     }
   </style>
 </head>
@@ -120,7 +654,7 @@
       <a class="app-nav-link" href="../settings/index.html"><i class="flm-icon" data-icon="Settings"></i> Settings</a>
 
       <div style="padding: var(--spacingM);">
-        <button class="flm-button" id="themeToggle" style="width: 100%;">Switch to Dark</button>
+        <button class="flm-button" id="themeToggle" style="width: 100%;">Switch to Light</button>
       </div>
     </nav>
 
@@ -133,7 +667,21 @@
       <div class="app-commandbar">
         <div class="flm-commandbar">
           <div class="flm-commandbar-items">
+            <button class="flm-button flm-button--primary" data-icon="Add" id="btn-new-classification" style="margin: 4px 8px;">
+              New Classification
+            </button>
+            <button class="flm-commandbar-item" data-icon="Play" id="btn-run" disabled>Run</button>
+            <button class="flm-commandbar-item" data-icon="Copy" id="btn-duplicate" disabled>Duplicate</button>
+            <button class="flm-commandbar-item" data-icon="Delete" id="btn-delete" disabled>Delete</button>
+            <span class="flm-commandbar-divider"></span>
+            <button class="flm-commandbar-item" data-icon="Refresh" id="btn-refresh">Refresh</button>
+            <span class="flm-commandbar-divider"></span>
             <button class="flm-commandbar-item" id="btn-ask-awarity"><svg viewBox="0 0 64 64" width="16" height="16" style="flex-shrink:0;vertical-align:middle;margin-right:4px;"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyBackground)"/></svg>Ask Awarity</button>
+          </div>
+          <div class="flm-commandbar-far" style="align-items: center; padding-right: 8px;">
+            <div class="flm-searchbox" style="min-width: 220px;">
+              <input class="flm-searchbox-input" type="text" placeholder="Search classifications…" id="search-input">
+            </div>
           </div>
         </div>
       </div>
@@ -146,19 +694,1078 @@
         </ol>
       </div>
 
-      <!-- Content -->
-      <div class="app-content">
-      </div>
+      <!-- MessageBar Zone -->
+      <div class="app-messagebar-zone" id="messagebar-zone"></div>
 
+      <!-- Content -->
+      <div class="app-content" id="content-area">
+
+        <!-- ── Loading State (Shimmer) ── -->
+        <div id="state-loading" style="display: none;">
+          <div class="shimmer-table">
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+            <div class="shimmer-row"><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 2;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div><div class="flm-shimmer" style="flex: 1;"><div class="flm-shimmer-line"></div></div></div>
+          </div>
+        </div>
+
+        <!-- ── Empty State ── -->
+        <div id="state-empty" style="display: none;">
+          <div class="empty-state">
+            <i class="flm-icon empty-state-icon" data-icon="Org"></i>
+            <span class="empty-state-text">No classifications yet</span>
+            <span class="empty-state-sub">Classifications assign labels to documents, turning raw corpora into structured, queryable data.</span>
+            <button class="flm-button flm-button--primary" data-icon="Add" id="btn-empty-create">
+              Create your first classification
+            </button>
+          </div>
+        </div>
+
+        <!-- ── Data State (DetailsList) ── -->
+        <div id="state-data" style="display: block;">
+          <div class="filter-bar">
+            <div class="flm-overflowset" id="category-filter">
+              <div class="flm-overflowset-items"></div>
+            </div>
+            <div class="view-dropdown-wrapper">
+              <button class="view-dropdown-btn" id="view-dropdown-btn">
+                <i class="flm-icon" data-icon="ViewList"></i> Columns
+              </button>
+              <div class="view-dropdown-menu" id="view-dropdown-menu"></div>
+            </div>
+          </div>
+          <div class="flm-detailslist" id="classifications-list">
+            <div class="flm-detailslist-header" id="classifications-header"></div>
+            <!-- Rows populated by JS -->
+          </div>
+        </div>
+
+      </div><!-- /app-content -->
     </div><!-- /app-main -->
   </div><!-- /app-shell -->
+
+  <!-- ════════════════════════════════════════════════════════════════
+       DETAIL PANEL (right slide-over, medium)
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-panel-overlay" id="detail-panel-overlay"></div>
+  <div class="flm-panel flm-panel--medium" id="detail-panel">
+    <div class="flm-panel-header">
+      <h2 class="flm-panel-title" id="detail-panel-title">Classification</h2>
+      <span style="font-size: var(--fontSizeSmall); color: var(--bodySubtext); margin-left: var(--spacingS1);" id="detail-panel-subtitle"></span>
+      <button class="flm-panel-close" data-icon="Cancel" aria-label="Close" id="detail-panel-close"></button>
+    </div>
+    <div class="flm-panel-body">
+
+      <!-- Quick Actions -->
+      <div style="display: flex; gap: var(--spacingS1); margin-bottom: var(--spacingM);">
+        <button class="flm-button" id="btn-run-panel"><i class="flm-icon" data-icon="Play"></i> Run Now</button>
+        <button class="flm-button" id="btn-export-csv"><i class="flm-icon" data-icon="Download"></i> Export CSV</button>
+      </div>
+
+      <!-- Dirty badge -->
+      <div class="dirty-badge" id="dirty-badge">
+        <div class="flm-messagebar flm-messagebar--warning">You have unsaved changes.</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="pivot-bar" id="detail-pivot-bar">
+        <button class="pivot-tab pivot-tab--active" data-tab="edit">Edit</button>
+        <button class="pivot-tab" data-tab="results">Results</button>
+        <button class="pivot-tab" data-tab="runs">Run History</button>
+      </div>
+
+      <!-- ── Tab: Edit ── -->
+      <div class="pivot-panel pivot-panel--active" id="tab-edit">
+        <div class="panel-form">
+          <div class="flm-textfield flm-textfield--required">
+            <label class="flm-label" for="edit-name">Name</label>
+            <input class="flm-textfield-input" id="edit-name" placeholder="e.g. doc-type">
+          </div>
+
+          <div class="flm-textfield">
+            <label class="flm-label" for="edit-description">Description</label>
+            <textarea class="flm-textfield-input" id="edit-description" rows="2" style="width: 100%; resize: vertical;"></textarea>
+          </div>
+
+          <div>
+            <label class="flm-label">Categories</label>
+            <div style="position: relative;">
+              <div class="category-input-wrap" id="edit-categories-wrap">
+                <input class="category-input" id="edit-categories-input" placeholder="Add category…">
+              </div>
+              <div class="category-suggestions" id="edit-categories-suggestions"></div>
+            </div>
+          </div>
+
+          <div class="flm-textfield flm-textfield--required">
+            <label class="flm-label" for="edit-task">Task</label>
+            <textarea class="flm-textfield-input" id="edit-task" rows="3" placeholder="Describe how labels should be applied…" style="width: 100%; resize: vertical;"></textarea>
+          </div>
+
+          <div>
+            <label class="flm-label">Mode</label>
+            <div class="flm-choicegroup" style="display: flex; gap: var(--spacingM); flex-direction: row; margin-top: var(--spacingS2);">
+              <label class="flm-choicegroup-option">
+                <input type="radio" class="flm-choicegroup-input" name="edit-mode" value="single" checked>
+                <span class="flm-choicegroup-mark"></span>
+                <span class="flm-choicegroup-label">Single-label</span>
+              </label>
+              <label class="flm-choicegroup-option">
+                <input type="radio" class="flm-choicegroup-input" name="edit-mode" value="multi">
+                <span class="flm-choicegroup-mark"></span>
+                <span class="flm-choicegroup-label">Multi-label</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacingS2);">
+              <label class="flm-label">Labels</label>
+              <button class="flm-button flm-button--subtle" id="btn-add-label" style="font-size: var(--fontSizeSmall);"><i class="flm-icon" data-icon="Add"></i> Add Label</button>
+            </div>
+            <div class="label-editor-list" id="label-editor-list">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <div class="flm-textfield">
+            <label class="flm-label">Catalog</label>
+            <div class="flm-dropdown" id="edit-catalog">
+              <button class="flm-dropdown-trigger" type="button">
+                <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select catalog…</span>
+                <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+              </button>
+              <div class="flm-dropdown-listbox"></div>
+            </div>
+          </div>
+
+          <div class="flm-textfield">
+            <label class="flm-label">Lens (optional)</label>
+            <div class="flm-dropdown" id="edit-lens">
+              <button class="flm-dropdown-trigger" type="button">
+                <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select lens…</span>
+                <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+              </button>
+              <div class="flm-dropdown-listbox"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Tab: Results ── -->
+      <div class="pivot-panel" id="tab-results">
+        <div id="detail-results-content"></div>
+      </div>
+
+      <!-- ── Tab: Run History ── -->
+      <div class="pivot-panel" id="tab-runs">
+        <div id="detail-runs-content"></div>
+      </div>
+
+    </div>
+    <div class="flm-panel-footer">
+      <div class="panel-footer-actions">
+        <button class="flm-button" id="btn-delete-panel" style="color: var(--red);"><i class="flm-icon" data-icon="Delete"></i> Delete</button>
+        <div class="panel-footer-right">
+          <button class="flm-button" id="btn-cancel-edit">Cancel</button>
+          <button class="flm-button flm-button--primary" id="btn-save" disabled>Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       NEW CLASSIFICATION DIALOG
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-dialog-overlay" id="new-dialog" data-light-dismiss style="z-index: 1002;">
+    <div class="flm-dialog" style="max-width: 480px;">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title">New Classification</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
+      </div>
+      <div class="flm-dialog-body">
+        <div class="panel-form">
+          <div class="flm-textfield flm-textfield--required">
+            <label class="flm-label" for="new-name">Name</label>
+            <input class="flm-textfield-input" id="new-name" placeholder="e.g. doc-type">
+          </div>
+          <div class="flm-textfield">
+            <label class="flm-label" for="new-description">Description</label>
+            <textarea class="flm-textfield-input" id="new-description" rows="2" style="width: 100%; resize: vertical;"></textarea>
+          </div>
+          <div>
+            <label class="flm-label">Categories</label>
+            <div style="position: relative;">
+              <div class="category-input-wrap" id="new-categories-wrap">
+                <input class="category-input" id="new-categories-input" placeholder="Add category…">
+              </div>
+              <div class="category-suggestions" id="new-categories-suggestions"></div>
+            </div>
+          </div>
+        </div>
+        <div id="new-messagebar" style="display: none; margin-top: var(--spacingM);"></div>
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button" data-dialog-close>Cancel</button>
+        <button class="flm-button flm-button--primary" id="btn-new-create">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       DELETE DIALOG
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-dialog-overlay" id="delete-dialog" data-light-dismiss style="z-index: 1002;">
+    <div class="flm-dialog">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title">Delete Classification</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
+      </div>
+      <div class="flm-dialog-body">
+        <p>Delete <strong id="delete-name">doc-type</strong>? This removes the classification and its label definitions. Past run results are unaffected.</p>
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button" data-dialog-close>Cancel</button>
+        <button class="flm-button flm-button--primary" style="background-color: var(--red); border-color: var(--red);" id="btn-confirm-delete">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════════════════════
+       RUN CLASSIFICATION DIALOG
+       ════════════════════════════════════════════════════════════════ -->
+  <div class="flm-dialog-overlay" id="run-dialog" data-light-dismiss style="z-index: 1002;">
+    <div class="flm-dialog" style="max-width: 480px; overflow: visible;">
+      <div class="flm-dialog-header">
+        <h2 class="flm-dialog-title">Run Classification</h2>
+        <button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button>
+      </div>
+      <div class="flm-dialog-body" style="overflow: visible;">
+        <div class="panel-form">
+          <div class="flm-textfield">
+            <label class="flm-label">Classification</label>
+            <input class="flm-textfield-input" id="run-classification-name" readonly style="background: var(--bodyStandoutBackground);">
+          </div>
+          <div class="flm-textfield">
+            <label class="flm-label">Catalog</label>
+            <div class="flm-dropdown" id="run-catalog">
+              <button class="flm-dropdown-trigger" type="button">
+                <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select catalog…</span>
+                <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+              </button>
+              <div class="flm-dropdown-listbox"></div>
+            </div>
+          </div>
+          <div class="flm-textfield">
+            <label class="flm-label">Method</label>
+            <div class="flm-dropdown" id="run-method" data-value="full">
+              <button class="flm-dropdown-trigger" type="button">
+                <span class="flm-dropdown-title">Full ECW</span>
+                <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+              </button>
+              <div class="flm-dropdown-listbox">
+                <div class="flm-dropdown-option flm-dropdown-option--selected" data-value="full">Full ECW</div>
+                <div class="flm-dropdown-option" data-value="abstracts">Abstracts</div>
+              </div>
+            </div>
+          </div>
+          <div class="flm-textfield">
+            <label class="flm-label">Model</label>
+            <div class="flm-dropdown" id="run-model">
+              <button class="flm-dropdown-trigger" type="button">
+                <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select model…</span>
+                <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+              </button>
+              <div class="flm-dropdown-listbox"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flm-dialog-footer">
+        <button class="flm-button" data-dialog-close>Cancel</button>
+        <button class="flm-button flm-button--primary" id="btn-confirm-run">Run</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Combined library JS -->
   <script src="../scripts/fluentlm.min.js"></script>
   <script src="../scripts/awarity-v2.js"></script>
 
   <script>
-    awarity.initThemeToggle();
+    (function () {
+
+      // ── Cached data + dropdown helpers (parts.md pattern) ──
+      var cachedCatalogs = [];
+      var cachedLenses = [];
+      var cachedModels = [];
+
+      function wireDropdowns(root) {
+        if (typeof FluentLM !== 'undefined' && FluentLM.refresh) FluentLM.refresh(root);
+      }
+
+      function getDropdownValue(id) {
+        var el = document.getElementById(id);
+        return el ? (el.getAttribute('data-value') || '') : '';
+      }
+
+      function populateCatalogDropdown(id, selected) {
+        var dropdown = document.getElementById(id);
+        if (!dropdown) return;
+        var listbox = dropdown.querySelector('.flm-dropdown-listbox');
+        var title = dropdown.querySelector('.flm-dropdown-title');
+        var html = '';
+        for (var i = 0; i < cachedCatalogs.length; i++) {
+          var isSelected = selected === cachedCatalogs[i].id;
+          html += '<div class="flm-dropdown-option' + (isSelected ? ' flm-dropdown-option--selected' : '') +
+            '" data-value="' + cachedCatalogs[i].id + '">' + cachedCatalogs[i].label + '</div>';
+          if (isSelected && title) {
+            title.textContent = cachedCatalogs[i].label;
+            title.classList.remove('flm-dropdown-title--placeholder');
+            dropdown.setAttribute('data-value', cachedCatalogs[i].id);
+          }
+        }
+        if (listbox) listbox.innerHTML = html;
+      }
+
+      function populateLensDropdown(id, selected, includeNone) {
+        var dropdown = document.getElementById(id);
+        if (!dropdown) return;
+        var listbox = dropdown.querySelector('.flm-dropdown-listbox');
+        var title = dropdown.querySelector('.flm-dropdown-title');
+        var html = '';
+        if (includeNone) {
+          var noneSelected = !selected;
+          html += '<div class="flm-dropdown-option' + (noneSelected ? ' flm-dropdown-option--selected' : '') + '" data-value="">(none)</div>';
+          if (noneSelected && title) {
+            title.textContent = '(none)';
+            title.classList.remove('flm-dropdown-title--placeholder');
+          }
+        }
+        for (var i = 0; i < cachedLenses.length; i++) {
+          var isSelected = selected === cachedLenses[i].id;
+          html += '<div class="flm-dropdown-option' + (isSelected ? ' flm-dropdown-option--selected' : '') +
+            '" data-value="' + cachedLenses[i].id + '">' + cachedLenses[i].label + '</div>';
+          if (isSelected && title) {
+            title.textContent = cachedLenses[i].label;
+            title.classList.remove('flm-dropdown-title--placeholder');
+            dropdown.setAttribute('data-value', cachedLenses[i].id);
+          }
+        }
+        if (listbox) listbox.innerHTML = html;
+      }
+
+      function populateModelDropdown(id, selected) {
+        var dropdown = document.getElementById(id);
+        if (!dropdown) return;
+        var listbox = dropdown.querySelector('.flm-dropdown-listbox');
+        var title = dropdown.querySelector('.flm-dropdown-title');
+        var html = '';
+        for (var i = 0; i < cachedModels.length; i++) {
+          var isSelected = selected === cachedModels[i].id;
+          html += '<div class="flm-dropdown-option' + (isSelected ? ' flm-dropdown-option--selected' : '') +
+            '" data-value="' + cachedModels[i].id + '">' + cachedModels[i].label + '</div>';
+          if (isSelected && title) {
+            title.textContent = cachedModels[i].label;
+            title.classList.remove('flm-dropdown-title--placeholder');
+            dropdown.setAttribute('data-value', cachedModels[i].id);
+          }
+        }
+        if (listbox) listbox.innerHTML = html;
+      }
+
+      Promise.all([
+        awarity.getCatalogs().then(function (c) { cachedCatalogs = c; }),
+        awarity.getLenses().then(function (l) { cachedLenses = l; }),
+        awarity.getModels().then(function (m) { cachedModels = m; })
+      ]).then(function () {
+        populateCatalogDropdown('edit-catalog');
+        populateCatalogDropdown('run-catalog');
+        populateLensDropdown('edit-lens', '', true);
+        populateModelDropdown('run-model');
+        wireDropdowns(document.getElementById('detail-panel'));
+        wireDropdowns(document.getElementById('run-dialog'));
+      });
+
+      // ── Suggested categories ──
+      var SUGGESTED_CATEGORIES = ['finance', 'legal', 'compliance', 'security', 'research', 'triage', 'extraction', 'routing', 'technical'];
+
+      // ── Distribution colors ──
+      var DIST_COLORS = ['#0078d4', '#107c10', '#d83b01', '#5c2d91', '#008272', '#e81123', '#ffb900', '#2b88d8', '#a4262c', '#00bcf2'];
+
+      // ── Mock classification data ──
+      var MOCK_CLASSIFICATIONS = [
+        {
+          id: 'doc-type', name: 'doc-type',
+          description: 'Classify documents by their regulatory filing type (10-K, 10-Q, 8-K, etc.).',
+          categories: ['finance', 'triage'],
+          task: 'Read each document and assign it to exactly one filing type based on its content, structure, and header information. Look for standard SEC filing headers, document structure patterns, and regulatory references.',
+          mode: 'single',
+          labels: [
+            { name: '10-K Annual Report', description: 'Annual report filed with the SEC' },
+            { name: '10-Q Quarterly Report', description: 'Quarterly financial report' },
+            { name: '8-K Current Report', description: 'Report of significant events' },
+            { name: 'DEF 14A Proxy Statement', description: 'Proxy solicitation materials' },
+            { name: 'S-1 Registration', description: 'Registration statement for new securities' },
+            { name: 'Other', description: 'Documents that do not match any known filing type' }
+          ],
+          catalog: 'sec-filings', lens: '',
+          lastUpdated: 'Feb 21, 2026', lastRun: 'Feb 21, 2026',
+          docsClassified: 34, labelCount: 6,
+          results: [
+            { document: 'ACME-10K-2025.pdf', label: '10-K Annual Report', confidence: 0.97 },
+            { document: 'ACME-10Q-Q3.pdf', label: '10-Q Quarterly Report', confidence: 0.95 },
+            { document: 'BETA-8K-20260220.pdf', label: '8-K Current Report', confidence: 0.92 },
+            { document: 'GAMMA-10Q-Q4.pdf', label: '10-Q Quarterly Report', confidence: 0.94 },
+            { document: 'DELTA-DEF14A.pdf', label: 'DEF 14A Proxy Statement', confidence: 0.91 },
+            { document: 'ACME-S1-2026.pdf', label: 'S-1 Registration', confidence: 0.98 },
+            { document: 'BETA-10K-2025.pdf', label: '10-K Annual Report', confidence: 0.96 },
+            { document: 'misc-filing.pdf', label: 'Other', confidence: 0.73 }
+          ],
+          distribution: { '10-K Annual Report': 8, '10-Q Quarterly Report': 12, '8-K Current Report': 6, 'DEF 14A Proxy Statement': 3, 'S-1 Registration': 2, 'Other': 3 },
+          runs: [
+            { name: 'Full run — SEC Filings Q4', date: 'Feb 21, 2026', status: 'completed', docs: 34, duration: '6m 08s' },
+            { name: 'Abstracts trial run', date: 'Feb 18, 2026', status: 'completed', docs: 34, duration: '1m 42s' }
+          ]
+        },
+        {
+          id: 'anomaly-type', name: 'anomaly-type',
+          description: 'Detect and categorize anomalies and red flags across contract documents.',
+          categories: ['legal', 'triage'],
+          task: 'Examine each document for anomalies, inconsistencies, and red flags. Assign one or more anomaly categories. Focus on clauses that deviate from standard templates, missing required provisions, contradictions, and unusual terms.',
+          mode: 'multi',
+          labels: [
+            { name: 'Unusual termination clause', description: 'Non-standard or one-sided termination provisions' },
+            { name: 'Missing liability cap', description: 'Absence of standard liability limitations' },
+            { name: 'Non-standard payment terms', description: 'Payment terms that deviate from norms' },
+            { name: 'Conflicting jurisdiction', description: 'Contradictory governing law or venue clauses' },
+            { name: 'Expired insurance', description: 'Insurance requirements past their validity date' },
+            { name: 'No anomalies', description: 'Document passes all checks with no flags' }
+          ],
+          catalog: 'contracts', lens: 'red-flag-detection',
+          lastUpdated: 'Feb 22, 2026', lastRun: 'Feb 22, 2026',
+          docsClassified: 47, labelCount: 6,
+          results: [
+            { document: 'contract-2847.pdf', label: 'Unusual termination clause', confidence: 0.89 },
+            { document: 'contract-3021.pdf', label: 'Missing liability cap', confidence: 0.93 },
+            { document: 'contract-1156.pdf', label: 'Non-standard payment terms', confidence: 0.85 },
+            { document: 'contract-0892.pdf', label: 'Conflicting jurisdiction', confidence: 0.88 },
+            { document: 'contract-2103.pdf', label: 'Expired insurance', confidence: 0.79 },
+            { document: 'contract-0001.pdf', label: 'No anomalies', confidence: 0.96 },
+            { document: 'contract-0045.pdf', label: 'No anomalies', confidence: 0.94 },
+            { document: 'contract-0102.pdf', label: 'No anomalies', confidence: 0.97 }
+          ],
+          distribution: { 'Unusual termination clause': 3, 'Missing liability cap': 2, 'Non-standard payment terms': 4, 'Conflicting jurisdiction': 2, 'Expired insurance': 1, 'No anomalies': 42 },
+          runs: [
+            { name: 'Full run — Contract Portfolio', date: 'Feb 22, 2026', status: 'completed', docs: 47, duration: '8m 15s' },
+            { name: 'Subset re-check (flagged only)', date: 'Feb 20, 2026', status: 'completed', docs: 5, duration: '1m 03s' },
+            { name: 'Initial broad pass', date: 'Feb 15, 2026', status: 'completed', docs: 47, duration: '8m 45s' }
+          ]
+        },
+        {
+          id: 'topic-cluster', name: 'topic-cluster',
+          description: 'Group research papers by primary topic area for routing and triage.',
+          categories: ['research', 'routing'],
+          task: 'Read each paper\'s abstract and content to determine its primary research topic. Assign exactly one topic cluster. Use the abstract as the primary signal; fall back to full text for ambiguous cases.',
+          mode: 'single',
+          labels: [
+            { name: 'Machine Learning', description: 'ML algorithms, training methods, model architectures' },
+            { name: 'Natural Language Processing', description: 'Text understanding, generation, translation' },
+            { name: 'Computer Vision', description: 'Image recognition, object detection, video analysis' },
+            { name: 'Robotics', description: 'Autonomous systems, control, manipulation' },
+            { name: 'Systems & Infrastructure', description: 'Distributed systems, databases, networking' },
+            { name: 'Security & Privacy', description: 'Cryptography, access control, threat detection' }
+          ],
+          catalog: 'research-papers', lens: '',
+          lastUpdated: 'Feb 19, 2026', lastRun: 'Feb 19, 2026',
+          docsClassified: 128, labelCount: 6,
+          results: [
+            { document: 'attention-is-all-you-need.pdf', label: 'Natural Language Processing', confidence: 0.98 },
+            { document: 'resnet-deep-residual.pdf', label: 'Computer Vision', confidence: 0.96 },
+            { document: 'transformer-survey.pdf', label: 'Machine Learning', confidence: 0.91 },
+            { document: 'llm-safety-alignment.pdf', label: 'Security & Privacy', confidence: 0.87 },
+            { document: 'robot-manipulation.pdf', label: 'Robotics', confidence: 0.94 },
+            { document: 'distributed-training.pdf', label: 'Systems & Infrastructure', confidence: 0.90 }
+          ],
+          distribution: { 'Machine Learning': 38, 'Natural Language Processing': 31, 'Computer Vision': 24, 'Robotics': 12, 'Systems & Infrastructure': 15, 'Security & Privacy': 8 },
+          runs: [
+            { name: 'Abstract-based clustering', date: 'Feb 19, 2026', status: 'completed', docs: 128, duration: '3m 22s' }
+          ]
+        },
+        {
+          id: 'compliance-gap', name: 'compliance-gap',
+          description: 'Identify compliance gaps and obligations from regulatory filings.',
+          categories: ['compliance', 'legal'],
+          task: 'Review each document for compliance obligations, deadlines, and gaps. Assign one or more compliance categories. Pay special attention to stated vs. actual compliance status, upcoming deadlines, and areas where remediation is needed.',
+          mode: 'multi',
+          labels: [
+            { name: 'Data Privacy', description: 'GDPR, CCPA, and data handling obligations' },
+            { name: 'Financial Reporting', description: 'SOX, audit, and disclosure requirements' },
+            { name: 'Environmental', description: 'ESG, emissions, and sustainability reporting' },
+            { name: 'Labor & Employment', description: 'Workplace safety, discrimination, and labor laws' },
+            { name: 'Anti-Corruption', description: 'FCPA, bribery, and ethics compliance' },
+            { name: 'Compliant', description: 'No gaps identified' }
+          ],
+          catalog: 'regulatory-filings', lens: 'legal-compliance',
+          lastUpdated: 'Feb 20, 2026', lastRun: 'Feb 20, 2026',
+          docsClassified: 22, labelCount: 6,
+          results: [
+            { document: 'annual-compliance-report.pdf', label: 'Financial Reporting', confidence: 0.94 },
+            { document: 'gdpr-assessment.pdf', label: 'Data Privacy', confidence: 0.97 },
+            { document: 'esg-disclosure.pdf', label: 'Environmental', confidence: 0.92 },
+            { document: 'workplace-audit.pdf', label: 'Labor & Employment', confidence: 0.88 },
+            { document: 'vendor-policy.pdf', label: 'Anti-Corruption', confidence: 0.85 },
+            { document: 'quarterly-report.pdf', label: 'Compliant', confidence: 0.91 }
+          ],
+          distribution: { 'Data Privacy': 5, 'Financial Reporting': 4, 'Environmental': 3, 'Labor & Employment': 2, 'Anti-Corruption': 1, 'Compliant': 12 },
+          runs: [
+            { name: 'Q4 compliance review', date: 'Feb 20, 2026', status: 'completed', docs: 22, duration: '4m 51s' },
+            { name: 'Initial scan (failed)', date: 'Feb 18, 2026', status: 'failed', docs: 0, duration: '0m 12s' }
+          ]
+        },
+        {
+          id: 'priority-level', name: 'priority-level',
+          description: 'Triage incoming documents by urgency and required action.',
+          categories: ['triage'],
+          task: 'Assess each document for urgency. Consider deadlines, regulatory implications, financial impact, and whether immediate action is required. Assign exactly one priority level.',
+          mode: 'single',
+          labels: [
+            { name: 'Critical', description: 'Immediate action required — regulatory deadline or material risk' },
+            { name: 'High', description: 'Action needed within 48 hours' },
+            { name: 'Medium', description: 'Review within the week' },
+            { name: 'Low', description: 'Informational — no time pressure' }
+          ],
+          catalog: 'sec-filings', lens: '',
+          lastUpdated: 'Feb 17, 2026', lastRun: 'Feb 17, 2026',
+          docsClassified: 34, labelCount: 4,
+          results: [
+            { document: 'BETA-8K-20260220.pdf', label: 'Critical', confidence: 0.93 },
+            { document: 'ACME-10K-2025.pdf', label: 'High', confidence: 0.88 },
+            { document: 'GAMMA-10Q-Q4.pdf', label: 'Medium', confidence: 0.91 },
+            { document: 'misc-filing.pdf', label: 'Low', confidence: 0.85 }
+          ],
+          distribution: { 'Critical': 2, 'High': 8, 'Medium': 14, 'Low': 10 },
+          runs: [
+            { name: 'Weekly triage run', date: 'Feb 17, 2026', status: 'completed', docs: 34, duration: '2m 18s' }
+          ]
+        }
+      ];
+
+      // ── Refs ──
+      var detailPanel = document.getElementById('detail-panel');
+      var detailOverlay = document.getElementById('detail-panel-overlay');
+      var detailTitle = document.getElementById('detail-panel-title');
+      var detailSubtitle = document.getElementById('detail-panel-subtitle');
+      var deleteDialog = document.getElementById('delete-dialog');
+      var newDialog = document.getElementById('new-dialog');
+      var runDialog = document.getElementById('run-dialog');
+      var messageZone = document.getElementById('messagebar-zone');
+      var listEl = document.getElementById('classifications-list');
+
+      var currentClassification = null;
+      var isDirty = false;
+      var editCategories = [];
+      var newCategories = [];
+
+      awarity.initThemeToggle();
+
+      // ── MessageBar helper ──
+      function showMessage(type, text) {
+        messageZone.innerHTML = '<div class="flm-messagebar flm-messagebar--' + type + '">' + text + '</div>';
+        setTimeout(function () { messageZone.innerHTML = ''; }, 5000);
+      }
+
+      // ── Column definitions ──
+      var COLUMNS = [
+        { key: 'description',    label: 'Description',    minWidth: 200, number: false },
+        { key: 'categories',     label: 'Categories',     minWidth: 140, number: false },
+        { key: 'mode',           label: 'Mode',           minWidth: 90,  number: false },
+        { key: 'labelCount',     label: 'Labels',         minWidth: 60,  number: true },
+        { key: 'docsClassified', label: 'Docs',           minWidth: 60,  number: true },
+        { key: 'catalog',        label: 'Catalog',        minWidth: 120, number: false },
+        { key: 'lastRun',        label: 'Last Run',       minWidth: 100, number: false },
+        { key: 'lastUpdated',    label: 'Updated',        minWidth: 100, number: false }
+      ];
+
+      var _measureCtx = document.createElement('canvas').getContext('2d');
+      var _cs = getComputedStyle(document.documentElement);
+      _measureCtx.font = '600 ' + (_cs.getPropertyValue('--fontSizeSmall').trim() || '12px') + ' ' + (_cs.getPropertyValue('--fontFamily').trim() || '"Segoe UI", sans-serif');
+      function colWidth(col) {
+        var labelW = Math.ceil(_measureCtx.measureText(col.label).width) + 28;
+        return Math.max(col.minWidth, labelW);
+      }
+
+      var visibleColumns = { description: true, categories: true, mode: true, labelCount: true, docsClassified: true, lastRun: true };
+
+      function getVisibleColumns() {
+        return COLUMNS.filter(function (col) { return visibleColumns[col.key]; });
+      }
+
+      // ── Render Header ──
+      var headerEl = document.getElementById('classifications-header');
+
+      function colStyle(col, isLast) {
+        if (col.key === 'description') return 'min-width: ' + colWidth(col) + 'px; flex: 1;';
+        var w = colWidth(col) + 'px';
+        return isLast ? 'min-width: ' + w + '; flex: 1;' : 'width: ' + w + ';';
+      }
+
+      function renderHeader() {
+        var visCols = getVisibleColumns();
+        headerEl.innerHTML =
+          '<div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" id="check-all"><span class="flm-checkbox-mark"></span></label></div>' +
+          '<div class="flm-detailslist-header-cell" style="width: 200px;">Name</div>';
+        visCols.forEach(function (col, i) {
+          var isLast = i === visCols.length - 1;
+          headerEl.innerHTML += '<div class="flm-detailslist-header-cell' + (col.number ? ' cell-number' : '') + '" style="' + colStyle(col, isLast) + '">' + col.label + '</div>';
+        });
+        var checkAll = document.getElementById('check-all');
+        checkAll.addEventListener('change', function () {
+          var checked = checkAll.checked;
+          listEl.querySelectorAll('.flm-detailslist-row[data-id] .flm-checkbox-input').forEach(function (cb) { cb.checked = checked; });
+          updateToolbarState();
+        });
+      }
+
+      function modeBadgeHtml(mode) {
+        var label = mode === 'multi' ? 'Multi-label' : 'Single-label';
+        return '<span class="mode-badge mode-badge--' + mode + '">' + label + '</span>';
+      }
+
+      function cellHtml(col, item) {
+        switch (col.key) {
+          case 'description':
+            return '<span style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">' + (item.description || '') + '</span>';
+          case 'categories':
+            var chips = (item.categories || []).map(function (c) { return '<span class="category-chip">' + c + '</span>'; }).join('');
+            return '<div class="category-chips">' + chips + '</div>';
+          case 'mode':
+            return modeBadgeHtml(item.mode);
+          case 'labelCount':
+            return '' + item.labelCount;
+          case 'docsClassified':
+            return '' + item.docsClassified;
+          case 'catalog':
+            return item.catalog;
+          case 'lastRun':
+            return item.lastRun || '—';
+          case 'lastUpdated':
+            return item.lastUpdated;
+          default: return '';
+        }
+      }
+
+      // ── Render Table Rows ──
+      function renderRows() {
+        var existing = listEl.querySelectorAll('.flm-detailslist-row');
+        existing.forEach(function (r) { r.remove(); });
+
+        MOCK_CLASSIFICATIONS.forEach(function (item) {
+          var row = document.createElement('div');
+          row.className = 'flm-detailslist-row';
+          row.setAttribute('data-id', item.id);
+          row.setAttribute('data-search', (item.name + ' ' + item.description + ' ' + item.categories.join(' ') + ' ' + item.mode + ' ' + item.catalog).toLowerCase());
+          row.setAttribute('data-categories', item.categories.join(','));
+
+          var visCols = getVisibleColumns();
+          var html =
+            '<div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label></div>' +
+            '<div class="flm-detailslist-cell" style="width: 200px; font-weight: var(--fontWeightSemibold);">' + item.name + '</div>';
+
+          visCols.forEach(function (col, i) {
+            var isLast = i === visCols.length - 1;
+            html += '<div class="flm-detailslist-cell' + (col.number ? ' cell-number' : '') + '" style="' + colStyle(col, isLast) + '">' + cellHtml(col, item) + '</div>';
+          });
+
+          row.innerHTML = html;
+          listEl.appendChild(row);
+        });
+
+        bindRowEvents();
+        if (typeof buildFilterBar === 'function') { buildFilterBar(); applyFilters(); }
+      }
+
+      // ── Row click & checkbox events ──
+      function bindRowEvents() {
+        var rows = listEl.querySelectorAll('.flm-detailslist-row[data-id]');
+        rows.forEach(function (row) {
+          row.addEventListener('click', function (e) {
+            if (e.target.closest('.flm-detailslist-check')) return;
+            var chip = e.target.closest('.category-chip');
+            if (chip) { setCategory(chip.textContent); return; }
+            openDetailPanel(row.getAttribute('data-id'));
+          });
+        });
+
+        listEl.querySelectorAll('.flm-detailslist-row[data-id] .flm-checkbox-input').forEach(function (cb) {
+          cb.addEventListener('change', updateToolbarState);
+        });
+      }
+
+      // ── Selection & toolbar state ──
+      var btnRun = document.getElementById('btn-run');
+      var btnDuplicate = document.getElementById('btn-duplicate');
+      var btnDelete = document.getElementById('btn-delete');
+
+      function getSelectedIds() {
+        var ids = [];
+        listEl.querySelectorAll('.flm-detailslist-row[data-id] .flm-checkbox-input:checked').forEach(function (cb) {
+          ids.push(cb.closest('.flm-detailslist-row').getAttribute('data-id'));
+        });
+        return ids;
+      }
+
+      function updateToolbarState() {
+        var checkAll = document.getElementById('check-all');
+        var rowCBs = listEl.querySelectorAll('.flm-detailslist-row[data-id] .flm-checkbox-input');
+        var count = getSelectedIds().length;
+        btnRun.disabled = count !== 1;
+        btnDuplicate.disabled = count !== 1;
+        btnDelete.disabled = count === 0;
+        if (checkAll) {
+          checkAll.checked = count > 0 && count === rowCBs.length;
+          checkAll.indeterminate = count > 0 && count < rowCBs.length;
+        }
+      }
+
+      // ── View dropdown (column picker) ──
+      var viewBtn = document.getElementById('view-dropdown-btn');
+      var viewMenu = document.getElementById('view-dropdown-menu');
+
+      function buildViewMenu() {
+        viewMenu.innerHTML = '';
+        COLUMNS.forEach(function (col) {
+          var btn = document.createElement('button');
+          btn.className = 'view-dropdown-item';
+          var checked = visibleColumns[col.key];
+          btn.innerHTML = '<span style="width:16px;text-align:center;">' + (checked ? '&#10003;' : '') + '</span> ' + col.label;
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            visibleColumns[col.key] = !visibleColumns[col.key];
+            renderHeader();
+            renderRows();
+            buildViewMenu();
+          });
+          viewMenu.appendChild(btn);
+        });
+      }
+
+      viewBtn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        viewMenu.classList.toggle('view-dropdown-menu--open');
+        if (viewMenu.classList.contains('view-dropdown-menu--open')) buildViewMenu();
+      });
+
+      document.addEventListener('click', function () {
+        viewMenu.classList.remove('view-dropdown-menu--open');
+      });
+
+      // ── Category filter bar ──
+      var activeCategory = 'All';
+
+      function buildFilterBar() {
+        var cats = {};
+        MOCK_CLASSIFICATIONS.forEach(function (c) {
+          c.categories.forEach(function (cat) { cats[cat] = true; });
+        });
+        var sorted = Object.keys(cats).sort();
+        var items = document.querySelector('#category-filter .flm-overflowset-items');
+        items.innerHTML = '';
+        ['All'].concat(sorted).forEach(function (cat) {
+          var btn = document.createElement('button');
+          btn.className = 'flm-overflowset-item filter-pill' + (cat === activeCategory ? ' filter-pill--active' : '');
+          btn.setAttribute('data-category', cat);
+          btn.textContent = cat;
+          btn.addEventListener('click', function () { setCategory(cat); });
+          items.appendChild(btn);
+        });
+      }
+
+      function setCategory(cat) {
+        activeCategory = cat;
+        document.querySelectorAll('#category-filter .filter-pill').forEach(function (btn) {
+          btn.classList.toggle('filter-pill--active', btn.getAttribute('data-category') === cat);
+        });
+        applyFilters();
+      }
+
+      function applyFilters() {
+        var query = document.getElementById('search-input').value.toLowerCase();
+        listEl.querySelectorAll('.flm-detailslist-row[data-id]').forEach(function (row) {
+          var searchMatch = row.getAttribute('data-search').indexOf(query) !== -1;
+          var catMatch = activeCategory === 'All' || (',' + row.getAttribute('data-categories') + ',').indexOf(',' + activeCategory + ',') !== -1;
+          row.style.display = (searchMatch && catMatch) ? '' : 'none';
+        });
+      }
+
+      document.getElementById('search-input').addEventListener('input', function () {
+        applyFilters();
+      });
+
+      // ── Panel Helpers ──
+      function openPanel(panel, overlay) {
+        panel.classList.add('flm-panel--open');
+        overlay.classList.add('flm-panel-overlay--visible');
+      }
+
+      function closePanel(panel, overlay) {
+        panel.classList.remove('flm-panel--open');
+        overlay.classList.remove('flm-panel-overlay--visible');
+      }
+
+      // ── Pivot tab switching ──
+      function switchDetailTab(tabName) {
+        document.querySelectorAll('#detail-pivot-bar .pivot-tab').forEach(function (t) {
+          t.classList.toggle('pivot-tab--active', t.getAttribute('data-tab') === tabName);
+        });
+        document.querySelectorAll('#detail-panel .pivot-panel').forEach(function (p) {
+          p.classList.toggle('pivot-panel--active', p.id === 'tab-' + tabName);
+        });
+      }
+
+      document.querySelectorAll('#detail-pivot-bar .pivot-tab').forEach(function (tab) {
+        tab.addEventListener('click', function () {
+          switchDetailTab(tab.getAttribute('data-tab'));
+        });
+      });
+
+      // ── Distribution chart ──
+      function renderDistribution(dist, container) {
+        var total = 0;
+        var entries = [];
+        Object.keys(dist).forEach(function (label) {
+          total += dist[label];
+          entries.push({ label: label, count: dist[label] });
+        });
+        if (total === 0) { container.innerHTML = '<span class="flm-text flm-text--secondary">No results yet.</span>'; return; }
+
+        var barHtml = '<div class="distribution-bar">';
+        var legendHtml = '<div class="distribution-legend">';
+        entries.forEach(function (e, i) {
+          var pct = (e.count / total * 100).toFixed(1);
+          var color = DIST_COLORS[i % DIST_COLORS.length];
+          barHtml += '<div class="distribution-segment" style="width: ' + pct + '%; background-color: ' + color + ';" data-tooltip="' + e.label + ': ' + e.count + ' (' + pct + '%)"></div>';
+          legendHtml += '<span class="distribution-legend-item"><span class="distribution-legend-dot" style="background-color: ' + color + ';"></span> ' + e.label + ' <span class="distribution-legend-count">(' + e.count + ')</span></span>';
+        });
+        barHtml += '</div>';
+        legendHtml += '</div>';
+        container.innerHTML = barHtml + legendHtml;
+      }
+
+      // ── Render label editor ──
+      function renderLabelEditor(labels) {
+        var list = document.getElementById('label-editor-list');
+        list.innerHTML = '';
+        labels.forEach(function (lbl, i) {
+          var row = document.createElement('div');
+          row.className = 'label-editor-row';
+          row.innerHTML =
+            '<input class="flm-textfield-input" value="' + lbl.name + '" placeholder="Label name" data-idx="' + i + '" data-field="name">' +
+            '<input class="flm-textfield-input" value="' + (lbl.description || '') + '" placeholder="Description (optional)" data-idx="' + i + '" data-field="desc" style="flex: 2;">' +
+            '<button class="label-editor-remove" data-idx="' + i + '" title="Remove">&times;</button>';
+          list.appendChild(row);
+        });
+      }
+
+      // ── Open Detail Panel ──
+      function openDetailPanel(id) {
+        var item = MOCK_CLASSIFICATIONS.find(function (c) { return c.id === id; });
+        if (!item) return;
+
+        currentClassification = item;
+        isDirty = false;
+        document.getElementById('dirty-badge').classList.remove('dirty-badge--visible');
+
+        detailTitle.textContent = item.name;
+        detailSubtitle.textContent = 'Last updated ' + item.lastUpdated;
+
+        // Edit tab
+        document.getElementById('edit-name').value = item.name;
+        document.getElementById('edit-description').value = item.description || '';
+        document.getElementById('edit-task').value = item.task || '';
+        var modeRadio = document.querySelector('input[name="edit-mode"][value="' + item.mode + '"]');
+        if (modeRadio) modeRadio.checked = true;
+        renderLabelEditor(item.labels);
+
+        // Results tab
+        var resultsContent = document.getElementById('detail-results-content');
+        var resultsHtml = '';
+
+        // Distribution
+        resultsHtml += '<div class="panel-section"><div class="panel-section-title">Distribution</div><div id="detail-distribution"></div></div>';
+
+        // Results table
+        if (item.results && item.results.length) {
+          resultsHtml += '<div class="panel-section"><div class="panel-section-title">Sample Results (' + item.results.length + ' of ' + item.docsClassified + ')</div>';
+          resultsHtml += '<table class="results-table"><thead><tr><th>Document</th><th>Label</th><th style="text-align: right;">Confidence</th></tr></thead><tbody>';
+          item.results.forEach(function (r) {
+            var pct = (r.confidence * 100).toFixed(0) + '%';
+            resultsHtml += '<tr><td>' + r.document + '</td><td>' + r.label + '</td><td style="text-align: right; font-variant-numeric: tabular-nums;">' + pct + '</td></tr>';
+          });
+          resultsHtml += '</tbody></table></div>';
+        } else {
+          resultsHtml += '<span class="flm-text flm-text--secondary">No results yet. Run the classification to generate results.</span>';
+        }
+        resultsContent.innerHTML = resultsHtml;
+
+        // Render distribution chart after HTML is in DOM
+        if (item.distribution) {
+          renderDistribution(item.distribution, document.getElementById('detail-distribution'));
+        }
+
+        // Runs tab
+        var runsContent = document.getElementById('detail-runs-content');
+        if (item.runs && item.runs.length) {
+          var runsHtml = '';
+          item.runs.forEach(function (r) {
+            var statusClass = r.status === 'completed' ? 'run-item-status--completed' : 'run-item-status--failed';
+            runsHtml += '<div class="run-item">' +
+              '<div class="run-item-left"><span class="run-item-name">' + r.name + '</span><span class="run-item-meta">' + r.date + ' · ' + r.docs + ' docs · ' + r.duration + '</span></div>' +
+              '<span class="run-item-status ' + statusClass + '">' + r.status.charAt(0).toUpperCase() + r.status.slice(1) + '</span>' +
+              '</div>';
+          });
+          runsContent.innerHTML = runsHtml;
+        } else {
+          runsContent.innerHTML = '<span class="flm-text flm-text--secondary">No runs yet.</span>';
+        }
+
+        switchDetailTab('edit');
+        openPanel(detailPanel, detailOverlay);
+      }
+
+      // ── Close panel ──
+      document.getElementById('detail-panel-close').addEventListener('click', function () {
+        closePanel(detailPanel, detailOverlay);
+      });
+      detailOverlay.addEventListener('click', function () {
+        closePanel(detailPanel, detailOverlay);
+      });
+
+      // ── Add label button ──
+      document.getElementById('btn-add-label').addEventListener('click', function () {
+        if (!currentClassification) return;
+        currentClassification.labels.push({ name: '', description: '' });
+        renderLabelEditor(currentClassification.labels);
+      });
+
+      // ── Label editor events (delegated) ──
+      document.getElementById('label-editor-list').addEventListener('click', function (e) {
+        var removeBtn = e.target.closest('.label-editor-remove');
+        if (removeBtn && currentClassification) {
+          var idx = parseInt(removeBtn.getAttribute('data-idx'), 10);
+          currentClassification.labels.splice(idx, 1);
+          renderLabelEditor(currentClassification.labels);
+        }
+      });
+
+      // ── Toolbar buttons ──
+      btnRun.addEventListener('click', function () {
+        var selected = getSelectedIds();
+        if (selected.length === 1) openRunDialog(selected[0]);
+      });
+
+      btnDuplicate.addEventListener('click', function () {
+        var selected = getSelectedIds();
+        if (selected.length === 1) {
+          var item = MOCK_CLASSIFICATIONS.find(function (c) { return c.id === selected[0]; });
+          if (item) showMessage('success', 'Duplicated "' + item.name + '".');
+        }
+      });
+
+      btnDelete.addEventListener('click', function () {
+        var selected = getSelectedIds();
+        if (selected.length > 0) {
+          var names = selected.map(function (id) {
+            var c = MOCK_CLASSIFICATIONS.find(function (x) { return x.id === id; });
+            return c ? c.name : id;
+          });
+          document.getElementById('delete-name').textContent = names.join(', ');
+          deleteDialog.classList.add('flm-dialog-overlay--visible');
+        }
+      });
+
+      document.getElementById('btn-confirm-delete').addEventListener('click', function () {
+        deleteDialog.classList.remove('flm-dialog-overlay--visible');
+        showMessage('success', 'Classification deleted.');
+      });
+
+      // ── Run dialog ──
+      function openRunDialog(id) {
+        var item = MOCK_CLASSIFICATIONS.find(function (c) { return c.id === id; });
+        if (!item) return;
+        document.getElementById('run-classification-name').value = item.name;
+        runDialog.classList.add('flm-dialog-overlay--visible');
+      }
+
+      document.getElementById('btn-confirm-run').addEventListener('click', function () {
+        runDialog.classList.remove('flm-dialog-overlay--visible');
+        showMessage('info', 'Classification run started…');
+      });
+
+      document.getElementById('btn-run-panel').addEventListener('click', function () {
+        if (currentClassification) openRunDialog(currentClassification.id);
+      });
+
+      document.getElementById('btn-export-csv').addEventListener('click', function () {
+        if (currentClassification) showMessage('info', 'Exporting CSV for "' + currentClassification.name + '"…');
+      });
+
+      // ── Panel footer ──
+      document.getElementById('btn-save').addEventListener('click', function () {
+        showMessage('success', 'Classification saved.');
+        isDirty = false;
+        document.getElementById('dirty-badge').classList.remove('dirty-badge--visible');
+      });
+
+      document.getElementById('btn-cancel-edit').addEventListener('click', function () {
+        closePanel(detailPanel, detailOverlay);
+      });
+
+      document.getElementById('btn-delete-panel').addEventListener('click', function () {
+        if (currentClassification) {
+          document.getElementById('delete-name').textContent = currentClassification.name;
+          deleteDialog.classList.add('flm-dialog-overlay--visible');
+        }
+      });
+
+      // ── New classification dialog ──
+      document.getElementById('btn-new-classification').addEventListener('click', function () {
+        document.getElementById('new-name').value = '';
+        document.getElementById('new-description').value = '';
+        newDialog.classList.add('flm-dialog-overlay--visible');
+      });
+
+      document.getElementById('btn-empty-create').addEventListener('click', function () {
+        document.getElementById('new-name').value = '';
+        document.getElementById('new-description').value = '';
+        newDialog.classList.add('flm-dialog-overlay--visible');
+      });
+
+      document.getElementById('btn-new-create').addEventListener('click', function () {
+        var name = document.getElementById('new-name').value.trim();
+        if (!name) {
+          document.getElementById('new-messagebar').style.display = 'block';
+          document.getElementById('new-messagebar').innerHTML = '<div class="flm-messagebar flm-messagebar--error">Name is required.</div>';
+          return;
+        }
+        newDialog.classList.remove('flm-dialog-overlay--visible');
+        showMessage('success', 'Classification "' + name + '" created.');
+      });
+
+      // ── Refresh ──
+      document.getElementById('btn-refresh').addEventListener('click', function () {
+        showMessage('info', 'Refreshing classifications…');
+      });
+
+      // ── Initialize ──
+      renderHeader();
+      renderRows();
+      buildFilterBar();
+
+    })();
   </script>
 </body>
 </html>

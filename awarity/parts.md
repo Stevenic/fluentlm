@@ -4,6 +4,117 @@ Reusable UI patterns built on FluentLM components and the awarity-v2.js runtime.
 
 ---
 
+## Dialog & Detail Panel Layout
+
+All dialogs and slide out detail panels must obey the following layout rules:
+
+- The primary action like Save/Add/Next must be docked to the right hand side at the bottom of the dialog or panel.
+- Seconday actions like Close/Cancel should be immediately to the left of the primary action.
+- If the item is deletable, the Delete action must be docked to the left side at the bottom of the dialog or panel.
+- For wizards, the Previous action should be docked to the left side at the bottom of the wizard.
+- The content area of detail panels should be scrollable but the title and action buttons should always be visible.
+- If a detail panel has a pivotset, only the content area of the pivots needs to be scrollable.
+- Dialogs should have their content scrollable if it won't fit on the screen but the same rules as detail panels applies.
+- FluentLM uses custom dropdowns and comboboxes so ensure that the content area of dialogs and detail panels contain the appropriate classes to prevent their popups from being clipped z-order wise.
+
+### Detail Panel Footer HTML
+
+The footer uses a full-width flex container. Delete is a direct child (sits at flex-start / left). Close and the primary action are wrapped in a `panel-footer-right` div that uses `margin-left: auto` to dock them to the right.
+
+```html
+<div class="flm-panel-footer">
+  <div class="panel-footer-actions">
+    <button class="flm-button" id="btn-delete" style="color: var(--red);">
+      <i class="flm-icon" data-icon="Delete"></i> Delete
+    </button>
+    <div class="panel-footer-right">
+      <button class="flm-button" id="btn-close">Close</button>
+      <button class="flm-button flm-button--primary" id="btn-save">Save</button>
+    </div>
+  </div>
+</div>
+```
+
+If the panel is not deletable, omit the Delete button — Close and the primary action remain in `panel-footer-right`.
+
+### Detail Panel Footer CSS
+
+The base `.flm-panel-footer` uses `justify-content: flex-end`, so `panel-footer-actions` must set `width: 100%` to fill the footer and allow its children to spread apart.
+
+```css
+.panel-footer-actions {
+  display: flex;
+  gap: var(--spacingS1);
+  align-items: center;
+  width: 100%;
+}
+.panel-footer-right {
+  margin-left: auto;
+  display: flex;
+  gap: var(--spacingS1);
+}
+```
+
+### Dialog Footer HTML
+
+Dialog footers use the built-in `flm-dialog-footer` which right-aligns its children by default. Place Cancel immediately left of the primary action.
+
+```html
+<div class="flm-dialog-footer">
+  <button class="flm-button" data-dialog-close>Cancel</button>
+  <button class="flm-button flm-button--primary" id="btn-confirm">Confirm</button>
+</div>
+```
+
+For wizards, dock the Back button to the left with `margin-right: auto`:
+
+```html
+<div class="flm-dialog-footer">
+  <button class="flm-button" id="btn-back" style="margin-right: auto;">Back</button>
+  <button class="flm-button" data-dialog-close>Cancel</button>
+  <button class="flm-button flm-button--primary" id="btn-next">Next</button>
+</div>
+```
+
+### Detail Panel Scrollability CSS
+
+The panel must be a flex column so the header and footer stay fixed while the body scrolls. If the panel has a pivot bar, make it sticky so only pivot content scrolls.
+
+```css
+/* Fixed header + footer, scrollable body */
+.flm-panel {
+  display: flex;
+  flex-direction: column;
+}
+.flm-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.flm-panel-header,
+.flm-panel-footer {
+  flex-shrink: 0;
+}
+
+/* Sticky pivot bar within scrollable body */
+.pivot-bar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.pivot-panel {
+  overflow-y: auto;
+}
+.pivot-panel--active {
+  flex: 1;
+  min-height: 0;
+}
+```
+
+---
+
 ## File & Folder Picker
 
 A text input with an inline browse button that opens a native file or folder picker. Uses the File System Access API when available (Chromium browsers) and remembers the last-used directory across sessions via IndexedDB. Falls back to a hidden `<input type="file">` on unsupported browsers.

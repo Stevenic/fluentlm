@@ -764,19 +764,17 @@
               </div>
             </div>
 
-            <div class="query-field">
+            <div class="query-field" style="min-width: 140px;">
               <label class="flm-label">Mode</label>
-              <div class="flm-choicegroup" style="display: flex; gap: var(--spacingM); flex-direction: row;">
-                <label class="flm-choicegroup-option">
-                  <input type="radio" class="flm-choicegroup-input" name="query-mode" value="full" checked>
-                  <span class="flm-choicegroup-mark"></span>
-                  <span class="flm-choicegroup-label">Full ECW</span>
-                </label>
-                <label class="flm-choicegroup-option">
-                  <input type="radio" class="flm-choicegroup-input" name="query-mode" value="abstracts">
-                  <span class="flm-choicegroup-mark"></span>
-                  <span class="flm-choicegroup-label">Abstracts</span>
-                </label>
+              <div class="flm-dropdown" id="sel-mode" data-value="full">
+                <button class="flm-dropdown-trigger" type="button">
+                  <span class="flm-dropdown-title">Full ECW</span>
+                  <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+                </button>
+                <div class="flm-dropdown-listbox">
+                  <div class="flm-dropdown-option flm-dropdown-option--selected" data-value="full">Full ECW</div>
+                  <div class="flm-dropdown-option" data-value="abstracts">Abstracts</div>
+                </div>
               </div>
             </div>
 
@@ -1069,14 +1067,26 @@
         if (listbox) listbox.innerHTML = html;
       }
 
+      var cachedCatalogs = [];
+      var cachedLenses = [];
+      var cachedModels = [];
+
+      function wireDropdowns(root) {
+        if (typeof FluentLM !== 'undefined' && FluentLM.refresh) FluentLM.refresh(root);
+      }
+
       Promise.all([
         awarity.getCatalogs(),
         awarity.getLenses(),
         awarity.getModels()
       ]).then(function (results) {
+        cachedCatalogs = results[0];
+        cachedLenses = results[1];
+        cachedModels = results[2];
         populateDropdown('sel-catalog', results[0]);
         populateDropdown('sel-lens', results[1], '', '(none)');
         populateDropdown('sel-model', results[2], results[2][0] ? results[2][0].id : '');
+        wireDropdowns(document.querySelector('.query-config'));
       });
 
       // ── Mock Catalog Data ──
@@ -1310,7 +1320,7 @@
         var cat = CATALOG_DATA[catalog];
         var lens = getDropdownValue('sel-lens');
         var model = getDropdownValue('sel-model') || 'claude-sonnet';
-        var queryMode = document.querySelector('input[name="query-mode"]:checked').value;
+        var queryMode = getDropdownValue('sel-mode');
 
         document.getElementById('stat-catalog').textContent = catalog;
         document.getElementById('stat-model').textContent = model;
@@ -1399,7 +1409,7 @@
       // ── Run Query ──
       function executeQuery(mode) {
         var catalog = getDropdownValue('sel-catalog');
-        var queryMode = mode || document.querySelector('input[name="query-mode"]:checked').value;
+        var queryMode = mode || getDropdownValue('sel-mode');
         var lens = getDropdownValue('sel-lens');
         var model = getDropdownValue('sel-model') || 'claude-sonnet';
 

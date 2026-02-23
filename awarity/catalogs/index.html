@@ -202,6 +202,23 @@
       height: 3px;
     }
 
+    /* ── Panel layout: fixed header + footer, scrollable body ── */
+    .flm-panel {
+      display: flex;
+      flex-direction: column;
+    }
+    .flm-panel-body {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .flm-panel-header,
+    .flm-panel-footer {
+      flex-shrink: 0;
+    }
+
     /* ── Panel Sections ── */
     .panel-section {
       margin-bottom: var(--spacingL2);
@@ -454,6 +471,9 @@
       background-color: var(--bodyStandoutBackground);
       margin: 0 calc(-1 * var(--spacingL1));
       padding: 0 var(--spacingL1);
+      position: sticky;
+      top: 0;
+      z-index: 1;
     }
     .pivot-tab {
       padding: var(--spacingS2) var(--spacingL1);
@@ -469,12 +489,12 @@
       border-bottom-color: var(--themePrimary);
       font-weight: var(--fontWeightSemibold);
     }
-    .pivot-panel { display: none; padding-top: var(--spacingM); }
-    .pivot-panel--active { display: block; }
+    .pivot-panel { display: none; padding-top: var(--spacingM); overflow-y: auto; }
+    .pivot-panel--active { display: block; flex: 1; min-height: 0; }
 
     /* ── Panel footer ── */
     .panel-footer-actions {
-      display: flex; gap: var(--spacingS1); align-items: center;
+      display: flex; gap: var(--spacingS1); align-items: center; width: 100%;
     }
     .panel-footer-right {
       margin-left: auto; display: flex; gap: var(--spacingS1);
@@ -788,10 +808,10 @@
     </div>
     <div class="flm-panel-footer">
       <div class="panel-footer-actions">
-        <button class="flm-button" id="detail-panel-close-btn">Close</button>
-        <button class="flm-button flm-button--primary" id="btn-save-catalog" disabled>Save</button>
+        <button class="flm-button" id="btn-delete-catalog" style="color: var(--red);"><i class="flm-icon" data-icon="Delete"></i> Delete</button>
         <div class="panel-footer-right">
-          <button class="flm-button" id="btn-delete-catalog" style="color: var(--red);"><i class="flm-icon" data-icon="Delete"></i> Delete</button>
+          <button class="flm-button" id="detail-panel-close-btn">Close</button>
+          <button class="flm-button flm-button--primary" id="btn-save-catalog" disabled>Save</button>
         </div>
       </div>
     </div>
