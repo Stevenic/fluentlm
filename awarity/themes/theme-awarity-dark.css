@@ -6,6 +6,35 @@
 
 .fluent-awarity-dark {
   /* -----------------------------------------------------------------------
+     THEME ACCENT RAMP
+     ----------------------------------------------------------------------- */
+  --themeDarker:    #1e3a8a;
+  --themeDark:      #1e40af;
+  --themeDarkAlt:   #1d4ed8;
+  --themePrimary:   #2563eb;
+  --themeSecondary: #3b82f6;
+  --themeTertiary:  #60a5fa;
+  --themeLight:     #93c5fd;
+  --themeLighter:   #bfdbfe;
+  --themeLighterAlt:#dbeafe;
+
+  /* -----------------------------------------------------------------------
+     NEUTRAL RAMP (inverted for dark mode)
+     ----------------------------------------------------------------------- */
+  --neutralDark:           #d4e4e8;
+  --neutralPrimary:        #d4e4e8;
+  --neutralPrimaryAlt:     #bccfd4;
+  --neutralSecondary:      #8eaaB2;
+  --neutralSecondaryAlt:   #6b8a94;
+  --neutralTertiary:       #4d6e76;
+  --neutralTertiaryAlt:    #3e5a62;
+  --neutralQuaternary:     #2a4148;
+  --neutralQuaternaryAlt:  #244044;
+  --neutralLight:          #1d3236;
+  --neutralLighter:        #162629;
+  --neutralLighterAlt:     #0f1c1f;
+
+  /* -----------------------------------------------------------------------
      BODY / BACKGROUND
      ----------------------------------------------------------------------- */
   --bodyBackground:          #0f1c1f;

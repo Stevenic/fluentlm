@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home — Awarity</title>
-  <!-- Themes & combined library CSS -->
+  <!-- Combined library CSS (base) then theme overrides -->
+  <link rel="stylesheet" href="../themes/fluentlm.min.css">
   <link rel="stylesheet" href="../themes/theme-dark.css">
   <link rel="stylesheet" href="../themes/theme-awarity-light.css">
   <link rel="stylesheet" href="../themes/theme-awarity-dark.css">
   <link rel="stylesheet" href="../themes/theme-awarity-amber-light.css">
   <link rel="stylesheet" href="../themes/theme-awarity-amber-dark.css">
-  <link rel="stylesheet" href="../themes/fluentlm.min.css">
 
   <style>
     /* ── App Shell ── */
@@ -96,6 +96,162 @@
       overflow-y: auto;
       background-color: var(--bodyBackground);
     }
+
+    /* ── Dashboard ── */
+    .dash-grid {
+      display: grid;
+      gap: 20px;
+      max-width: 1400px;
+    }
+
+    .dash-summary-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 16px;
+    }
+
+    .dash-card {
+      background: var(--cardStandoutBackground);
+      border: 1px solid var(--variantBorder);
+      border-radius: var(--roundedCorner4);
+      padding: 20px 24px;
+      transition: border-color 0.15s;
+    }
+
+    .dash-card:hover {
+      border-color: var(--variantBorderHovered);
+    }
+
+    .dash-stat-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      text-decoration: none !important;
+      color: inherit;
+    }
+
+    .dash-stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dash-stat-icon i,
+    .dash-stat-icon svg { color: #fff; }
+
+    .dash-stat-body {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    .dash-stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--bodyText);
+      letter-spacing: -0.5px;
+    }
+
+    .dash-stat-label {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+      margin-top: 2px;
+    }
+
+    .dash-chart-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .dash-chart-card {
+      background: var(--cardStandoutBackground);
+      border: 1px solid var(--variantBorder);
+      border-radius: var(--roundedCorner4);
+      padding: 20px 24px;
+      transition: border-color 0.15s;
+    }
+
+    .dash-chart-card:hover {
+      border-color: var(--variantBorderHovered);
+    }
+
+    .dash-chart-title {
+      font-size: var(--fontSizeMedium);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+      margin-bottom: 16px;
+    }
+
+    .dash-chart-wrap {
+      position: relative;
+      width: 100%;
+    }
+
+    .dash-chart-wrap--doughnut {
+      max-width: 280px;
+      margin: 0 auto;
+    }
+
+    /* ── Recent Runs Table ── */
+    .dash-wide {
+      grid-column: 1 / -1;
+    }
+
+    .dash-runs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--fontSizeSmall);
+    }
+
+    .dash-runs-table th {
+      text-align: left;
+      padding: 8px 12px;
+      color: var(--bodySubtext);
+      font-weight: var(--fontWeightSemibold);
+      border-bottom: 1px solid var(--bodyDivider);
+    }
+
+    .dash-runs-table td {
+      padding: 10px 12px;
+      color: var(--bodyText);
+      border-bottom: 1px solid var(--bodyFrameDivider);
+    }
+
+    .dash-runs-table tbody tr:hover {
+      background: var(--listItemBackgroundHovered);
+    }
+
+    .dash-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 18px;
+    }
+
+    .dash-badge--ready    { background: var(--successBackground); color: var(--successText); }
+    .dash-badge--warning  { background: var(--warningBackground); color: #f59e0b; }
+    .dash-badge--running  { background: var(--infoBackground);    color: var(--infoIcon); }
+    .dash-badge--error    { background: var(--errorBackground);   color: var(--errorText); }
+    .dash-badge--complete { background: var(--successBackground); color: var(--successText); }
+    .dash-badge--never    { background: var(--bodyBackgroundChecked); color: var(--bodySubtext); }
+
+    /* ── Responsive ── */
+    @media (max-width: 1100px) {
+      .dash-summary-row { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 800px) {
+      .dash-summary-row { grid-template-columns: repeat(2, 1fr); }
+      .dash-chart-row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -147,6 +303,195 @@
 
       <!-- Content -->
       <div class="app-content">
+        <div class="dash-grid">
+
+          <!-- ═══════ Summary Cards ═══════ -->
+          <div class="dash-summary-row">
+
+            <a class="dash-card dash-stat-card" href="../catalogs/index.html">
+              <div class="dash-stat-icon" style="background: linear-gradient(135deg, #2563eb, #3b82f6);">
+                <i class="flm-icon" data-icon="Database" style="font-size: 20px;"></i>
+              </div>
+              <div class="dash-stat-body">
+                <div class="dash-stat-value">5</div>
+                <div class="dash-stat-label">Catalogs</div>
+              </div>
+            </a>
+
+            <a class="dash-card dash-stat-card" href="../catalogs/index.html">
+              <div class="dash-stat-icon" style="background: linear-gradient(135deg, #0891b2, #22d3ee);">
+                <i class="flm-icon" data-icon="TextDocument" style="font-size: 20px;"></i>
+              </div>
+              <div class="dash-stat-body">
+                <div class="dash-stat-value">9,005</div>
+                <div class="dash-stat-label">Documents</div>
+              </div>
+            </a>
+
+            <a class="dash-card dash-stat-card" href="../lenses/index.html">
+              <div class="dash-stat-icon" style="background: linear-gradient(135deg, #7c3aed, #a78bfa);">
+                <i class="flm-icon" data-icon="Filter" style="font-size: 20px;"></i>
+              </div>
+              <div class="dash-stat-body">
+                <div class="dash-stat-value">5</div>
+                <div class="dash-stat-label">Lenses</div>
+              </div>
+            </a>
+
+            <a class="dash-card dash-stat-card" href="../workflows/index.html">
+              <div class="dash-stat-icon" style="background: linear-gradient(135deg, #059669, #34d399);">
+                <i class="flm-icon" data-icon="Flow" style="font-size: 20px;"></i>
+              </div>
+              <div class="dash-stat-body">
+                <div class="dash-stat-value">4</div>
+                <div class="dash-stat-label">Workflows</div>
+              </div>
+            </a>
+
+            <a class="dash-card dash-stat-card" href="../runs/index.html">
+              <div class="dash-stat-icon" style="background: linear-gradient(135deg, #d97706, #fbbf24);">
+                <i class="flm-icon" data-icon="Processing" style="font-size: 20px;"></i>
+              </div>
+              <div class="dash-stat-body">
+                <div class="dash-stat-value">8</div>
+                <div class="dash-stat-label">Recent Runs</div>
+              </div>
+            </a>
+
+          </div>
+
+          <!-- ═══════ Row 2: Doughnuts ═══════ -->
+          <div class="dash-chart-row">
+
+            <div class="dash-chart-card">
+              <div class="dash-chart-title">Catalog Health</div>
+              <div class="dash-chart-wrap dash-chart-wrap--doughnut">
+                <canvas id="chartCatalogHealth"></canvas>
+              </div>
+            </div>
+
+            <div class="dash-chart-card">
+              <div class="dash-chart-title">Workflow Status</div>
+              <div class="dash-chart-wrap dash-chart-wrap--doughnut">
+                <canvas id="chartWorkflowStatus"></canvas>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ═══════ Row 3: Bars ═══════ -->
+          <div class="dash-chart-row">
+
+            <div class="dash-chart-card">
+              <div class="dash-chart-title">Documents by Catalog</div>
+              <div class="dash-chart-wrap">
+                <canvas id="chartDocsByCatalog"></canvas>
+              </div>
+            </div>
+
+            <div class="dash-chart-card">
+              <div class="dash-chart-title">Run Activity (Last 7 Days)</div>
+              <div class="dash-chart-wrap">
+                <canvas id="chartRunActivity"></canvas>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ═══════ Row 4: Token usage + Lens usage ═══════ -->
+          <div class="dash-chart-row">
+
+            <div class="dash-chart-card">
+              <div class="dash-chart-title">Estimated Tokens by Catalog</div>
+              <div class="dash-chart-wrap">
+                <canvas id="chartTokens"></canvas>
+              </div>
+            </div>
+
+            <div class="dash-chart-card">
+              <div class="dash-chart-title">Lens Usage</div>
+              <div class="dash-chart-wrap">
+                <canvas id="chartLensUsage"></canvas>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ═══════ Row 5: Recent Runs Table ═══════ -->
+          <div class="dash-chart-card dash-wide">
+            <div class="dash-chart-title">Recent Runs</div>
+            <table class="dash-runs-table">
+              <thead>
+                <tr>
+                  <th>Workflow</th>
+                  <th>Timestamp</th>
+                  <th>Status</th>
+                  <th>Duration</th>
+                  <th>Steps</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>financial-risk-report</td>
+                  <td>Feb 22, 2026 &nbsp;2:33 PM</td>
+                  <td><span class="dash-badge dash-badge--complete">Complete</span></td>
+                  <td>3m 2s</td>
+                  <td>3</td>
+                </tr>
+                <tr>
+                  <td>compliance-monitoring</td>
+                  <td>Feb 20, 2026 &nbsp;9:15 AM</td>
+                  <td><span class="dash-badge dash-badge--complete">Complete</span></td>
+                  <td>5m 48s</td>
+                  <td>4</td>
+                </tr>
+                <tr>
+                  <td>financial-risk-report</td>
+                  <td>Feb 20, 2026 &nbsp;8:00 AM</td>
+                  <td><span class="dash-badge dash-badge--complete">Complete</span></td>
+                  <td>2m 55s</td>
+                  <td>3</td>
+                </tr>
+                <tr>
+                  <td>research-digest</td>
+                  <td>Feb 19, 2026 &nbsp;4:10 PM</td>
+                  <td><span class="dash-badge dash-badge--error">Error</span></td>
+                  <td>1m 12s</td>
+                  <td>2</td>
+                </tr>
+                <tr>
+                  <td>financial-risk-report</td>
+                  <td>Feb 19, 2026 &nbsp;10:22 AM</td>
+                  <td><span class="dash-badge dash-badge--complete">Complete</span></td>
+                  <td>3m 18s</td>
+                  <td>3</td>
+                </tr>
+                <tr>
+                  <td>compliance-monitoring</td>
+                  <td>Feb 18, 2026 &nbsp;9:00 AM</td>
+                  <td><span class="dash-badge dash-badge--complete">Complete</span></td>
+                  <td>6m 3s</td>
+                  <td>4</td>
+                </tr>
+                <tr>
+                  <td>financial-risk-report</td>
+                  <td>Feb 17, 2026 &nbsp;2:45 PM</td>
+                  <td><span class="dash-badge dash-badge--error">Error</span></td>
+                  <td>0m 34s</td>
+                  <td>3</td>
+                </tr>
+                <tr>
+                  <td>research-digest</td>
+                  <td>Feb 16, 2026 &nbsp;11:30 AM</td>
+                  <td><span class="dash-badge dash-badge--complete">Complete</span></td>
+                  <td>2m 5s</td>
+                  <td>2</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
       </div>
 
     </div><!-- /app-main -->
@@ -155,9 +500,263 @@
   <!-- Combined library JS -->
   <script src="../scripts/fluentlm.min.js"></script>
   <script src="../scripts/awarity-v2.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 
   <script>
     awarity.initThemeToggle();
+
+    // ── Theme-aware Chart.js defaults ──
+    (function () {
+      var cs = getComputedStyle(document.documentElement);
+      var textColor   = cs.getPropertyValue('--bodySubtext').trim()  || '#8eaaB2';
+      var gridColor   = cs.getPropertyValue('--bodyDivider').trim()  || '#1d3236';
+      var bodyText    = cs.getPropertyValue('--bodyText').trim()     || '#d4e4e8';
+
+      Chart.defaults.color = textColor;
+      Chart.defaults.borderColor = gridColor;
+      Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      Chart.defaults.font.size = 12;
+      Chart.defaults.plugins.legend.labels.usePointStyle = true;
+      Chart.defaults.plugins.legend.labels.pointStyleWidth = 10;
+      Chart.defaults.plugins.legend.labels.padding = 16;
+      Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(10, 20, 22, 0.92)';
+      Chart.defaults.plugins.tooltip.titleColor = bodyText;
+      Chart.defaults.plugins.tooltip.bodyColor = textColor;
+      Chart.defaults.plugins.tooltip.borderColor = gridColor;
+      Chart.defaults.plugins.tooltip.borderWidth = 1;
+      Chart.defaults.plugins.tooltip.cornerRadius = 6;
+      Chart.defaults.plugins.tooltip.padding = 10;
+      Chart.defaults.elements.arc.borderWidth = 0;
+
+      // ── Palette ──
+      var blue   = '#2563eb';
+      var sky    = '#60a5fa';
+      var cyan   = '#22d3ee';
+      var teal   = '#14b8a6';
+      var green  = '#34d399';
+      var amber  = '#fbbf24';
+      var orange = '#f97316';
+      var rose   = '#f43f5e';
+      var violet = '#a78bfa';
+      var indigo = '#818cf8';
+
+      // ── 1. Catalog Health Doughnut ──
+      new Chart(document.getElementById('chartCatalogHealth'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Ready', 'Abstracts Missing', 'Processing', 'Error'],
+          datasets: [{
+            data: [2, 1, 1, 1],
+            backgroundColor: [green, amber, sky, rose],
+            hoverBackgroundColor: ['#4ade80', '#fcd34d', '#93c5fd', '#fb7185'],
+            borderRadius: 4,
+            spacing: 3
+          }]
+        },
+        options: {
+          cutout: '68%',
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+              callbacks: {
+                label: function (ctx) {
+                  return ctx.label + ': ' + ctx.parsed + ' catalog' + (ctx.parsed !== 1 ? 's' : '');
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // ── 2. Workflow Status Doughnut ──
+      new Chart(document.getElementById('chartWorkflowStatus'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Complete', 'Never Run', 'Error'],
+          datasets: [{
+            data: [2, 1, 1],
+            backgroundColor: [green, '#475569', rose],
+            hoverBackgroundColor: ['#4ade80', '#64748b', '#fb7185'],
+            borderRadius: 4,
+            spacing: 3
+          }]
+        },
+        options: {
+          cutout: '68%',
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+              callbacks: {
+                label: function (ctx) {
+                  return ctx.label + ': ' + ctx.parsed + ' workflow' + (ctx.parsed !== 1 ? 's' : '');
+                }
+              }
+            }
+          }
+        }
+      });
+
+      // ── 3. Documents by Catalog (horizontal bar) ──
+      new Chart(document.getElementById('chartDocsByCatalog'), {
+        type: 'bar',
+        data: {
+          labels: ['email-archive', 'sec-filings', 'compliance-docs', 'legal-contracts', 'research-papers'],
+          datasets: [{
+            label: 'Documents',
+            data: [4200, 2341, 1105, 847, 512],
+            backgroundColor: [cyan, blue, teal, sky, indigo],
+            borderRadius: 4,
+            barThickness: 22
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (ctx) { return ctx.parsed.x.toLocaleString() + ' documents'; }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: gridColor },
+              ticks: {
+                callback: function (v) { return v >= 1000 ? (v / 1000) + 'k' : v; }
+              }
+            },
+            y: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+
+      // ── 4. Run Activity (line chart, last 7 days) ──
+      new Chart(document.getElementById('chartRunActivity'), {
+        type: 'line',
+        data: {
+          labels: ['Feb 16', 'Feb 17', 'Feb 18', 'Feb 19', 'Feb 20', 'Feb 21', 'Feb 22'],
+          datasets: [
+            {
+              label: 'Successful',
+              data: [1, 0, 1, 1, 2, 0, 1],
+              borderColor: green,
+              backgroundColor: green + '18',
+              fill: true,
+              tension: 0.35,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+              pointBackgroundColor: green,
+              pointBorderColor: 'transparent',
+              borderWidth: 2.5
+            },
+            {
+              label: 'Failed',
+              data: [0, 1, 0, 1, 0, 0, 0],
+              borderColor: rose,
+              backgroundColor: rose + '18',
+              fill: true,
+              tension: 0.35,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+              pointBackgroundColor: rose,
+              pointBorderColor: 'transparent',
+              borderWidth: 2.5
+            }
+          ]
+        },
+        options: {
+          plugins: {
+            legend: { position: 'bottom' }
+          },
+          scales: {
+            x: { grid: { color: gridColor } },
+            y: {
+              beginAtZero: true,
+              grid: { color: gridColor },
+              ticks: { stepSize: 1 }
+            }
+          }
+        }
+      });
+
+      // ── 5. Token Estimates (bar) ──
+      new Chart(document.getElementById('chartTokens'), {
+        type: 'bar',
+        data: {
+          labels: ['sec-filings', 'compliance-docs', 'legal-contracts', 'research-papers', 'email-archive'],
+          datasets: [{
+            label: 'Estimated Tokens (millions)',
+            data: [4.2, 2.1, 1.4, 0.9, 0],
+            backgroundColor: function (ctx) {
+              var grad = ctx.chart.ctx.createLinearGradient(0, 0, 0, 300);
+              grad.addColorStop(0, blue);
+              grad.addColorStop(1, cyan + '60');
+              return grad;
+            },
+            borderRadius: 6,
+            barThickness: 32
+          }]
+        },
+        options: {
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (ctx) {
+                  return ctx.parsed.y > 0 ? ctx.parsed.y.toFixed(1) + 'M tokens' : 'Not indexed';
+                }
+              }
+            }
+          },
+          scales: {
+            x: { grid: { display: false } },
+            y: {
+              grid: { color: gridColor },
+              ticks: {
+                callback: function (v) { return v + 'M'; }
+              }
+            }
+          }
+        }
+      });
+
+      // ── 6. Lens Usage (horizontal bar) ──
+      new Chart(document.getElementById('chartLensUsage'), {
+        type: 'bar',
+        data: {
+          labels: ['executive-summary', 'financial-risk', 'legal-compliance', 'red-flag-detection', 'technical-detail'],
+          datasets: [{
+            label: 'Used in workflows / queries',
+            data: [12, 7, 4, 3, 2],
+            backgroundColor: [violet, blue, teal, amber, sky],
+            borderRadius: 4,
+            barThickness: 22
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: function (ctx) { return 'Used in ' + ctx.parsed.x + ' queries / workflows'; }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: gridColor },
+              ticks: { stepSize: 2 }
+            },
+            y: { grid: { display: false } }
+          }
+        }
+      });
+
+    })();
   </script>
 </body>
 </html>

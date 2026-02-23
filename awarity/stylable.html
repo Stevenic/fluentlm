@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en" class="fluentlm fluent-dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FluentLM — Stylable Properties</title>
+  <!-- Combined library CSS (base) then theme overrides -->
+  <link rel="stylesheet" href="themes/fluentlm.min.css">
+  <link rel="stylesheet" href="themes/theme-dark.css">
+  <link rel="stylesheet" href="themes/theme-awarity-light.css">
+  <link rel="stylesheet" href="themes/theme-awarity-dark.css">
+  <link rel="stylesheet" href="themes/theme-awarity-amber-light.css">
+  <link rel="stylesheet" href="themes/theme-awarity-amber-dark.css">
+
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--fontFamily);
+      background: var(--bodyBackground);
+      color: var(--bodyText);
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    /* ── Chrome: top bar ── */
+    .chrome {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 24px;
+      background: var(--bodyStandoutBackground);
+      border-bottom: 1px solid var(--bodyFrameDivider);
+      backdrop-filter: blur(12px);
+    }
+    .chrome-left { display: flex; align-items: center; gap: 16px; }
+    .chrome-title {
+      font-size: var(--fontSizeLarge);
+      font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText);
+    }
+    .chrome-subtitle {
+      font-size: var(--fontSizeSmall);
+      color: var(--bodySubtext);
+    }
+    .chrome-right { display: flex; align-items: center; gap: 10px; }
+    .chrome-nav {
+      display: flex; align-items: center; gap: 6px;
+      font-size: var(--fontSizeSmall); color: var(--bodySubtext);
+    }
+    .chrome-nav button {
+      width: 32px; height: 32px; border-radius: var(--roundedCorner4);
+      border: 1px solid var(--buttonBorder); background: var(--buttonBackground);
+      color: var(--bodyText); cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .chrome-nav button:hover { background: var(--buttonBackgroundHovered); color: var(--buttonTextHovered); }
+    .chrome-nav button:disabled { opacity: 0.35; cursor: default; }
+    .theme-btn {
+      padding: 6px 14px; border-radius: var(--roundedCorner4);
+      border: 1px solid var(--buttonBorder); background: var(--buttonBackground);
+      color: var(--bodyText); cursor: pointer; font-size: var(--fontSizeSmall);
+      font-family: var(--fontFamily); white-space: nowrap;
+    }
+    .theme-btn:hover { background: var(--buttonBackgroundHovered); }
+    .theme-btn--active {
+      background: var(--themePrimary); color: #fff; border-color: transparent;
+    }
+
+    /* ── Slide deck ── */
+    .deck {
+      position: absolute; top: 54px; bottom: 0; left: 0; right: 0;
+      overflow: hidden;
+    }
+    .slide {
+      position: absolute; inset: 0;
+      padding: 40px 48px 32px;
+      overflow-y: auto;
+      opacity: 0; pointer-events: none;
+      transition: opacity var(--duration2) var(--easeStandard);
+    }
+    .slide--active { opacity: 1; pointer-events: auto; }
+
+    .slide h2 {
+      font-size: var(--fontSizeXXLarge); font-weight: var(--fontWeightBold);
+      color: var(--bodyText); margin-bottom: 8px;
+    }
+    .slide h3 {
+      font-size: var(--fontSizeLarge); font-weight: var(--fontWeightSemibold);
+      color: var(--bodyText); margin: 20px 0 10px;
+    }
+    .slide-desc {
+      font-size: var(--fontSizeMedium); color: var(--bodySubtext);
+      margin-bottom: 24px; max-width: 720px; line-height: 1.6;
+    }
+
+    /* ── Swatch grids ── */
+    .swatch-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 12px; margin-bottom: 24px;
+    }
+    .swatch {
+      border-radius: var(--roundedCorner4);
+      border: 1px solid var(--variantBorder);
+      overflow: hidden;
+    }
+    .swatch-color { height: 52px; }
+    .swatch-info { padding: 8px 10px; background: var(--cardStandoutBackground); }
+    .swatch-name { font-size: 11px; font-weight: var(--fontWeightSemibold); color: var(--bodyText); }
+    .swatch-val  { font-size: 10px; color: var(--bodySubtext); font-family: var(--fontFamilyMonospace); }
+
+    /* ── Token table ── */
+    .token-table { width: 100%; border-collapse: collapse; font-size: var(--fontSizeSmall); margin-bottom: 24px; }
+    .token-table th { text-align: left; padding: 8px 12px; color: var(--bodySubtext); font-weight: var(--fontWeightSemibold); border-bottom: 2px solid var(--bodyDivider); }
+    .token-table td { padding: 8px 12px; border-bottom: 1px solid var(--bodyFrameDivider); color: var(--bodyText); }
+    .token-table code { font-family: var(--fontFamilyMonospace); font-size: 11px; color: var(--themePrimary); }
+    .token-table .sample { width: 36px; height: 22px; border-radius: 3px; border: 1px solid var(--variantBorder); display: inline-block; vertical-align: middle; }
+
+    /* ── Component demo areas ── */
+    .demo-row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; margin-bottom: 20px; }
+    .demo-col { display: flex; flex-direction: column; gap: 12px; }
+    .demo-label { font-size: 11px; font-weight: var(--fontWeightSemibold); color: var(--bodySubtext); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .demo-card {
+      background: var(--cardStandoutBackground); border: 1px solid var(--variantBorder);
+      border-radius: var(--roundedCorner4); padding: 20px; flex: 1; min-width: 280px;
+    }
+    .demo-card h4 { font-size: var(--fontSizeMedium); font-weight: var(--fontWeightSemibold); color: var(--bodyText); margin-bottom: 12px; }
+    .demo-inline { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .demo-stack { display: flex; flex-direction: column; gap: 10px; }
+    .demo-wide { width: 100%; max-width: 360px; }
+
+    /* ── Two / three column layout ── */
+    .cols-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .cols-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+
+    /* ── Title slide ── */
+    .title-slide {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; height: 100%;
+    }
+    .title-slide h1 {
+      font-size: 56px; font-weight: var(--fontWeightBold);
+      color: var(--bodyText); letter-spacing: -1px; margin-bottom: 8px;
+    }
+    .title-slide h1 span { color: var(--themePrimary); }
+    .title-slide p { font-size: var(--fontSizeLarge); color: var(--bodySubtext); max-width: 540px; line-height: 1.6; }
+    .title-slide .hint {
+      margin-top: 40px; font-size: var(--fontSizeSmall); color: var(--disabledText);
+    }
+    .title-slide .hint kbd {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      border: 1px solid var(--variantBorder); background: var(--cardStandoutBackground);
+      font-family: var(--fontFamily); font-size: 12px; color: var(--bodySubtext);
+    }
+
+    /* ── Icon grid ── */
+    .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; }
+    .icon-cell {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 14px 8px; border-radius: var(--roundedCorner4);
+      border: 1px solid var(--variantBorder); background: var(--cardStandoutBackground);
+    }
+    .icon-cell i { font-size: 20px; color: var(--themePrimary); }
+    .icon-cell span { font-size: 10px; color: var(--bodySubtext); text-align: center; }
+
+    /* ── Elevation cards ── */
+    .elevation-card {
+      width: 160px; height: 80px; border-radius: var(--roundedCorner6);
+      background: var(--cardStandoutBackground); border: 1px solid var(--variantBorder);
+      display: flex; align-items: center; justify-content: center;
+      font-size: var(--fontSizeSmall); color: var(--bodySubtext);
+    }
+
+    /* ── Status bar demos ── */
+    .status-bars { display: flex; flex-direction: column; gap: 10px; max-width: 600px; }
+
+    /* ── Persona row ── */
+    .persona-row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-end; }
+  </style>
+</head>
+<body>
+
+  <!-- ════════ Top Chrome ════════ -->
+  <div class="chrome">
+    <div class="chrome-left">
+      <div class="chrome-title">FluentLM</div>
+      <div class="chrome-subtitle" id="slideLabel">Design System</div>
+    </div>
+    <div class="chrome-right">
+      <button class="theme-btn" data-theme="awarity-dark">Blue Dark</button>
+      <button class="theme-btn" data-theme="awarity-light">Blue Light</button>
+      <button class="theme-btn" data-theme="awarity-amber-dark">Amber Dark</button>
+      <button class="theme-btn" data-theme="awarity-amber-light">Amber Light</button>
+      <span style="width:1px;height:24px;background:var(--bodyDivider);margin:0 4px;"></span>
+      <div class="chrome-nav">
+        <button id="btnPrev" aria-label="Previous slide">&#8249;</button>
+        <span id="slideCounter">1 / 22</span>
+        <button id="btnNext" aria-label="Next slide">&#8250;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ Slide Deck ════════ -->
+  <div class="deck" id="deck">
+
+    <!-- ──────── SLIDE 1: Title ──────── -->
+    <div class="slide slide--active" data-title="Design System">
+      <div class="title-slide">
+        <h1>Fluent<span>LM</span></h1>
+        <p>A complete design token and component system for building Fluent-styled web applications. Every property shown here is fully stylable.</p>
+        <div class="hint"><kbd>&larr;</kbd> <kbd>&rarr;</kbd> to navigate &middot; click a theme above to switch</div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 2: Theme Accent Ramp ──────── -->
+    <div class="slide" data-title="Theme Accent Ramp">
+      <h2>Theme Accent Ramp</h2>
+      <p class="slide-desc">The 9-stop accent ramp drives all interactive elements — buttons, links, focus rings, selections, and icons. Override these tokens per-theme to rebrand the entire system.</p>
+      <div class="swatch-grid" id="accentRamp"></div>
+      <h3>Semantic Usage</h3>
+      <table class="token-table">
+        <tr><th>Token</th><th>Used By</th></tr>
+        <tr><td><code>--themePrimary</code></td><td>Primary buttons, active tabs, active nav borders, filter pills, links</td></tr>
+        <tr><td><code>--themeSecondary</code></td><td>Input focus borders, input icons, menu icons, hover accents</td></tr>
+        <tr><td><code>--themeDarkAlt</code></td><td>Primary button hover, input checked hover</td></tr>
+        <tr><td><code>--themeDark</code></td><td>Primary button pressed states</td></tr>
+        <tr><td><code>--themeTertiary</code></td><td>Subtle accents, icon tints</td></tr>
+        <tr><td><code>--themeLight</code></td><td>Light accent backgrounds, selection highlights</td></tr>
+        <tr><td><code>--themeLighter</code></td><td>Lightest accent wash, hover tints</td></tr>
+      </table>
+    </div>
+
+    <!-- ──────── SLIDE 3: Neutral Palette ──────── -->
+    <div class="slide" data-title="Neutral Palette">
+      <h2>Neutral Palette</h2>
+      <p class="slide-desc">A 15-stop neutral ramp from black to white. These feed into all semantic surface, text, and border tokens.</p>
+      <div class="swatch-grid" id="neutralRamp"></div>
+    </div>
+
+    <!-- ──────── SLIDE 4: Accent Colors ──────── -->
+    <div class="slide" data-title="Accent Colors">
+      <h2>Accent Colors</h2>
+      <p class="slide-desc">Named accent colors for status indicators, data visualization, and brand expression.</p>
+      <div class="swatch-grid" id="accentColors"></div>
+    </div>
+
+    <!-- ──────── SLIDE 5: Typography ──────── -->
+    <div class="slide" data-title="Typography">
+      <h2>Typography</h2>
+      <p class="slide-desc">A complete type scale with matching line heights. Use the <code>.flm-text--*</code> utility classes or reference tokens directly.</p>
+      <div class="cols-2">
+        <div>
+          <h3>Type Scale</h3>
+          <div class="demo-stack" id="typeScale"></div>
+        </div>
+        <div>
+          <h3>Font Weights</h3>
+          <div class="demo-stack">
+            <span style="font-weight:var(--fontWeightLight);font-size:var(--fontSizeLarge);">Light (100)</span>
+            <span style="font-weight:var(--fontWeightSemilight);font-size:var(--fontSizeLarge);">Semilight (300)</span>
+            <span style="font-weight:var(--fontWeightRegular);font-size:var(--fontSizeLarge);">Regular (400)</span>
+            <span style="font-weight:var(--fontWeightSemibold);font-size:var(--fontSizeLarge);">Semibold (600)</span>
+            <span style="font-weight:var(--fontWeightBold);font-size:var(--fontSizeLarge);">Bold (700)</span>
+          </div>
+          <h3>Monospace</h3>
+          <div style="font-family:var(--fontFamilyMonospace);font-size:var(--fontSizeMedium);color:var(--bodyText);padding:12px 16px;background:var(--cardStandoutBackground);border-radius:var(--roundedCorner4);border:1px solid var(--variantBorder);margin-top:8px;">
+            const result = await awarity.ask(query);<br>
+            console.log(result.answer);
+          </div>
+          <h3 style="margin-top:24px;">Text Utilities</h3>
+          <div class="demo-stack" style="gap:6px;">
+            <span class="flm-text--secondary">flm-text--secondary</span>
+            <span class="flm-text--disabled">flm-text--disabled</span>
+            <span class="flm-text--error">flm-text--error</span>
+            <span class="flm-text--success">flm-text--success</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 6: Spacing & Elevation ──────── -->
+    <div class="slide" data-title="Spacing, Radius & Elevation">
+      <h2>Spacing, Radius &amp; Elevation</h2>
+      <p class="slide-desc">Standardized spacing, corner radius, and shadow tokens for consistent depth and layout.</p>
+      <div class="cols-3">
+        <div>
+          <h3>Spacing</h3>
+          <div class="demo-stack" id="spacingDemo"></div>
+        </div>
+        <div>
+          <h3>Border Radius</h3>
+          <div class="demo-stack">
+            <div class="demo-inline">
+              <div style="width:48px;height:48px;background:var(--themePrimary);border-radius:var(--roundedCorner2);"></div>
+              <span style="font-size:12px;color:var(--bodySubtext);">roundedCorner2 (2px)</span>
+            </div>
+            <div class="demo-inline">
+              <div style="width:48px;height:48px;background:var(--themePrimary);border-radius:var(--roundedCorner4);"></div>
+              <span style="font-size:12px;color:var(--bodySubtext);">roundedCorner4 (4px)</span>
+            </div>
+            <div class="demo-inline">
+              <div style="width:48px;height:48px;background:var(--themePrimary);border-radius:var(--roundedCorner6);"></div>
+              <span style="font-size:12px;color:var(--bodySubtext);">roundedCorner6 (6px)</span>
+            </div>
+          </div>
+          <h3 style="margin-top:20px;">Motion</h3>
+          <table class="token-table" style="font-size:11px;">
+            <tr><td><code>--duration1</code></td><td>100ms</td></tr>
+            <tr><td><code>--duration2</code></td><td>200ms</td></tr>
+            <tr><td><code>--duration3</code></td><td>300ms</td></tr>
+            <tr><td><code>--duration4</code></td><td>400ms</td></tr>
+          </table>
+        </div>
+        <div>
+          <h3>Elevation</h3>
+          <div class="demo-stack" style="gap:20px;">
+            <div class="elevation-card" style="box-shadow:var(--elevation4);">elevation4</div>
+            <div class="elevation-card" style="box-shadow:var(--elevation8);">elevation8</div>
+            <div class="elevation-card" style="box-shadow:var(--elevation16);">elevation16</div>
+            <div class="elevation-card" style="box-shadow:var(--elevation64);">elevation64</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 7: Buttons ──────── -->
+    <div class="slide" data-title="Buttons">
+      <h2>Buttons</h2>
+      <p class="slide-desc">All button variants, states, and compositions. 16 button tokens control every visual state.</p>
+      <div class="demo-row">
+        <div class="demo-card">
+          <h4>Variants</h4>
+          <div class="demo-inline" style="margin-bottom:12px;">
+            <button class="flm-button">Default</button>
+            <button class="flm-button flm-button--primary">Primary</button>
+            <button class="flm-button flm-button--subtle">Subtle</button>
+            <button class="flm-button flm-button--icon"><i class="flm-icon" data-icon="Settings"></i></button>
+          </div>
+          <div class="demo-label">Disabled</div>
+          <div class="demo-inline" style="margin-bottom:12px;">
+            <button class="flm-button" disabled>Default</button>
+            <button class="flm-button flm-button--primary" disabled>Primary</button>
+            <button class="flm-button flm-button--subtle" disabled>Subtle</button>
+          </div>
+          <div class="demo-label">With Icons</div>
+          <div class="demo-inline">
+            <button class="flm-button" data-icon="Add">New Item</button>
+            <button class="flm-button flm-button--primary" data-icon="Play">Run</button>
+            <button class="flm-button" data-icon="Download">Export</button>
+          </div>
+        </div>
+        <div class="demo-card">
+          <h4>Compound Button</h4>
+          <button class="flm-button flm-button--compound">
+            <span class="flm-button-label">Send to catalog</span>
+            <span class="flm-button-description">Ingest documents into the selected catalog</span>
+          </button>
+          <h4 style="margin-top:16px;">Split Button</h4>
+          <div class="demo-inline">
+            <button class="flm-button flm-button--primary" data-split>Save</button>
+          </div>
+          <h4 style="margin-top:16px;">Button Tokens</h4>
+          <table class="token-table" style="font-size:11px;">
+            <tr><td><code>--buttonBackground</code></td><td><span class="sample" style="background:var(--buttonBackground);"></span></td></tr>
+            <tr><td><code>--buttonBackgroundHovered</code></td><td><span class="sample" style="background:var(--buttonBackgroundHovered);"></span></td></tr>
+            <tr><td><code>--primaryButtonBackground</code></td><td><span class="sample" style="background:var(--primaryButtonBackground);"></span></td></tr>
+            <tr><td><code>--primaryButtonBackgroundHovered</code></td><td><span class="sample" style="background:var(--primaryButtonBackgroundHovered);"></span></td></tr>
+            <tr><td><code>--buttonBorder</code></td><td><span class="sample" style="background:var(--buttonBorder);"></span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 8: Text Fields ──────── -->
+    <div class="slide" data-title="Text Fields">
+      <h2>Text Fields</h2>
+      <p class="slide-desc">Input fields with labels, required states, error states, prefixes/suffixes, and textarea support.</p>
+      <div class="demo-row">
+        <div class="demo-card">
+          <h4>Standard</h4>
+          <div class="demo-stack demo-wide">
+            <div class="flm-textfield">
+              <label class="flm-label" for="tf1">Label</label>
+              <input class="flm-textfield-input" id="tf1" placeholder="Enter text…">
+            </div>
+            <div class="flm-textfield flm-textfield--required">
+              <label class="flm-label" for="tf2">Required Field</label>
+              <input class="flm-textfield-input" id="tf2" value="sec-filings">
+            </div>
+            <div class="flm-textfield flm-textfield--error">
+              <label class="flm-label" for="tf3">With Error</label>
+              <input class="flm-textfield-input" id="tf3" value="bad input">
+              <span class="flm-textfield-error">This field contains invalid characters.</span>
+            </div>
+            <div class="flm-textfield flm-textfield--disabled">
+              <label class="flm-label" for="tf4">Disabled</label>
+              <input class="flm-textfield-input" id="tf4" value="Read only" disabled>
+            </div>
+          </div>
+        </div>
+        <div class="demo-card">
+          <h4>Variants</h4>
+          <div class="demo-stack demo-wide">
+            <div class="flm-textfield flm-textfield--borderless">
+              <label class="flm-label" for="tf5">Borderless</label>
+              <input class="flm-textfield-input" id="tf5" placeholder="No border…">
+            </div>
+            <div class="flm-textfield flm-textfield--underlined">
+              <label class="flm-label" for="tf6">Underlined</label>
+              <input class="flm-textfield-input" id="tf6" placeholder="Bottom border only…">
+            </div>
+            <div class="flm-textfield">
+              <label class="flm-label" for="tf7">With Suffix</label>
+              <div class="flm-textfield-wrapper">
+                <input class="flm-textfield-input" id="tf7" placeholder="/path/to/docs">
+                <button class="flm-button flm-button--icon" type="button"><i class="flm-icon" data-icon="FolderOpen"></i></button>
+              </div>
+            </div>
+            <div class="flm-textfield">
+              <label class="flm-label" for="tf8">Textarea</label>
+              <textarea class="flm-textfield-input" id="tf8" rows="3" style="width:100%;resize:vertical;" placeholder="Multi-line input…"></textarea>
+            </div>
+          </div>
+          <h4 style="margin-top:12px;">Input Tokens</h4>
+          <table class="token-table" style="font-size:11px;">
+            <tr><td><code>--inputBackground</code></td><td><span class="sample" style="background:var(--inputBackground);"></span></td></tr>
+            <tr><td><code>--inputBorder</code></td><td><span class="sample" style="background:var(--inputBorder);"></span></td></tr>
+            <tr><td><code>--inputFocusBorderAlt</code></td><td><span class="sample" style="background:var(--inputFocusBorderAlt);"></span></td></tr>
+            <tr><td><code>--inputText</code></td><td><span class="sample" style="background:var(--inputText);"></span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 9: Dropdowns, ComboBox, Search ──────── -->
+    <div class="slide" data-title="Dropdowns & Search">
+      <h2>Dropdowns, ComboBox &amp; Search</h2>
+      <p class="slide-desc">Selection controls with filtering, multi-select, and search capabilities.</p>
+      <div class="demo-row">
+        <div class="demo-card">
+          <h4>Dropdown</h4>
+          <div class="demo-stack demo-wide">
+            <div class="flm-dropdown" id="demo-dd1">
+              <button class="flm-dropdown-trigger" type="button">
+                <span class="flm-dropdown-title flm-dropdown-title--placeholder">Select a catalog…</span>
+                <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+              </button>
+              <div class="flm-dropdown-listbox">
+                <div class="flm-dropdown-option" data-value="sec-filings">sec-filings</div>
+                <div class="flm-dropdown-option" data-value="legal-contracts">legal-contracts</div>
+                <div class="flm-dropdown-option" data-value="research-papers">research-papers</div>
+              </div>
+            </div>
+            <div class="flm-dropdown" style="pointer-events:none;opacity:0.5;">
+              <button class="flm-dropdown-trigger" type="button" disabled>
+                <span class="flm-dropdown-title">Disabled</span>
+                <span class="flm-dropdown-caret" data-icon="ChevronDown"></span>
+              </button>
+            </div>
+          </div>
+          <h4 style="margin-top:16px;">ComboBox</h4>
+          <div class="demo-wide">
+            <div class="flm-combobox" id="demo-combo1">
+              <div class="flm-combobox-wrapper">
+                <input class="flm-combobox-input" placeholder="Type to filter…">
+                <button class="flm-combobox-caret" data-icon="ChevronDown"></button>
+              </div>
+              <div class="flm-combobox-listbox">
+                <div class="flm-combobox-option" data-value="claude-sonnet">claude-sonnet</div>
+                <div class="flm-combobox-option" data-value="claude-haiku">claude-haiku</div>
+                <div class="flm-combobox-option" data-value="gpt-4o">gpt-4o</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-card">
+          <h4>SearchBox</h4>
+          <div class="demo-stack demo-wide">
+            <div class="flm-searchbox">
+              <input class="flm-searchbox-input" type="text" placeholder="Search catalogs…">
+            </div>
+            <div class="flm-searchbox flm-searchbox--underlined">
+              <input class="flm-searchbox-input" type="text" placeholder="Underlined search…">
+            </div>
+          </div>
+          <h4 style="margin-top:16px;">TagPicker</h4>
+          <div class="demo-wide">
+            <div class="flm-tagpicker" id="demo-tags">
+              <div class="flm-tagpicker-well">
+                <span class="flm-tagpicker-chip"><span class="flm-tagpicker-chip-text">finance</span><button class="flm-tagpicker-chip-remove">&times;</button></span>
+                <span class="flm-tagpicker-chip"><span class="flm-tagpicker-chip-text">regulatory</span><button class="flm-tagpicker-chip-remove">&times;</button></span>
+                <input class="flm-tagpicker-input" placeholder="Add category…">
+              </div>
+              <div class="flm-tagpicker-listbox">
+                <div class="flm-tagpicker-option" data-value="legal">legal</div>
+                <div class="flm-tagpicker-option" data-value="compliance">compliance</div>
+                <div class="flm-tagpicker-option" data-value="technical">technical</div>
+              </div>
+            </div>
+          </div>
+          <h4 style="margin-top:16px;">Swatch Color Picker</h4>
+          <div class="flm-swatchcolorpicker" id="demo-swatch">
+            <button class="flm-swatchcolorpicker-cell flm-swatchcolorpicker-cell--selected" data-color="#2563eb" style="background:#2563eb;"></button>
+            <button class="flm-swatchcolorpicker-cell" data-color="#7c3aed" style="background:#7c3aed;"></button>
+            <button class="flm-swatchcolorpicker-cell" data-color="#059669" style="background:#059669;"></button>
+            <button class="flm-swatchcolorpicker-cell" data-color="#d97706" style="background:#d97706;"></button>
+            <button class="flm-swatchcolorpicker-cell" data-color="#e81123" style="background:#e81123;"></button>
+            <button class="flm-swatchcolorpicker-cell" data-color="#0891b2" style="background:#0891b2;"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 10: Checkboxes, Radios, Toggles, Sliders ──────── -->
+    <div class="slide" data-title="Selection Controls">
+      <h2>Selection Controls</h2>
+      <p class="slide-desc">Checkboxes, radio groups, toggles, sliders, spin buttons, and rating stars.</p>
+      <div class="demo-row">
+        <div class="demo-card">
+          <h4>Checkbox</h4>
+          <div class="demo-stack">
+            <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" checked><span class="flm-checkbox-mark"></span><span class="flm-label">Checked</span></label>
+            <label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span><span class="flm-label">Unchecked</span></label>
+            <label class="flm-checkbox flm-checkbox--disabled"><input type="checkbox" class="flm-checkbox-input" disabled checked><span class="flm-checkbox-mark"></span><span class="flm-label">Disabled</span></label>
+          </div>
+          <h4 style="margin-top:16px;">ChoiceGroup (Radio)</h4>
+          <div class="flm-choicegroup">
+            <label class="flm-choicegroup-option"><input type="radio" class="flm-choicegroup-input" name="demo-radio" checked><span class="flm-choicegroup-mark"></span><span class="flm-choicegroup-label">Full ECW</span></label>
+            <label class="flm-choicegroup-option"><input type="radio" class="flm-choicegroup-input" name="demo-radio"><span class="flm-choicegroup-mark"></span><span class="flm-choicegroup-label">Abstracts</span></label>
+            <label class="flm-choicegroup-option flm-choicegroup-option--disabled"><input type="radio" class="flm-choicegroup-input" name="demo-radio" disabled><span class="flm-choicegroup-mark"></span><span class="flm-choicegroup-label">Disabled</span></label>
+          </div>
+        </div>
+        <div class="demo-card">
+          <h4>Toggle</h4>
+          <div class="demo-stack">
+            <label class="flm-toggle flm-toggle--inline"><input type="checkbox" class="flm-toggle-input" checked><span class="flm-toggle-track"><span class="flm-toggle-thumb"></span></span><span class="flm-toggle-label">Enabled</span></label>
+            <label class="flm-toggle flm-toggle--inline"><input type="checkbox" class="flm-toggle-input"><span class="flm-toggle-track"><span class="flm-toggle-thumb"></span></span><span class="flm-toggle-label">Disabled</span></label>
+            <label class="flm-toggle flm-toggle--inline flm-toggle--disabled"><input type="checkbox" class="flm-toggle-input" disabled><span class="flm-toggle-track"><span class="flm-toggle-thumb"></span></span><span class="flm-toggle-label">Disabled State</span></label>
+          </div>
+          <h4 style="margin-top:16px;">Slider</h4>
+          <div class="flm-slider" style="max-width:280px;">
+            <div class="flm-slider-container">
+              <input type="range" class="flm-slider-input" min="0" max="100" value="65">
+            </div>
+            <div style="display:flex;justify-content:space-between;"><span class="flm-slider-label">Confidence</span><span class="flm-slider-value">65</span></div>
+          </div>
+          <h4 style="margin-top:16px;">SpinButton</h4>
+          <div class="flm-spinbutton" style="max-width:160px;">
+            <div class="flm-spinbutton-wrapper">
+              <input type="number" class="flm-spinbutton-input" value="5" min="1" max="20">
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--increment">&#9650;</button>
+              <button class="flm-spinbutton-btn flm-spinbutton-btn--decrement">&#9660;</button>
+            </div>
+          </div>
+          <h4 style="margin-top:16px;">Rating</h4>
+          <div class="flm-rating" data-rating-value="3">
+            <input type="radio" class="flm-rating-input" name="demo-rating" value="1"><label class="flm-rating-star flm-rating-star--filled">&#9733;</label>
+            <input type="radio" class="flm-rating-input" name="demo-rating" value="2"><label class="flm-rating-star flm-rating-star--filled">&#9733;</label>
+            <input type="radio" class="flm-rating-input" name="demo-rating" value="3" checked><label class="flm-rating-star flm-rating-star--filled">&#9733;</label>
+            <input type="radio" class="flm-rating-input" name="demo-rating" value="4"><label class="flm-rating-star flm-rating-star--empty">&#9733;</label>
+            <input type="radio" class="flm-rating-input" name="demo-rating" value="5"><label class="flm-rating-star flm-rating-star--empty">&#9733;</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 11: Date & Time Pickers ──────── -->
+    <div class="slide" data-title="Date & Time Pickers">
+      <h2>Date &amp; Time Pickers</h2>
+      <p class="slide-desc">Calendar and time selection controls with min/max constraints and formatting options.</p>
+      <div class="demo-row">
+        <div class="demo-card">
+          <h4>DatePicker</h4>
+          <div class="demo-wide">
+            <div class="flm-datepicker" id="demo-datepicker">
+              <div class="flm-datepicker-wrapper">
+                <input class="flm-datepicker-input" placeholder="Select a date…">
+                <button class="flm-datepicker-icon" data-icon="Calendar"></button>
+              </div>
+            </div>
+          </div>
+          <h4 style="margin-top:16px;">DatePicker with Error</h4>
+          <div class="demo-wide">
+            <div class="flm-datepicker flm-datepicker--error">
+              <div class="flm-datepicker-wrapper">
+                <input class="flm-datepicker-input" value="13/45/2026">
+                <button class="flm-datepicker-icon" data-icon="Calendar"></button>
+              </div>
+              <span class="flm-datepicker-error">Invalid date format.</span>
+            </div>
+          </div>
+        </div>
+        <div class="demo-card">
+          <h4>TimePicker</h4>
+          <div class="demo-wide">
+            <div class="flm-timepicker" id="demo-timepicker" data-increment="30" data-use-12h>
+              <div class="flm-timepicker-wrapper">
+                <input class="flm-timepicker-input" placeholder="Select a time…">
+                <button class="flm-timepicker-icon" data-icon="Clock"></button>
+              </div>
+            </div>
+          </div>
+          <h4 style="margin-top:16px;">TimePicker Disabled</h4>
+          <div class="demo-wide">
+            <div class="flm-timepicker flm-timepicker--disabled">
+              <div class="flm-timepicker-wrapper">
+                <input class="flm-timepicker-input" value="2:30 PM" disabled>
+                <button class="flm-timepicker-icon" data-icon="Clock" disabled></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 12: CommandBar & Breadcrumb ──────── -->
+    <div class="slide" data-title="CommandBar & Breadcrumb">
+      <h2>CommandBar &amp; Breadcrumb</h2>
+      <p class="slide-desc">Application-level navigation and action chrome.</p>
+      <div class="demo-stack" style="gap:24px;">
+        <div class="demo-card" style="max-width:100%;">
+          <h4>CommandBar</h4>
+          <div class="flm-commandbar" style="border:1px solid var(--bodyDivider);border-radius:var(--roundedCorner4);">
+            <div class="flm-commandbar-items">
+              <button class="flm-button flm-button--primary" data-icon="Add" style="margin:4px 8px;">New Catalog</button>
+              <button class="flm-commandbar-item" data-icon="Refresh">Refresh</button>
+              <span class="flm-commandbar-divider"></span>
+              <button class="flm-commandbar-item" data-icon="Delete" disabled>Delete</button>
+              <button class="flm-commandbar-item" data-icon="Download">Export</button>
+            </div>
+            <div class="flm-commandbar-far" style="align-items:center;padding-right:8px;">
+              <div class="flm-searchbox" style="min-width:200px;">
+                <input class="flm-searchbox-input" type="text" placeholder="Search…">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-card" style="max-width:100%;">
+          <h4>Breadcrumb</h4>
+          <div class="demo-stack" style="gap:16px;">
+            <div><div class="demo-label">Default</div>
+              <ol class="flm-breadcrumb">
+                <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#">Home</a></li>
+                <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#">Catalogs</a></li>
+                <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link">sec-filings</a></li>
+              </ol>
+            </div>
+            <div><div class="demo-label">Large</div>
+              <ol class="flm-breadcrumb flm-breadcrumb--large">
+                <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#">Home</a></li>
+                <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link">Workflows</a></li>
+              </ol>
+            </div>
+            <div><div class="demo-label">Small</div>
+              <ol class="flm-breadcrumb flm-breadcrumb--small">
+                <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#">Home</a></li>
+                <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link" href="#">Structure</a></li>
+                <li class="flm-breadcrumb-item"><a class="flm-breadcrumb-link">Labels</a></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 13: DetailsList & Lists ──────── -->
+    <div class="slide" data-title="DetailsList & Lists">
+      <h2>DetailsList &amp; Lists</h2>
+      <p class="slide-desc">Data tables and list components with selection, grouping, and compact variants.</p>
+      <div class="demo-card" style="max-width:100%;margin-bottom:20px;">
+        <h4>DetailsList</h4>
+        <div class="flm-detailslist">
+          <div class="flm-detailslist-header">
+            <div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label></div>
+            <div class="flm-detailslist-header-cell" style="width:180px;">Name</div>
+            <div class="flm-detailslist-header-cell" style="width:140px;">Categories</div>
+            <div class="flm-detailslist-header-cell" style="width:100px;">Documents</div>
+            <div class="flm-detailslist-header-cell" style="width:100px;">Status</div>
+          </div>
+          <div class="flm-detailslist-row flm-detailslist-row--selected">
+            <div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input" checked><span class="flm-checkbox-mark"></span></label></div>
+            <div class="flm-detailslist-cell" style="width:180px;">sec-filings</div>
+            <div class="flm-detailslist-cell" style="width:140px;">finance, regulatory</div>
+            <div class="flm-detailslist-cell" style="width:100px;">2,341</div>
+            <div class="flm-detailslist-cell" style="width:100px;"><span style="color:var(--successText);">Ready</span></div>
+          </div>
+          <div class="flm-detailslist-row">
+            <div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label></div>
+            <div class="flm-detailslist-cell" style="width:180px;">legal-contracts</div>
+            <div class="flm-detailslist-cell" style="width:140px;">legal, compliance</div>
+            <div class="flm-detailslist-cell" style="width:100px;">847</div>
+            <div class="flm-detailslist-cell" style="width:100px;"><span style="color:var(--warningIcon);">Missing</span></div>
+          </div>
+          <div class="flm-detailslist-row">
+            <div class="flm-detailslist-check"><label class="flm-checkbox"><input type="checkbox" class="flm-checkbox-input"><span class="flm-checkbox-mark"></span></label></div>
+            <div class="flm-detailslist-cell" style="width:180px;">research-papers</div>
+            <div class="flm-detailslist-cell" style="width:140px;">research</div>
+            <div class="flm-detailslist-cell" style="width:100px;">512</div>
+            <div class="flm-detailslist-cell" style="width:100px;"><span style="color:var(--errorText);">Error</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="cols-2">
+        <div class="demo-card">
+          <h4>GroupedList</h4>
+          <div class="flm-groupedlist">
+            <div class="flm-groupedlist-group">
+              <div class="flm-groupedlist-header"><span class="flm-groupedlist-chevron flm-groupedlist-chevron--expanded">&#9656;</span> Finance <span class="flm-groupedlist-count">2</span></div>
+              <div class="flm-groupedlist-items">
+                <div class="flm-groupedlist-item">sec-filings</div>
+                <div class="flm-groupedlist-item flm-groupedlist-item--selected">compliance-docs</div>
+              </div>
+            </div>
+            <div class="flm-groupedlist-group">
+              <div class="flm-groupedlist-header"><span class="flm-groupedlist-chevron">&#9656;</span> Research <span class="flm-groupedlist-count">1</span></div>
+              <div class="flm-groupedlist-items flm-groupedlist-items--collapsed">
+                <div class="flm-groupedlist-item">research-papers</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="demo-card">
+          <h4>List Tokens</h4>
+          <table class="token-table" style="font-size:11px;">
+            <tr><td><code>--listBackground</code></td><td><span class="sample" style="background:var(--listBackground);"></span></td></tr>
+            <tr><td><code>--listItemBackgroundHovered</code></td><td><span class="sample" style="background:var(--listItemBackgroundHovered);"></span></td></tr>
+            <tr><td><code>--listItemBackgroundChecked</code></td><td><span class="sample" style="background:var(--listItemBackgroundChecked);"></span></td></tr>
+            <tr><td><code>--listText</code></td><td><span class="sample" style="background:var(--listText);"></span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 14: Pivots & Nav ──────── -->
+    <div class="slide" data-title="Pivots & Nav">
+      <h2>Pivots &amp; Nav</h2>
+      <p class="slide-desc">Tab navigation (Pivots) and hierarchical navigation (Nav) components.</p>
+      <div class="demo-row">
+        <div class="demo-card">
+          <h4>Pivot — Tabs Style</h4>
+          <div class="flm-pivot flm-pivot--tabs" id="demoPivot1">
+            <div class="flm-pivot-tabs">
+              <button class="flm-pivot-tab flm-pivot-tab--active" data-panel="dp1-edit">Edit</button>
+              <button class="flm-pivot-tab" data-panel="dp1-abstracts">Abstracts</button>
+              <button class="flm-pivot-tab" data-panel="dp1-usage">Usage</button>
+              <button class="flm-pivot-tab flm-pivot-tab--disabled">Disabled</button>
+            </div>
+            <div class="flm-pivot-panel flm-pivot-panel--active" id="dp1-edit" style="padding:12px 0;">Panel content for the Edit tab.</div>
+            <div class="flm-pivot-panel" id="dp1-abstracts" style="padding:12px 0;">Panel content for the Abstracts tab.</div>
+            <div class="flm-pivot-panel" id="dp1-usage" style="padding:12px 0;">Panel content for the Usage tab.</div>
+          </div>
+          <h4 style="margin-top:20px;">Pivot — Links Style</h4>
+          <div class="flm-pivot flm-pivot--links" id="demoPivot2">
+            <div class="flm-pivot-tabs">
+              <button class="flm-pivot-tab flm-pivot-tab--active" data-panel="dp2-a">Answer</button>
+              <button class="flm-pivot-tab" data-panel="dp2-b">Sources</button>
+              <button class="flm-pivot-tab" data-panel="dp2-c">Logs</button>
+            </div>
+            <div class="flm-pivot-panel flm-pivot-panel--active" id="dp2-a" style="padding:12px 0;">The synthesized answer appears here.</div>
+            <div class="flm-pivot-panel" id="dp2-b" style="padding:12px 0;">Source documents listed here.</div>
+            <div class="flm-pivot-panel" id="dp2-c" style="padding:12px 0;">Execution logs appear here.</div>
+          </div>
+        </div>
+        <div class="demo-card">
+          <h4>Nav</h4>
+          <div class="flm-nav" style="max-width:220px;border:1px solid var(--variantBorder);border-radius:var(--roundedCorner4);padding:8px 0;">
+            <div class="flm-nav-group">
+              <div class="flm-nav-group-header"><span class="flm-nav-chevron flm-nav-chevron--expanded">&#9656;</span> Catalogs</div>
+              <div class="flm-nav-group-items">
+                <a class="flm-nav-link flm-nav-link--active" href="#">sec-filings</a>
+                <a class="flm-nav-link" href="#">legal-contracts</a>
+                <a class="flm-nav-link" href="#">research-papers</a>
+              </div>
+            </div>
+            <div class="flm-nav-group">
+              <div class="flm-nav-group-header"><span class="flm-nav-chevron">&#9656;</span> Workflows</div>
+              <div class="flm-nav-group-items flm-nav-group-items--collapsed">
+                <a class="flm-nav-link" href="#">financial-risk-report</a>
+              </div>
+            </div>
+            <a class="flm-nav-link" href="#">Settings</a>
+            <a class="flm-nav-link flm-nav-link--disabled">Disabled Link</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 15: MessageBars, Progress, Shimmer ──────── -->
+    <div class="slide" data-title="Status & Loading">
+      <h2>Status &amp; Loading</h2>
+      <p class="slide-desc">Message bars for status communication, progress indicators, spinners, and loading shimmers.</p>
+      <div class="cols-2">
+        <div>
+          <h3>Message Bars</h3>
+          <div class="status-bars">
+            <div class="flm-messagebar flm-messagebar--info">This is an informational message.</div>
+            <div class="flm-messagebar flm-messagebar--success">Operation completed successfully.</div>
+            <div class="flm-messagebar flm-messagebar--warning">Abstracts are missing for 847 documents.</div>
+            <div class="flm-messagebar flm-messagebar--severeWarning">Classification model is nearing token limits.</div>
+            <div class="flm-messagebar flm-messagebar--error">Failed to connect to catalog source.</div>
+            <div class="flm-messagebar flm-messagebar--blocked">Access denied to this resource.</div>
+          </div>
+          <h3>Status Tokens</h3>
+          <table class="token-table" style="font-size:11px;">
+            <tr><td><code>--infoBackground</code></td><td><span class="sample" style="background:var(--infoBackground);"></span></td><td><code>--infoIcon</code></td><td><span class="sample" style="background:var(--infoIcon);"></span></td></tr>
+            <tr><td><code>--successBackground</code></td><td><span class="sample" style="background:var(--successBackground);"></span></td><td><code>--successText</code></td><td><span class="sample" style="background:var(--successText);"></span></td></tr>
+            <tr><td><code>--warningBackground</code></td><td><span class="sample" style="background:var(--warningBackground);"></span></td><td><code>--errorText</code></td><td><span class="sample" style="background:var(--errorText);"></span></td></tr>
+            <tr><td><code>--errorBackground</code></td><td><span class="sample" style="background:var(--errorBackground);"></span></td><td><code>--errorIcon</code></td><td><span class="sample" style="background:var(--errorIcon);"></span></td></tr>
+          </table>
+        </div>
+        <div>
+          <h3>Progress</h3>
+          <div class="demo-stack" style="max-width:400px;">
+            <div class="flm-progress">
+              <div class="flm-progress-label">Determinate — 56%</div>
+              <div class="flm-progress-track"><div class="flm-progress-bar" style="width:56%;"></div></div>
+            </div>
+            <div class="flm-progress flm-progress--indeterminate">
+              <div class="flm-progress-label">Indeterminate</div>
+              <div class="flm-progress-track"><div class="flm-progress-bar"></div></div>
+            </div>
+          </div>
+          <h3>Spinner</h3>
+          <div class="demo-inline" style="gap:24px;">
+            <div style="text-align:center;"><div class="flm-spinner flm-spinner--xSmall"><div class="flm-spinner-circle"></div></div><div style="font-size:10px;color:var(--bodySubtext);margin-top:4px;">xSmall</div></div>
+            <div style="text-align:center;"><div class="flm-spinner flm-spinner--small"><div class="flm-spinner-circle"></div></div><div style="font-size:10px;color:var(--bodySubtext);margin-top:4px;">small</div></div>
+            <div style="text-align:center;"><div class="flm-spinner"><div class="flm-spinner-circle"></div></div><div style="font-size:10px;color:var(--bodySubtext);margin-top:4px;">default</div></div>
+            <div style="text-align:center;"><div class="flm-spinner flm-spinner--large"><div class="flm-spinner-circle"></div></div><div style="font-size:10px;color:var(--bodySubtext);margin-top:4px;">large</div></div>
+          </div>
+          <h3>Shimmer</h3>
+          <div class="demo-stack" style="max-width:400px;gap:10px;">
+            <div class="demo-inline">
+              <div class="flm-shimmer" style="width:40px;height:40px;"><div class="flm-shimmer-circle"></div></div>
+              <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+                <div class="flm-shimmer" style="width:60%;"><div class="flm-shimmer-line"></div></div>
+                <div class="flm-shimmer" style="width:40%;"><div class="flm-shimmer-line flm-shimmer-line--short"></div></div>
+              </div>
+            </div>
+            <div class="flm-shimmer"><div class="flm-shimmer-line"></div></div>
+            <div class="flm-shimmer" style="width:80%;"><div class="flm-shimmer-line flm-shimmer-line--medium"></div></div>
+            <div class="flm-shimmer" style="width:50%;"><div class="flm-shimmer-line flm-shimmer-line--short"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 16: Panels & Dialogs ──────── -->
+    <div class="slide" data-title="Panels & Dialogs">
+      <h2>Panels &amp; Dialogs</h2>
+      <p class="slide-desc">Overlay surfaces for detail editing, confirmation dialogs, and modal workflows. Click the buttons to preview.</p>
+      <div class="demo-row">
+        <div class="demo-card">
+          <h4>Panel Sizes</h4>
+          <div class="demo-inline">
+            <button class="flm-button" data-panel-open="demo-panel-sm">Small</button>
+            <button class="flm-button" data-panel-open="demo-panel-md">Medium</button>
+            <button class="flm-button" data-panel-open="demo-panel-lg">Large</button>
+          </div>
+          <h4 style="margin-top:16px;">Panel Tokens</h4>
+          <table class="token-table" style="font-size:11px;">
+            <tr><td><code>--overlayBackground</code></td><td><span class="sample" style="background:var(--overlayBackground);"></span></td></tr>
+            <tr><td><code>--cardStandoutBackground</code></td><td><span class="sample" style="background:var(--cardStandoutBackground);"></span></td></tr>
+            <tr><td><code>--bodyFrameDivider</code></td><td><span class="sample" style="background:var(--bodyFrameDivider);"></span></td></tr>
+          </table>
+        </div>
+        <div class="demo-card">
+          <h4>Dialogs</h4>
+          <div class="demo-inline">
+            <button class="flm-button" data-dialog-open="demo-dialog">Standard Dialog</button>
+            <button class="flm-button" data-dialog-open="demo-dialog-lg">Large Header</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live panels -->
+      <div class="flm-panel-overlay" id="demo-panel-sm-overlay"></div>
+      <div class="flm-panel flm-panel--small" id="demo-panel-sm">
+        <div class="flm-panel-header"><h2 class="flm-panel-title">Small Panel</h2><button class="flm-panel-close" data-icon="Cancel" aria-label="Close" data-panel-close></button></div>
+        <div class="flm-panel-body"><p>Panel body content. Width: small (340px).</p></div>
+        <div class="flm-panel-footer"><button class="flm-button flm-button--primary" data-panel-close>Save</button><button class="flm-button" data-panel-close>Cancel</button></div>
+      </div>
+      <div class="flm-panel-overlay" id="demo-panel-md-overlay"></div>
+      <div class="flm-panel flm-panel--medium" id="demo-panel-md">
+        <div class="flm-panel-header"><h2 class="flm-panel-title">Medium Panel</h2><button class="flm-panel-close" data-icon="Cancel" aria-label="Close" data-panel-close></button></div>
+        <div class="flm-panel-body"><p>Panel body content. Width: medium (592px).</p></div>
+        <div class="flm-panel-footer"><button class="flm-button flm-button--primary" data-panel-close>Save</button><button class="flm-button" data-panel-close>Cancel</button></div>
+      </div>
+      <div class="flm-panel-overlay" id="demo-panel-lg-overlay"></div>
+      <div class="flm-panel flm-panel--large" id="demo-panel-lg">
+        <div class="flm-panel-header"><h2 class="flm-panel-title">Large Panel</h2><button class="flm-panel-close" data-icon="Cancel" aria-label="Close" data-panel-close></button></div>
+        <div class="flm-panel-body"><p>Panel body content. Width: large (940px).</p></div>
+        <div class="flm-panel-footer"><button class="flm-button flm-button--primary" data-panel-close>Save</button><button class="flm-button" data-panel-close>Cancel</button></div>
+      </div>
+
+      <!-- Live dialogs -->
+      <div class="flm-dialog-overlay" id="demo-dialog" data-light-dismiss>
+        <div class="flm-dialog" style="max-width:480px;">
+          <div class="flm-dialog-header"><h2 class="flm-dialog-title">Confirm Action</h2><button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button></div>
+          <div class="flm-dialog-body"><p>Are you sure you want to delete this catalog? This action cannot be undone.</p></div>
+          <div class="flm-dialog-footer"><button class="flm-button flm-button--primary" data-dialog-close>Delete</button><button class="flm-button" data-dialog-close>Cancel</button></div>
+        </div>
+      </div>
+      <div class="flm-dialog-overlay" id="demo-dialog-lg" data-light-dismiss>
+        <div class="flm-dialog flm-dialog--large-header" style="max-width:520px;">
+          <div class="flm-dialog-header"><h2 class="flm-dialog-title">New Catalog Wizard</h2><button class="flm-dialog-close" data-icon="Cancel" aria-label="Close" data-dialog-close></button></div>
+          <div class="flm-dialog-body"><p>This dialog uses the <code>flm-dialog--large-header</code> variant for a taller title area. Ideal for multi-step wizards.</p></div>
+          <div class="flm-dialog-footer"><button class="flm-button flm-button--primary" data-dialog-close>Next</button><button class="flm-button" data-dialog-close>Cancel</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 17: Personas & Cards ──────── -->
+    <div class="slide" data-title="Personas & Cards">
+      <h2>Personas &amp; Cards</h2>
+      <p class="slide-desc">Identity components and content cards with preview areas and activity indicators.</p>
+      <div class="cols-2">
+        <div>
+          <h3>Persona Sizes</h3>
+          <div class="persona-row">
+            <div class="flm-persona flm-persona--size24"><div class="flm-persona-coin" style="background:var(--themePrimary);color:#fff;">A</div></div>
+            <div class="flm-persona flm-persona--size32"><div class="flm-persona-coin" style="background:var(--themePrimary);color:#fff;">AB</div><div class="flm-persona-details"><div class="flm-persona-name">Alice B.</div></div></div>
+            <div class="flm-persona flm-persona--size40"><div class="flm-persona-coin" style="background:var(--themePrimary);color:#fff;">JD</div><div class="flm-persona-details"><div class="flm-persona-name">Jane Doe</div><div class="flm-persona-secondary">Analyst</div></div></div>
+            <div class="flm-persona flm-persona--size48"><div class="flm-persona-coin" style="background:var(--themePrimary);color:#fff;">MS</div><div class="flm-persona-details"><div class="flm-persona-name">Max Smith</div><div class="flm-persona-secondary">Engineer</div><div class="flm-persona-tertiary">Online</div></div></div>
+          </div>
+          <h3>Presence</h3>
+          <div class="demo-inline" style="gap:20px;">
+            <div class="flm-persona flm-persona--size40"><div class="flm-persona-coin" style="position:relative;">A<span class="flm-persona-presence flm-persona-presence--available"></span></div><div class="flm-persona-details"><div class="flm-persona-secondary">Available</div></div></div>
+            <div class="flm-persona flm-persona--size40"><div class="flm-persona-coin" style="position:relative;">B<span class="flm-persona-presence flm-persona-presence--busy"></span></div><div class="flm-persona-details"><div class="flm-persona-secondary">Busy</div></div></div>
+            <div class="flm-persona flm-persona--size40"><div class="flm-persona-coin" style="position:relative;">C<span class="flm-persona-presence flm-persona-presence--away"></span></div><div class="flm-persona-details"><div class="flm-persona-secondary">Away</div></div></div>
+            <div class="flm-persona flm-persona--size40"><div class="flm-persona-coin" style="position:relative;">D<span class="flm-persona-presence flm-persona-presence--offline"></span></div><div class="flm-persona-details"><div class="flm-persona-secondary">Offline</div></div></div>
+            <div class="flm-persona flm-persona--size40"><div class="flm-persona-coin" style="position:relative;">E<span class="flm-persona-presence flm-persona-presence--dnd"></span></div><div class="flm-persona-details"><div class="flm-persona-secondary">DND</div></div></div>
+          </div>
+          <h3>Facepile</h3>
+          <div class="flm-facepile" data-max="4">
+            <div class="flm-facepile-member"><div class="flm-persona-coin" style="background:var(--themePrimary);color:#fff;">AB</div></div>
+            <div class="flm-facepile-member"><div class="flm-persona-coin" style="background:#7c3aed;color:#fff;">CD</div></div>
+            <div class="flm-facepile-member"><div class="flm-persona-coin" style="background:#059669;color:#fff;">EF</div></div>
+            <div class="flm-facepile-member"><div class="flm-persona-coin" style="background:#d97706;color:#fff;">GH</div></div>
+            <div class="flm-facepile-member"><div class="flm-persona-coin" style="background:#e81123;color:#fff;">IJ</div></div>
+            <div class="flm-facepile-member"><div class="flm-persona-coin" style="background:#0891b2;color:#fff;">KL</div></div>
+          </div>
+        </div>
+        <div>
+          <h3>DocumentCard</h3>
+          <div class="flm-documentcard" style="max-width:320px;">
+            <div class="flm-documentcard-preview" style="background:var(--bodyBackgroundHovered);height:120px;display:flex;align-items:center;justify-content:center;">
+              <i class="flm-icon flm-icon--large" data-icon="TextDocument" style="font-size:40px;color:var(--bodySubtext);"></i>
+            </div>
+            <div class="flm-documentcard-details">
+              <div class="flm-documentcard-title">10-K_ACME_2025.pdf</div>
+              <div class="flm-documentcard-activity">
+                <span class="flm-documentcard-activity-name">sec-filings</span>
+                <span class="flm-documentcard-activity-date">Feb 22, 2026</span>
+              </div>
+            </div>
+          </div>
+          <h3 style="margin-top:16px;">Card Tokens</h3>
+          <table class="token-table" style="font-size:11px;">
+            <tr><td><code>--cardStandoutBackground</code></td><td><span class="sample" style="background:var(--cardStandoutBackground);"></span></td></tr>
+            <tr><td><code>--cardShadow</code></td><td style="font-size:10px;color:var(--bodySubtext);">shadow value</td></tr>
+            <tr><td><code>--variantBorder</code></td><td><span class="sample" style="background:var(--variantBorder);"></span></td></tr>
+            <tr><td><code>--variantBorderHovered</code></td><td><span class="sample" style="background:var(--variantBorderHovered);"></span></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 18: Icons ──────── -->
+    <div class="slide" data-title="Icons">
+      <h2>Icons</h2>
+      <p class="slide-desc">All registered icons from the base library and Awarity extension. Use <code>&lt;i class="flm-icon" data-icon="Name"&gt;</code> or register custom SVG paths via <code>FluentIcons.register()</code>.</p>
+      <div class="icon-grid" id="iconGrid"></div>
+    </div>
+
+    <!-- ──────── SLIDE 19: Brand — Logo & Marks ──────── -->
+    <div class="slide" data-title="Brand: Logo & Marks">
+      <h2>Brand: Logo &amp; Marks</h2>
+      <p class="slide-desc">The Awarity identity centers on the "A" lettermark inside a rounded rectangle. Two variants exist: the <strong>Simple Mark</strong> for nav icons and inline use, and the <strong>Elastic Window Mark</strong> for hero and marketing contexts.</p>
+
+      <div class="cols-2">
+        <div>
+          <h3>Simple Mark</h3>
+          <p style="font-size:var(--fontSizeSmall);color:var(--bodySubtext);margin-bottom:16px;">Rounded rect stroke + "A" letterform. Uses <code>currentColor</code> for theme adaptation. ViewBox: 0 0 64 64.</p>
+          <div style="display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:24px;">
+            <div style="text-align:center;">
+              <div style="padding:20px;background:var(--cardStandoutBackground);border:1px solid var(--variantBorder);border-radius:var(--roundedCorner4);display:inline-block;">
+                <svg viewBox="0 0 64 64" width="64" height="64" style="color:var(--bodyText);"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyBackground)"/></svg>
+              </div>
+              <div style="font-size:10px;color:var(--bodySubtext);margin-top:6px;">64px &middot; On dark</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="padding:20px;background:#ffffff;border:1px solid var(--variantBorder);border-radius:var(--roundedCorner4);display:inline-block;">
+                <svg viewBox="0 0 64 64" width="64" height="64" style="color:#111827;"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="#ffffff"/></svg>
+              </div>
+              <div style="font-size:10px;color:var(--bodySubtext);margin-top:6px;">64px &middot; On light</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="padding:20px;background:var(--themePrimary);border-radius:var(--roundedCorner4);display:inline-block;">
+                <svg viewBox="0 0 64 64" width="64" height="64" style="color:#ffffff;"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--themePrimary)"/></svg>
+              </div>
+              <div style="font-size:10px;color:var(--bodySubtext);margin-top:6px;">64px &middot; On brand</div>
+            </div>
+          </div>
+
+          <h3>Size Scale</h3>
+          <div style="display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;">
+            <div style="text-align:center;"><svg viewBox="0 0 64 64" width="16" height="16" style="color:var(--bodyText);"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyBackground)"/></svg><div style="font-size:10px;color:var(--bodySubtext);margin-top:4px;">16</div></div>
+            <div style="text-align:center;"><svg viewBox="0 0 64 64" width="20" height="20" style="color:var(--bodyText);"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyBackground)"/></svg><div style="font-size:10px;color:var(--bodySubtext);margin-top:4px;">20</div></div>
+            <div style="text-align:center;"><svg viewBox="0 0 64 64" width="24" height="24" style="color:var(--bodyText);"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyBackground)"/></svg><div style="font-size:10px;color:var(--bodySubtext);margin-top:4px;">24</div></div>
+            <div style="text-align:center;"><svg viewBox="0 0 64 64" width="32" height="32" style="color:var(--bodyText);"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyBackground)"/></svg><div style="font-size:10px;color:var(--bodySubtext);margin-top:4px;">32</div></div>
+            <div style="text-align:center;"><svg viewBox="0 0 64 64" width="40" height="40" style="color:var(--bodyText);"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyBackground)"/></svg><div style="font-size:10px;color:var(--bodySubtext);margin-top:4px;">40</div></div>
+            <div style="text-align:center;"><svg viewBox="0 0 64 64" width="48" height="48" style="color:var(--bodyText);"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="var(--bodyBackground)"/></svg><div style="font-size:10px;color:var(--bodySubtext);margin-top:4px;">48</div></div>
+          </div>
+        </div>
+
+        <div>
+          <h3>Elastic Window Mark</h3>
+          <p style="font-size:var(--fontSizeSmall);color:var(--bodySubtext);margin-bottom:16px;">Gradient stroke (dark &rarr; brand), corner brackets suggesting expansion, drop shadow. ViewBox: 0 0 256 256.</p>
+          <div class="demo-label" style="margin-bottom:8px;">On Light</div>
+          <div style="display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:20px;">
+            <div style="text-align:center;">
+              <div style="padding:20px;background:#ffffff;border:1px solid var(--variantBorder);border-radius:var(--roundedCorner4);display:inline-block;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="96" height="96">
+                  <defs><linearGradient id="bgl1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#111827"/><stop offset="1" stop-color="#2563eb"/></linearGradient></defs>
+                  <rect x="44" y="52" width="152" height="152" rx="28" fill="#111827" opacity="0.12"/>
+                  <rect x="60" y="40" width="156" height="156" rx="32" fill="none" stroke="url(#bgl1)" stroke-width="16"/>
+                  <path d="M86 72c0-10 8-18 18-18" fill="none" stroke="#111827" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+                  <path d="M170 72c10 0 18 8 18 18" fill="none" stroke="#111827" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+                  <path d="M86 164c0 10 8 18 18 18" fill="none" stroke="#111827" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+                  <path d="M170 182c10 0 18-8 18-18" fill="none" stroke="#111827" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+                  <path d="M102 176 128 92l26 84h-16l-4-14h-12l-4 14Z" fill="#111827"/>
+                  <path d="M121 146h14l-7-24Z" fill="#ffffff" opacity="0.9"/>
+                </svg>
+              </div>
+              <div style="font-size:10px;color:var(--bodySubtext);margin-top:6px;">Blue</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="padding:20px;background:#ffffff;border:1px solid var(--variantBorder);border-radius:var(--roundedCorner4);display:inline-block;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="96" height="96">
+                  <defs><linearGradient id="bgl2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#111827"/><stop offset="1" stop-color="#f59e0b"/></linearGradient></defs>
+                  <rect x="44" y="52" width="152" height="152" rx="28" fill="#111827" opacity="0.10"/>
+                  <rect x="60" y="40" width="156" height="156" rx="32" fill="none" stroke="url(#bgl2)" stroke-width="16"/>
+                  <path d="M86 72c0-10 8-18 18-18" fill="none" stroke="#111827" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+                  <path d="M170 72c10 0 18 8 18 18" fill="none" stroke="#111827" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+                  <path d="M86 164c0 10 8 18 18 18" fill="none" stroke="#111827" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+                  <path d="M170 182c10 0 18-8 18-18" fill="none" stroke="#111827" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+                  <path d="M102 176 128 92l26 84h-16l-4-14h-12l-4 14Z" fill="#111827"/>
+                  <path d="M121 146h14l-7-24Z" fill="#ffffff" opacity="0.92"/>
+                </svg>
+              </div>
+              <div style="font-size:10px;color:var(--bodySubtext);margin-top:6px;">Amber</div>
+            </div>
+          </div>
+
+          <div class="demo-label" style="margin-bottom:8px;">On Dark</div>
+          <div style="display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:24px;">
+            <div style="text-align:center;">
+              <div style="padding:20px;background:#0a1416;border:1px solid #1d3236;border-radius:var(--roundedCorner4);display:inline-block;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="96" height="96">
+                  <defs><linearGradient id="bgl1d" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#2563eb"/></linearGradient></defs>
+                  <rect x="44" y="52" width="152" height="152" rx="28" fill="#d4e4e8" opacity="0.06"/>
+                  <rect x="60" y="40" width="156" height="156" rx="32" fill="none" stroke="url(#bgl1d)" stroke-width="16"/>
+                  <path d="M86 72c0-10 8-18 18-18" fill="none" stroke="#d4e4e8" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+                  <path d="M170 72c10 0 18 8 18 18" fill="none" stroke="#d4e4e8" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+                  <path d="M86 164c0 10 8 18 18 18" fill="none" stroke="#d4e4e8" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+                  <path d="M170 182c10 0 18-8 18-18" fill="none" stroke="#d4e4e8" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+                  <path d="M102 176 128 92l26 84h-16l-4-14h-12l-4 14Z" fill="#d4e4e8"/>
+                  <path d="M121 146h14l-7-24Z" fill="#0a1416" opacity="0.9"/>
+                </svg>
+              </div>
+              <div style="font-size:10px;color:var(--bodySubtext);margin-top:6px;">Blue Dark</div>
+            </div>
+            <div style="text-align:center;">
+              <div style="padding:20px;background:#0a1416;border:1px solid #1d3236;border-radius:var(--roundedCorner4);display:inline-block;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="96" height="96">
+                  <defs><linearGradient id="bgl2d" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fcd34d"/><stop offset="1" stop-color="#f59e0b"/></linearGradient></defs>
+                  <rect x="44" y="52" width="152" height="152" rx="28" fill="#d4e4e8" opacity="0.06"/>
+                  <rect x="60" y="40" width="156" height="156" rx="32" fill="none" stroke="url(#bgl2d)" stroke-width="16"/>
+                  <path d="M86 72c0-10 8-18 18-18" fill="none" stroke="#d4e4e8" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+                  <path d="M170 72c10 0 18 8 18 18" fill="none" stroke="#d4e4e8" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+                  <path d="M86 164c0 10 8 18 18 18" fill="none" stroke="#d4e4e8" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+                  <path d="M170 182c10 0 18-8 18-18" fill="none" stroke="#d4e4e8" stroke-width="10" stroke-linecap="round" opacity="0.5"/>
+                  <path d="M102 176 128 92l26 84h-16l-4-14h-12l-4 14Z" fill="#d4e4e8"/>
+                  <path d="M121 146h14l-7-24Z" fill="#0a1416" opacity="0.9"/>
+                </svg>
+              </div>
+              <div style="font-size:10px;color:var(--bodySubtext);margin-top:6px;">Amber Dark</div>
+            </div>
+          </div>
+
+          <h3>Construction</h3>
+          <table class="token-table" style="font-size:11px;">
+            <tr><th>Element</th><th>Details</th></tr>
+            <tr><td>Outer rect</td><td>156 &times; 156, rx 32, gradient stroke 16px</td></tr>
+            <tr><td>Corner brackets</td><td>18px radius arcs, stroke 10px, 75% opacity</td></tr>
+            <tr><td>Shadow rect</td><td>Offset +8 down, 10-12% opacity fill</td></tr>
+            <tr><td>"A" letterform</td><td>Solid fill, knockout counter triangle at 90% white</td></tr>
+            <tr><td>Blue gradient (light)</td><td><code>#111827</code> &rarr; <code>#2563eb</code></td></tr>
+            <tr><td>Blue gradient (dark)</td><td><code>#60a5fa</code> &rarr; <code>#2563eb</code></td></tr>
+            <tr><td>Amber gradient (light)</td><td><code>#111827</code> &rarr; <code>#f59e0b</code></td></tr>
+            <tr><td>Amber gradient (dark)</td><td><code>#fcd34d</code> &rarr; <code>#f59e0b</code></td></tr>
+            <tr><td>"A" fill (light)</td><td><code>#111827</code> charcoal, counter <code>#ffffff</code></td></tr>
+            <tr><td>"A" fill (dark)</td><td><code>#d4e4e8</code> light text, counter <code>#0a1416</code></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 20: Brand — Color Palette ──────── -->
+    <div class="slide" data-title="Brand: Color Palette">
+      <h2>Brand: Color Palette</h2>
+      <p class="slide-desc">Awarity's brand palette is organized into two families — Blue and Amber — each with dark and light application modes. The core dark surface teal and charcoal tones are shared across both families.</p>
+
+      <h3>Primary Brand Colors</h3>
+      <div class="swatch-grid" style="grid-template-columns:repeat(6, 1fr);">
+        <div class="swatch"><div class="swatch-color" style="background:#2563eb;"></div><div class="swatch-info"><div class="swatch-name">Awarity Blue</div><div class="swatch-val">#2563eb</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#3b82f6;"></div><div class="swatch-info"><div class="swatch-name">Blue Light</div><div class="swatch-val">#3b82f6</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#60a5fa;"></div><div class="swatch-info"><div class="swatch-name">Sky</div><div class="swatch-val">#60a5fa</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#f59e0b;"></div><div class="swatch-info"><div class="swatch-name">Awarity Amber</div><div class="swatch-val">#f59e0b</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#fbbf24;"></div><div class="swatch-info"><div class="swatch-name">Amber Light</div><div class="swatch-val">#fbbf24</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#d97706;"></div><div class="swatch-info"><div class="swatch-name">Amber Dark</div><div class="swatch-val">#d97706</div></div></div>
+      </div>
+
+      <h3>Dark Surface Palette</h3>
+      <div class="swatch-grid" style="grid-template-columns:repeat(6, 1fr);">
+        <div class="swatch"><div class="swatch-color" style="background:#0a1416;"></div><div class="swatch-info"><div class="swatch-name">Deepest</div><div class="swatch-val">#0a1416</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#0f1c1f;"></div><div class="swatch-info"><div class="swatch-name">Background</div><div class="swatch-val">#0f1c1f</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#162629;"></div><div class="swatch-info"><div class="swatch-name">Hover</div><div class="swatch-val">#162629</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#1d3236;"></div><div class="swatch-info"><div class="swatch-name">Border / Divider</div><div class="swatch-val">#1d3236</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#3e5a62;"></div><div class="swatch-info"><div class="swatch-name">Muted</div><div class="swatch-val">#3e5a62</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#8eaaB2;"></div><div class="swatch-info"><div class="swatch-name">Subtext</div><div class="swatch-val">#8eaaB2</div></div></div>
+      </div>
+
+      <h3>Text &amp; Content</h3>
+      <div class="swatch-grid" style="grid-template-columns:repeat(6, 1fr);">
+        <div class="swatch"><div class="swatch-color" style="background:#111827;"></div><div class="swatch-info"><div class="swatch-name">Charcoal</div><div class="swatch-val">#111827</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#1e293b;"></div><div class="swatch-info"><div class="swatch-name">Dark Text</div><div class="swatch-val">#1e293b</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#d4e4e8;"></div><div class="swatch-info"><div class="swatch-name">Light Text</div><div class="swatch-val">#d4e4e8</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#ffffff;"></div><div class="swatch-info"><div class="swatch-name">White</div><div class="swatch-val">#ffffff</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#8eb878;"></div><div class="swatch-info"><div class="swatch-name">Success</div><div class="swatch-val">#8eb878</div></div></div>
+        <div class="swatch"><div class="swatch-color" style="background:#F1707B;"></div><div class="swatch-info"><div class="swatch-name">Error</div><div class="swatch-val">#F1707B</div></div></div>
+      </div>
+
+      <h3>Usage Rules</h3>
+      <table class="token-table" style="font-size:12px;max-width:700px;">
+        <tr><td style="font-weight:var(--fontWeightSemibold);">Blue family</td><td>Default application theme. Use for UI chrome, interactive elements, and primary actions.</td></tr>
+        <tr><td style="font-weight:var(--fontWeightSemibold);">Amber family</td><td>Alternate warmth. Use for secondary branding contexts, alert-oriented dashboards, or user preference.</td></tr>
+        <tr><td style="font-weight:var(--fontWeightSemibold);">Dark teal surfaces</td><td>Shared across both families. The signature Awarity dark mode feel.</td></tr>
+        <tr><td style="font-weight:var(--fontWeightSemibold);">Charcoal #111827</td><td>Icon fills, logo marks, and dark-on-light text. The anchor of the brand identity.</td></tr>
+      </table>
+    </div>
+
+    <!-- ──────── SLIDE 21: Brand — Voice & Messaging ──────── -->
+    <div class="slide" data-title="Brand: Voice & Messaging">
+      <h2>Brand: Voice &amp; Messaging</h2>
+      <p class="slide-desc">Awarity's brand voice is confident, direct, and grounded in capability. We solve hard problems simply.</p>
+
+      <div class="cols-2">
+        <div>
+          <h3>Tagline</h3>
+          <div style="font-size:var(--fontSizeXXLarge);font-weight:var(--fontWeightBold);color:var(--bodyText);line-height:1.2;margin-bottom:24px;">We've cracked the code.</div>
+
+          <h3>Value Proposition</h3>
+          <div style="font-size:var(--fontSizeLarge);color:var(--bodySubtext);line-height:1.6;margin-bottom:24px;">Awarity provides unlimited memory, private data, and reduced error rates.</div>
+
+          <h3>Key Messages</h3>
+          <div class="demo-stack" style="gap:12px;">
+            <div style="padding:12px 16px;background:var(--cardStandoutBackground);border-left:3px solid var(--themePrimary);border-radius:0 var(--roundedCorner4) var(--roundedCorner4) 0;">
+              <div style="font-weight:var(--fontWeightSemibold);margin-bottom:4px;">Elastic Context Window</div>
+              <div style="font-size:var(--fontSizeSmall);color:var(--bodySubtext);">Scales to 400M tokens without memory constraints. No embeddings, no vector DB.</div>
+            </div>
+            <div style="padding:12px 16px;background:var(--cardStandoutBackground);border-left:3px solid var(--themePrimary);border-radius:0 var(--roundedCorner4) var(--roundedCorner4) 0;">
+              <div style="font-weight:var(--fontWeightSemibold);margin-bottom:4px;">Your Data Stays Private</div>
+              <div style="font-size:var(--fontSizeSmall);color:var(--bodySubtext);">Runs in your cloud or on-site. No data movement required.</div>
+            </div>
+            <div style="padding:12px 16px;background:var(--cardStandoutBackground);border-left:3px solid var(--themePrimary);border-radius:0 var(--roundedCorner4) var(--roundedCorner4) 0;">
+              <div style="font-weight:var(--fontWeightSemibold);margin-bottom:4px;">Guides</div>
+              <div style="font-size:var(--fontSizeSmall);color:var(--bodySubtext);">Builds long-lasting information layers on top of your data.</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3>Tone Attributes</h3>
+          <div class="demo-stack" style="gap:16px;margin-bottom:24px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--themePrimary),var(--themeSecondary));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;color:#fff;font-weight:bold;">1</div>
+              <div><div style="font-weight:var(--fontWeightSemibold);">Confident</div><div style="font-size:var(--fontSizeSmall);color:var(--bodySubtext);">"We've cracked the code" — not tentative, not hedging.</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--themePrimary),var(--themeSecondary));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;color:#fff;font-weight:bold;">2</div>
+              <div><div style="font-weight:var(--fontWeightSemibold);">Direct</div><div style="font-size:var(--fontSizeSmall);color:var(--bodySubtext);">Lead with the benefit. Short sentences. No filler words.</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--themePrimary),var(--themeSecondary));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;color:#fff;font-weight:bold;">3</div>
+              <div><div style="font-weight:var(--fontWeightSemibold);">Problem-Solution</div><div style="font-size:var(--fontSizeSmall);color:var(--bodySubtext);">Name the pain, then show the fix. Other AI forgets. We don't.</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--themePrimary),var(--themeSecondary));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;color:#fff;font-weight:bold;">4</div>
+              <div><div style="font-weight:var(--fontWeightSemibold);">Approachable</div><div style="font-size:var(--fontSizeSmall);color:var(--bodySubtext);">Professional but human. Avoid jargon unless talking to engineers.</div></div>
+            </div>
+          </div>
+
+          <h3>Do / Don't</h3>
+          <table class="token-table" style="font-size:12px;">
+            <tr><th style="color:var(--successText);">Do</th><th style="color:var(--errorText);">Don't</th></tr>
+            <tr><td>"Scales to 400M tokens"</td><td>"Leverages cutting-edge AI"</td></tr>
+            <tr><td>"Your data stays private"</td><td>"Industry-leading privacy framework"</td></tr>
+            <tr><td>"No embeddings needed"</td><td>"Paradigm-shifting approach"</td></tr>
+            <tr><td>"Runs in your cloud"</td><td>"Cloud-native synergy platform"</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ──────── SLIDE 22: Brand — Theme Modes ──────── -->
+    <div class="slide" data-title="Brand: Theme Modes">
+      <h2>Brand: Theme Modes</h2>
+      <p class="slide-desc">Four application themes combine two color families (Blue, Amber) with two surface modes (Dark, Light). All themes share the same component library and token architecture — only the values change.</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <!-- Blue Dark -->
+        <div style="border-radius:var(--roundedCorner6);overflow:hidden;border:1px solid var(--variantBorder);">
+          <div style="background:#0f1c1f;padding:24px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+              <svg viewBox="0 0 64 64" width="24" height="24" style="color:#d4e4e8;"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="#0f1c1f"/></svg>
+              <span style="color:#d4e4e8;font-weight:600;font-size:16px;">Blue Dark</span>
+            </div>
+            <div style="display:flex;gap:6px;margin-bottom:12px;">
+              <div style="width:32px;height:20px;border-radius:3px;background:#2563eb;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#3b82f6;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#60a5fa;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#1d3236;border:1px solid #3e5a62;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#0a1416;border:1px solid #3e5a62;"></div>
+            </div>
+            <div style="font-size:11px;color:#8eaaB2;">Default theme. Deep teal surfaces, blue accents.</div>
+            <button style="margin-top:10px;padding:5px 14px;background:#2563eb;color:#fff;border:none;border-radius:4px;font-size:12px;cursor:pointer;">Primary Button</button>
+          </div>
+        </div>
+        <!-- Blue Light -->
+        <div style="border-radius:var(--roundedCorner6);overflow:hidden;border:1px solid var(--variantBorder);">
+          <div style="background:#ffffff;padding:24px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+              <svg viewBox="0 0 64 64" width="24" height="24" style="color:#1e293b;"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="#ffffff"/></svg>
+              <span style="color:#1e293b;font-weight:600;font-size:16px;">Blue Light</span>
+            </div>
+            <div style="display:flex;gap:6px;margin-bottom:12px;">
+              <div style="width:32px;height:20px;border-radius:3px;background:#2563eb;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#1d4ed8;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#dbeafe;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#f5f7fb;border:1px solid #d4dce8;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#ffffff;border:1px solid #d4dce8;"></div>
+            </div>
+            <div style="font-size:11px;color:#64748b;">Clean white surfaces, blue accents for light environments.</div>
+            <button style="margin-top:10px;padding:5px 14px;background:#2563eb;color:#fff;border:none;border-radius:4px;font-size:12px;cursor:pointer;">Primary Button</button>
+          </div>
+        </div>
+        <!-- Amber Dark -->
+        <div style="border-radius:var(--roundedCorner6);overflow:hidden;border:1px solid var(--variantBorder);">
+          <div style="background:#0f1c1f;padding:24px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+              <svg viewBox="0 0 64 64" width="24" height="24" style="color:#d4e4e8;"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="#0f1c1f"/></svg>
+              <span style="color:#d4e4e8;font-weight:600;font-size:16px;">Amber Dark</span>
+            </div>
+            <div style="display:flex;gap:6px;margin-bottom:12px;">
+              <div style="width:32px;height:20px;border-radius:3px;background:#f59e0b;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#fbbf24;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#fcd34d;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#1d3236;border:1px solid #3e5a62;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#0a1416;border:1px solid #3e5a62;"></div>
+            </div>
+            <div style="font-size:11px;color:#8eaaB2;">Same deep surfaces with warm amber accents.</div>
+            <button style="margin-top:10px;padding:5px 14px;background:#f59e0b;color:#1c1917;border:none;border-radius:4px;font-size:12px;cursor:pointer;">Primary Button</button>
+          </div>
+        </div>
+        <!-- Amber Light -->
+        <div style="border-radius:var(--roundedCorner6);overflow:hidden;border:1px solid var(--variantBorder);">
+          <div style="background:#ffffff;padding:24px;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+              <svg viewBox="0 0 64 64" width="24" height="24" style="color:#292524;"><rect x="6" y="6" width="52" height="52" rx="14" fill="none" stroke="currentColor" stroke-width="6"/><path d="M22 46 32 18l10 28h-6l-2-6h-4l-2 6Z" fill="currentColor"/><path d="M29 34h6l-3-9Z" fill="#ffffff"/></svg>
+              <span style="color:#292524;font-weight:600;font-size:16px;">Amber Light</span>
+            </div>
+            <div style="display:flex;gap:6px;margin-bottom:12px;">
+              <div style="width:32px;height:20px;border-radius:3px;background:#d97706;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#f59e0b;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#fef3cd;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#fdfaf5;border:1px solid #e7ddd0;"></div>
+              <div style="width:32px;height:20px;border-radius:3px;background:#ffffff;border:1px solid #e7ddd0;"></div>
+            </div>
+            <div style="font-size:11px;color:#78716c;">Warm cream tones with amber accents for light environments.</div>
+            <button style="margin-top:10px;padding:5px 14px;background:#f59e0b;color:#1c1917;border:none;border-radius:4px;font-size:12px;cursor:pointer;">Primary Button</button>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-top:20px;">Theme Architecture</h3>
+      <table class="token-table" style="font-size:12px;max-width:700px;">
+        <tr><td style="font-weight:var(--fontWeightSemibold);">CSS class on &lt;html&gt;</td><td><code>.fluent-awarity-dark</code>, <code>.fluent-awarity-light</code>, <code>.fluent-awarity-amber-dark</code>, <code>.fluent-awarity-amber-light</code></td></tr>
+        <tr><td style="font-weight:var(--fontWeightSemibold);">Token layers</td><td>Base library (:root) &rarr; Generic dark/light &rarr; Awarity theme override</td></tr>
+        <tr><td style="font-weight:var(--fontWeightSemibold);">Persistence</td><td><code>localStorage</code> key <code>fluentlm-theme</code></td></tr>
+        <tr><td style="font-weight:var(--fontWeightSemibold);">Default</td><td><code>awarity-dark</code> (Blue Dark)</td></tr>
+      </table>
+    </div>
+
+  </div><!-- /deck -->
+
+  <!-- ════════ Scripts ════════ -->
+  <script src="scripts/fluentlm.min.js"></script>
+  <script src="scripts/awarity-v2.js"></script>
+
+  <script>
+  (function () {
+    // ── Slide navigation ──
+    var slides = document.querySelectorAll('.slide');
+    var total = slides.length;
+    var current = 0;
+
+    var counter  = document.getElementById('slideCounter');
+    var label    = document.getElementById('slideLabel');
+    var btnPrev  = document.getElementById('btnPrev');
+    var btnNext  = document.getElementById('btnNext');
+
+    function goTo(n) {
+      if (n < 0 || n >= total) return;
+      slides[current].classList.remove('slide--active');
+      current = n;
+      slides[current].classList.add('slide--active');
+      counter.textContent = (current + 1) + ' / ' + total;
+      label.textContent = slides[current].getAttribute('data-title') || '';
+      btnPrev.disabled = current === 0;
+      btnNext.disabled = current === total - 1;
+    }
+
+    btnPrev.addEventListener('click', function () { goTo(current - 1); });
+    btnNext.addEventListener('click', function () { goTo(current + 1); });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); goTo(current + 1); }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); goTo(current - 1); }
+    });
+
+    goTo(0);
+
+    // ── Theme switcher ──
+    var themeBtns = document.querySelectorAll('.theme-btn[data-theme]');
+    function setActiveThemeBtn() {
+      var cur = FluentLM.getTheme();
+      themeBtns.forEach(function (b) {
+        b.classList.toggle('theme-btn--active', b.getAttribute('data-theme') === cur);
+      });
+    }
+    themeBtns.forEach(function (b) {
+      b.addEventListener('click', function () {
+        FluentLM.setTheme(b.getAttribute('data-theme'));
+        setActiveThemeBtn();
+        buildAccentRamp();
+      });
+    });
+    setActiveThemeBtn();
+
+    // ── Build accent ramp swatches ──
+    function buildAccentRamp() {
+      var cs = getComputedStyle(document.documentElement);
+      var ramp = [
+        ['--themeDarker',    'themeDarker'],
+        ['--themeDark',      'themeDark'],
+        ['--themeDarkAlt',   'themeDarkAlt'],
+        ['--themePrimary',   'themePrimary'],
+        ['--themeSecondary', 'themeSecondary'],
+        ['--themeTertiary',  'themeTertiary'],
+        ['--themeLight',     'themeLight'],
+        ['--themeLighter',   'themeLighter'],
+        ['--themeLighterAlt','themeLighterAlt']
+      ];
+      var grid = document.getElementById('accentRamp');
+      grid.innerHTML = '';
+      ramp.forEach(function (r) {
+        var v = cs.getPropertyValue(r[0]).trim() || '#888';
+        grid.innerHTML += '<div class="swatch"><div class="swatch-color" style="background:' + v + ';"></div><div class="swatch-info"><div class="swatch-name">' + r[1] + '</div><div class="swatch-val">' + v + '</div></div></div>';
+      });
+    }
+    buildAccentRamp();
+
+    // ── Build neutral ramp ──
+    (function () {
+      var cs = getComputedStyle(document.documentElement);
+      var neutrals = [
+        '--black', '--neutralDark', '--neutralPrimary', '--neutralPrimaryAlt',
+        '--neutralSecondary', '--neutralSecondaryAlt', '--neutralTertiary',
+        '--neutralTertiaryAlt', '--neutralQuaternary', '--neutralQuaternaryAlt',
+        '--neutralLight', '--neutralLighter', '--neutralLighterAlt', '--white'
+      ];
+      var grid = document.getElementById('neutralRamp');
+      neutrals.forEach(function (n) {
+        var v = cs.getPropertyValue(n).trim() || '#888';
+        var name = n.replace('--', '');
+        grid.innerHTML += '<div class="swatch"><div class="swatch-color" style="background:' + v + ';"></div><div class="swatch-info"><div class="swatch-name">' + name + '</div><div class="swatch-val">' + v + '</div></div></div>';
+      });
+    })();
+
+    // ── Build accent colors ──
+    (function () {
+      var accents = [
+        ['--yellow','yellow'], ['--yellowDark','yellowDark'], ['--yellowLight','yellowLight'],
+        ['--orange','orange'], ['--orangeLight','orangeLight'], ['--orangeLighter','orangeLighter'],
+        ['--red','red'], ['--redDark','redDark'],
+        ['--magenta','magenta'], ['--magentaDark','magentaDark'], ['--magentaLight','magentaLight'],
+        ['--purple','purple'], ['--purpleDark','purpleDark'], ['--purpleLight','purpleLight'],
+        ['--blue','blue'], ['--blueDark','blueDark'], ['--blueMid','blueMid'], ['--blueLight','blueLight'],
+        ['--teal','teal'], ['--tealDark','tealDark'], ['--tealLight','tealLight'],
+        ['--green','green'], ['--greenDark','greenDark'], ['--greenLight','greenLight']
+      ];
+      var cs = getComputedStyle(document.documentElement);
+      var grid = document.getElementById('accentColors');
+      accents.forEach(function (a) {
+        var v = cs.getPropertyValue(a[0]).trim() || '#888';
+        grid.innerHTML += '<div class="swatch"><div class="swatch-color" style="background:' + v + ';"></div><div class="swatch-info"><div class="swatch-name">' + a[1] + '</div><div class="swatch-val">' + v + '</div></div></div>';
+      });
+    })();
+
+    // ── Build type scale ──
+    (function () {
+      var sizes = [
+        ['Mega (68px)',       'var(--fontSizeMega)',       'var(--lineHeightMega)'],
+        ['SuperLarge (42px)', 'var(--fontSizeSuperLarge)', 'var(--lineHeightSuperLarge)'],
+        ['XXLarge (28px)',    'var(--fontSizeXXLarge)',    'var(--lineHeightXXLarge)'],
+        ['XLarge (20px)',     'var(--fontSizeXLarge)',     'var(--lineHeightXLarge)'],
+        ['Large (18px)',      'var(--fontSizeLarge)',      'var(--lineHeightLarge)'],
+        ['MediumPlus (16px)', 'var(--fontSizeMediumPlus)','var(--lineHeightMediumPlus)'],
+        ['Medium (14px)',     'var(--fontSizeMedium)',     'var(--lineHeightMedium)'],
+        ['Small (12px)',      'var(--fontSizeSmall)',      'var(--lineHeightSmall)'],
+        ['Tiny (10px)',       'var(--fontSizeTiny)',       'var(--lineHeightTiny)']
+      ];
+      var cont = document.getElementById('typeScale');
+      sizes.forEach(function (s) {
+        cont.innerHTML += '<div style="font-size:' + s[1] + ';line-height:' + s[2] + ';color:var(--bodyText);">' + s[0] + '</div>';
+      });
+    })();
+
+    // ── Build spacing demo ──
+    (function () {
+      var spacings = [
+        ['spacingS2', 'var(--spacingS2)', '4px'],
+        ['spacingS1', 'var(--spacingS1)', '8px'],
+        ['spacingM',  'var(--spacingM)',  '16px'],
+        ['spacingL1', 'var(--spacingL1)', '20px'],
+        ['spacingL2', 'var(--spacingL2)', '32px']
+      ];
+      var cont = document.getElementById('spacingDemo');
+      spacings.forEach(function (s) {
+        cont.innerHTML += '<div style="display:flex;align-items:center;gap:12px;"><div style="width:' + s[1] + ';height:20px;background:var(--themePrimary);border-radius:2px;flex-shrink:0;"></div><span style="font-size:12px;color:var(--bodySubtext);">' + s[0] + ' (' + s[2] + ')</span></div>';
+      });
+    })();
+
+    // ── Build icon grid ──
+    (function () {
+      var icons = [
+        'Database','Org','Flow','Processing','TextDocument','Refresh','Tag','Download',
+        'FolderOpen','ViewList','Copy','Help','Beaker','Play','ChevronLeft','ChevronUp',
+        'ChevronDown','Edit','CheckMark','Cancel','Back','Clock',
+        'ChevronRight','More','Search','Filter','Add','Delete','Save',
+        'Undo','Redo','Share','Mail','Send','Info','Warning',
+        'ErrorBadge','Completed','Blocked','Checkmark','Settings','Home','Calendar','Person',
+        'Document','Attach'
+      ];
+      var grid = document.getElementById('iconGrid');
+      icons.forEach(function (name) {
+        grid.innerHTML += '<div class="icon-cell"><i class="flm-icon" data-icon="' + name + '"></i><span>' + name + '</span></div>';
+      });
+      // Re-init icons after dynamic insertion
+      if (FluentLM && FluentLM.refresh) FluentLM.refresh(grid);
+    })();
+
+  })();
+  </script>
+</body>
+</html>

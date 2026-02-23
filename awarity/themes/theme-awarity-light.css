@@ -6,6 +6,18 @@
 
 .fluent-awarity-light {
   /* -----------------------------------------------------------------------
+     THEME ACCENT RAMP
+     ----------------------------------------------------------------------- */
+  --themeDarker:    #1e3a8a;
+  --themeDark:      #1e40af;
+  --themeDarkAlt:   #1d4ed8;
+  --themePrimary:   #2563eb;
+  --themeSecondary: #3b82f6;
+  --themeTertiary:  #60a5fa;
+  --themeLight:     #bfdbfe;
+  --themeLighter:   #dbeafe;
+
+  /* -----------------------------------------------------------------------
      BODY / BACKGROUND
      ----------------------------------------------------------------------- */
   --bodyBackground:          #ffffff;
