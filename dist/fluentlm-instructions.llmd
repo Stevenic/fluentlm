@@ -16,6 +16,7 @@ flm-sr-only¦Visually hidden, screen-reader accessible
 Auto-wired JS handlers — Nav, Pivot, Dialog, Panel, Modal, Callout, Dropdown, ComboBox, SpinButton, SwatchColorPicker, GroupedList, MessageBar, Toggle, Rating, SearchBox, TagPicker, DatePicker, TimePicker, Coachmark, and TeachingBubble components implement own click/interaction handlers via fluentlm.js. Do not duplicate page scripts
 Theme switching — Use FluentLM.setTheme('dark') / FluentLM.setTheme('light'), or toggle fluent-dark class <html>. Do not use data-theme attributes
 CSS variables — Use only FluentLM semantic tokens documented CSS Custom Properties section below (e.g. --bodyText, --bodyBackground). Do not use Fluent UI v2 variable names (e.g. --colorNeutralForeground1). Important: custom styles (hover states, backgrounds, borders, text colors), always use Semantic Colors variables (e.g. --bodyBackground, --defaultStateBackground, --bodySubtext) instead Palette Colors variables (e.g. --neutralLighter, --neutralLight). Palette colors fixed values do not change light and dark themes, so using will produce incorrect colors one theme or
+CSS load order — base CSS file must always be included before any theme files
 Icons — element data-icon="Name" attribute gets inline SVG injected JS. Works .flm-icon elements, empty <i> / <span> tags, buttons, and links
 @button
 ::html

@@ -30,6 +30,8 @@ Apply to any element.
 
 **CSS variables** — Use only the FluentLM semantic tokens documented in the CSS Custom Properties section below (e.g. `--bodyText`, `--bodyBackground`). Do not use Fluent UI v2 variable names (e.g. `--colorNeutralForeground1`). **Important:** For any custom styles (hover states, backgrounds, borders, text colors), always use the **Semantic Colors** variables (e.g. `--bodyBackground`, `--defaultStateBackground`, `--bodySubtext`) instead of the **Palette Colors** variables (e.g. `--neutralLighter`, `--neutralLight`). Palette colors are fixed values that do not change between light and dark themes, so using them will produce incorrect colors in one theme or the other.
 
+**CSS load order** — The base CSS file must always be included before any theme files.
+
 **Icons** — Any element with a `data-icon="Name"` attribute gets an inline SVG injected by JS. Works on `.flm-icon` elements, empty `<i>` / `<span>` tags, buttons, and links.
 
 ---
