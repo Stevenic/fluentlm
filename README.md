@@ -2,7 +2,7 @@
 
 A pure HTML/CSS/JS component library based on [Fluent UI React](https://github.com/microsoft/fluentui/tree/master/packages/react) v8, designed to be used by LLMs when generating web pages. No React, no build tools, no framework — just static files that any model can reference to produce polished Fluent UI interfaces.
 
-The library implements ~98% of the Fluent UI v8 component set (46 components across buttons, inputs, navigation, data display, surfaces, feedback, layout, and pickers) with full light/dark theme support.
+The library implements ~98% of the Fluent UI v8 component set (46 components across buttons, inputs, navigation, data display, surfaces, feedback, layout, and pickers) with full light/dark theme support. View the [Component Explorer](https://stevenic.github.io/fluentlm/).
 
 ## Why?
 
